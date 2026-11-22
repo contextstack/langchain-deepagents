@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from langchain_core.callbacks import AsyncCallbackHandler
@@ -36,11 +36,12 @@ class UsageStats:
         )
 
 
-@dataclass
 class UsageTrackingCallback(AsyncCallbackHandler):
     """Captures exact model calls and token usage across both create_agent and create_deep_agent."""
 
-    stats: UsageStats = field(default_factory=UsageStats)
+    def __init__(self) -> None:
+        super().__init__()
+        self.stats = UsageStats()
 
     async def on_chat_model_start(
         self,

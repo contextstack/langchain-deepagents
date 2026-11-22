@@ -25,6 +25,7 @@ from langchain.agents.middleware import (
 )
 from langchain.tools import tool
 from langchain_core.messages import AIMessage
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import Runtime
 from langgraph.types import interrupt
@@ -305,7 +306,9 @@ def build_submission_triage_graph(
             tenant_id=ctx.tenant_id,
             settings=wf_deps.settings,
         )
-        invoke_cfg: dict[str, Any] = {"callbacks": wf_deps.callbacks} if wf_deps.callbacks else {}
+        invoke_cfg: RunnableConfig = (
+            {"callbacks": wf_deps.callbacks} if wf_deps.callbacks else {}
+        )
         user_prompt = (
             f"Triage commercial insurance submission '{sub_id}'. "
             "Inspect all attached documents, check for superseded versions, missing required "
@@ -314,6 +317,10 @@ def build_submission_triage_graph(
         )
 
         if variant == "deep_agents":
+            deep_guardrails: list[Any] = [
+                ModelCallLimitMiddleware(run_limit=wf_deps.settings.max_model_calls),
+                ToolCallLimitMiddleware(run_limit=wf_deps.settings.max_tool_calls),
+            ]
             evidence_subagent: dict[str, Any] = {
                 "name": "evidence_auditor",
                 "description": (
@@ -323,6 +330,7 @@ def build_submission_triage_graph(
                 "system_prompt": EVIDENCE_AUDITOR_PROMPT,
                 "tools": read_tools,
                 "model": chat_model,
+                "middleware": deep_guardrails,
             }
             deep_agent = create_deep_agent(
                 model=chat_model,
@@ -333,6 +341,7 @@ def build_submission_triage_graph(
                     "your 'evidence_auditor' specialist subagent, then synthesize the final "
                     "triage findings clearly."
                 ),
+                middleware=deep_guardrails,
                 subagents=[evidence_subagent],  # type: ignore[list-item]
                 context_schema=RunContext,
             )
@@ -478,7 +487,7 @@ def build_submission_triage_graph(
                     thread_id=ctx.thread_id,
                     run_id=ctx.run_id,
                     workflow_version="submission_triage+0.1.0",
-                    event_type="approval_decision",
+                    event_type="approval_refused",
                     decision="refused",
                     step_or_op_key=f"approval:{state['operation_id']}:refused",
                     operation_id=state["operation_id"],

@@ -1,4 +1,13 @@
-# ContextStack Enterprise LangChain Reference Stack
+# ContextStack Enterprise LangChain — Deep Agents Experiments Fork
+
+> **Fork Purpose:** Experimental fork of [`contextstack/langchain`](https://github.com/contextstack/langchain) testing two concrete questions on a **Commercial Insurance Submission Triage** workflow sharing the same governed LangGraph substrate:
+> 1. **Experiment 1 ([Results & 3-Trial Matrix](./docs/experiments/submission-triage-results.md)):** Does `deepagents` (`create_deep_agent` + `evidence_auditor` subagent) outperform the bounded LangChain v1 `create_agent` baseline on 12 synthetic submissions (4 clean, 8 messy × 3 trials) across both a frontier model (`anthropic/claude-sonnet-5-5`) and a local on-prem DGX Spark (`Qwen3-Coder-Next-FP8`)?
+> 2. **Experiment 2 ([Recovery Trace](./docs/experiments/carrier-recovery-trace.md)):** Can the workflow safely recover when a downstream mock HTTP carrier commits a quote request and withholds its response (both with status lookup available and with outcome unverifiable → human review, proving zero duplicate `POST`s)?
+> 3. **Engineering Decision Record ([ADR 0002](./docs/adr/0002-deep-agents-submission-triage-decision.md)):** Where Deep Agents helped, what it cost (2.80× cost / 3.68× tokens on frontier; 501-call runaway loop risk when unbounded on local open-weight models), and why we keep Deep Agents outside this bounded triage workflow.
+
+---
+
+## Base Reference Stack (`contextstack/langchain`)
 
 A 100% Python, 100% open-source reference monorepo demonstrating an **enterprise-grade agent platform** built the LangChain stack way - using **LangChain v1**, **LangGraph**, native **MCP (`langchain[mcp]` + FastMCP)**, **PostgreSQL (`pgvector` + checkpoints + store)**, **Redis**, **OpenTelemetry**, and self-hosted **Langfuse**.
 

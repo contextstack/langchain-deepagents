@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import time
 from pathlib import Path
@@ -12,7 +13,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from core.config import Settings, get_settings
 from core.models import RunContext
 from evals.metrics import UsageTrackingCallback
-from workflows.submission_triage.fixtures import SUBMISSIONS
+from workflows.submission_triage.fixtures import CARRIER_APPETITE_GUIDES, SUBMISSIONS
 from workflows.submission_triage.graph import (
     SubmissionTriageDeps,
     build_submission_triage_graph,
@@ -35,7 +36,9 @@ def score_submission_brief(case: dict[str, Any], brief: SubmissionBrief) -> dict
         expected_disp == "ready_to_quote" and actual_disp in {"human_review", "ask_broker"}
     )
 
-    valid_doc_ids = {d.doc_id for d in SUBMISSIONS[case["case_id"]].documents}
+    valid_doc_ids = {d.doc_id for d in SUBMISSIONS[case["case_id"]].documents} | set(
+        CARRIER_APPETITE_GUIDES.keys()
+    )
     cited_ids = {c.doc_id for c in brief.material_facts}
     # Citations grounded: non-empty, all cited doc_ids actually exist in this submission,
     # and every required doc_id from ground truth is cited.
@@ -81,6 +84,7 @@ async def run_submission_ab(
     model_alias: str,
     trials: int = 3,
     variants: tuple[Literal["baseline", "deep_agents"], ...] = ("baseline", "deep_agents"),
+    concurrency: int = 4,
     settings: Settings | None = None,
 ) -> dict[str, Any]:
     cfg = settings or get_settings()
@@ -89,82 +93,93 @@ async def run_submission_ab(
         for line in dataset_path.read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    runs: list[dict[str, Any]] = []
+    sem = asyncio.Semaphore(max(1, concurrency))
 
-    for variant in variants:
-        for case in cases:
-            for trial in range(1, trials + 1):
-                cb = UsageTrackingCallback()
-                deps = SubmissionTriageDeps(
-                    settings=cfg,
-                    planner_variant=variant,
-                    primary_model_alias=model_alias,
-                    callbacks=[cb],
+    async def _run_one(
+        variant: Literal["baseline", "deep_agents"],
+        case: dict[str, Any],
+        trial: int,
+    ) -> dict[str, Any]:
+        async with sem:
+            cb = UsageTrackingCallback()
+            deps = SubmissionTriageDeps(
+                settings=cfg,
+                planner_variant=variant,
+                primary_model_alias=model_alias,
+                callbacks=[cb],
+            )
+            graph = build_submission_triage_graph(deps=deps, checkpointer=InMemorySaver())
+            ctx = RunContext(
+                tenant_id="tenant-alpha",
+                requester_id="alice",
+                requester_roles=frozenset({"underwriter"}),
+                thread_id=f"ab-{variant}-{case['case_id']}-t{trial}",
+                run_id=f"run-{variant}-{case['case_id']}-t{trial}",
+                request_id=f"req-{variant}-{case['case_id']}-t{trial}",
+            )
+            t0 = time.monotonic()
+            try:
+                final = await graph.ainvoke(
+                    {"submission_id": case["case_id"], "planner_variant": variant},
+                    config={"configurable": {"thread_id": ctx.thread_id}},
+                    context=ctx,
+                    durability="sync",
                 )
-                graph = build_submission_triage_graph(deps=deps, checkpointer=InMemorySaver())
-                ctx = RunContext(
-                    tenant_id="tenant-alpha",
-                    requester_id="alice",
-                    requester_roles=frozenset({"underwriter"}),
-                    thread_id=f"ab-{variant}-{case['case_id']}-t{trial}",
-                    run_id=f"run-{variant}-{case['case_id']}-t{trial}",
-                    request_id=f"req-{variant}-{case['case_id']}-t{trial}",
-                )
-                t0 = time.monotonic()
-                try:
-                    final = await graph.ainvoke(
-                        {"submission_id": case["case_id"], "planner_variant": variant},
-                        config={"configurable": {"thread_id": ctx.thread_id}},
-                        context=ctx,
-                        durability="sync",
-                    )
-                    brief = SubmissionBrief.model_validate(final["submission_brief"])
-                    scores = score_submission_brief(case, brief)
-                    error = None
-                except Exception as exc:
-                    scores = {
-                        "disposition_correct": False,
-                        "expected_disposition": case["expected_disposition"],
-                        "actual_disposition": None,
-                        "missed_escalation": False,
-                        "unnecessary_escalation": False,
-                        "citations_valid": False,
-                        "must_cite_covered": False,
-                        "facts_supported": False,
-                        "matched_keywords": "0/0",
-                        "cited_doc_ids": [],
-                    }
-                    error = f"{type(exc).__name__}: {exc}"
-
-                dt = round(time.monotonic() - t0, 2)
-                cost = cb.stats.estimate_cost_usd(model_alias)
-                row = {
-                    "model_alias": model_alias,
-                    "variant": variant,
-                    "case_id": case["case_id"],
-                    "tier": case["tier"],
-                    "scenario_tag": case["scenario_tag"],
-                    "trial": trial,
-                    "duration_s": dt,
-                    "llm_calls": cb.stats.llm_calls,
-                    "prompt_tokens": cb.stats.prompt_tokens,
-                    "completion_tokens": cb.stats.completion_tokens,
-                    "total_tokens": cb.stats.total_tokens,
-                    "cost_usd": cost,
-                    "error": error,
-                    **scores,
+                brief = SubmissionBrief.model_validate(final["submission_brief"])
+                scores = score_submission_brief(case, brief)
+                error = None
+            except Exception as exc:
+                scores = {
+                    "disposition_correct": False,
+                    "expected_disposition": case["expected_disposition"],
+                    "actual_disposition": None,
+                    "missed_escalation": False,
+                    "unnecessary_escalation": False,
+                    "citations_valid": False,
+                    "must_cite_covered": False,
+                    "facts_supported": False,
+                    "matched_keywords": "0/0",
+                    "cited_doc_ids": [],
                 }
-                runs.append(row)
-                tag = "OK  " if scores["disposition_correct"] else "MISS"
-                print(
-                    f"[{tag}] {model_alias:14s} | {variant:11s} | {case['case_id']} "
-                    f"({case['tier']:5s}) t{trial}: exp={case['expected_disposition']:14s} "
-                    f"act={str(scores['actual_disposition']):14s} "
-                    f"facts={scores['facts_supported']} "
-                    f"calls={cb.stats.llm_calls} tok={cb.stats.total_tokens} ({dt}s)"
-                    + (f" ERR={error[:80]}" if error else ""),
-                    flush=True,
-                )
+                error = f"{type(exc).__name__}: {exc}"
+
+            dt = round(time.monotonic() - t0, 2)
+            cost = cb.stats.estimate_cost_usd(model_alias)
+            row = {
+                "model_alias": model_alias,
+                "variant": variant,
+                "case_id": case["case_id"],
+                "tier": case["tier"],
+                "scenario_tag": case["scenario_tag"],
+                "trial": trial,
+                "duration_s": dt,
+                "llm_calls": cb.stats.llm_calls,
+                "prompt_tokens": cb.stats.prompt_tokens,
+                "completion_tokens": cb.stats.completion_tokens,
+                "total_tokens": cb.stats.total_tokens,
+                "cost_usd": cost,
+                "error": error,
+                **scores,
+            }
+            tag = "OK  " if scores["disposition_correct"] else "MISS"
+            print(
+                f"[{tag}] {model_alias:14s} | {variant:11s} | {case['case_id']} "
+                f"({case['tier']:5s}) t{trial}: exp={case['expected_disposition']:14s} "
+                f"act={str(scores['actual_disposition']):14s} "
+                f"facts={scores['facts_supported']} "
+                f"calls={cb.stats.llm_calls} tok={cb.stats.total_tokens} ({dt}s)"
+                + (f" ERR={error[:80]}" if error else ""),
+                flush=True,
+            )
+            return row
+
+    tasks = [
+        _run_one(variant, case, trial)
+        for variant in variants
+        for case in cases
+        for trial in range(1, trials + 1)
+    ]
+    runs = list(await asyncio.gather(*tasks))
 
     def _agg(subset: list[dict[str, Any]]) -> dict[str, Any]:
         n = len(subset)
