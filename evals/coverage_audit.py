@@ -16,8 +16,8 @@ from workflows.coverage_audit.models import CoverageAuditBrief, CoverageCitation
 from workflows.coverage_audit.tools import ARCHIVE_ROOT, load_packet_documents
 
 _NEG_RE = re.compile(
-    r"\b(?:does\s+not|do\s+not|doesn't|not\s+apply|not\s+bound|not\s+executed|"
-    r"excluded|revokes|deletes|unsigned|no\s+coverage|unscheduled)\b",
+    r"\b(?:does\s+not|do\s+not|doesn't|not\s+apply|not\s+bound|not\s+executed|not\s+valid|"
+    r"excluded|revokes|deletes|unsigned|no\s+coverage|unscheduled|expired|pending|superseded)\b",
     re.I,
 )
 _NUM_RE = re.compile(r"\b\d{4,9}\b")

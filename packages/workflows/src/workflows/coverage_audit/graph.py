@@ -66,7 +66,10 @@ AUDIT_SYNTHESIS_PROMPT = (
     "- supersession_chain: ordered doc_id filenames from base declarations through executed "
     "endorsements (exclude unsigned drafts).\n"
     "- evidence_citations: include exact doc_id, 1-indexed line_start/line_end, verbatim_quote "
-    "copied verbatim from that document, atomic claim_supported, subject, value, and polarity.\n\n"
+    "copied EXACTLY verbatim from that document, atomic claim_supported, subject (the Named "
+    "Insured or entity name, e.g. 'Harborview Cold Storage LLC', NOT a topic label), value "
+    "(the dollar amount/date/status appearing in that quote, or null), and polarity ('affirmed' "
+    "or 'negated').\n\n"
     "Audit Question: {prompt}\n"
     "Investigation Findings:\n{investigation}"
 )
