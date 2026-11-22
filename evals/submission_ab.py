@@ -6,6 +6,7 @@ import asyncio
 import json
 import re
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
@@ -25,52 +26,46 @@ from workflows.submission_triage.graph import (
 )
 from workflows.submission_triage.models import EvidenceCitation, SubmissionBrief
 
-_STOPWORDS = frozenset(
-    {
-        "that",
-        "this",
-        "with",
-        "from",
-        "have",
-        "were",
-        "been",
-        "into",
-        "over",
-        "than",
-        "then",
-        "them",
-        "they",
-        "their",
-        "there",
-        "about",
-        "under",
-        "above",
-        "which",
-        "where",
-        "while",
-        "other",
-        "clean",
-        "field",
-        "fields",
-        "value",
-        "states",
-        "stated",
-        "shows",
-        "shown",
-        "lists",
-        "listed",
-        "confirms",
-        "confirmed",
-    }
+_NEGATION_RE = re.compile(
+    r"\b(?:does\s+not|do\s+not|doesn't|don't|did\s+not|didn't|"
+    r"is\s+not|isn't|are\s+not|aren't|was\s+not|wasn't|were\s+not|weren't|"
+    r"has\s+not|hasn't|have\s+not|haven't|cannot|can't|not\s+have|never|"
+    r"neither|nor|contrary\s+to|contradicts|false\s+that|no\s+longer)\b"
 )
 _NUM_OR_ID_RE = re.compile(r"\b(?:\d{4}-\d{2}-\d{2}|\d{2}-\d{7}|clm-\d{4}-\d+|\d{2,})\b")
 _WORD_RE = re.compile(r"[a-z0-9][a-z0-9\-]*")
+_MILLION_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s*m(?:illion)?\b")
+_THOUSAND_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s*k\b")
+
+_CLASS_CANONICAL: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("saas", ("saas", "b2b software", "cloud analytics")),
+    ("consulting", ("management consulting", "it & management consulting", "consulting")),
+    ("accounting", ("accounting", "legal professional")),
+    ("light_manufacturing", ("light manufacturing", "cnc metal")),
+    ("warehouse", ("warehouse", "distribution")),
+    ("wholesale", ("wholesale goods", "wholesale")),
+    ("hvac", ("hvac", "mechanical")),
+    ("roofing", ("roofing", "flat-roof", "torch-down")),
+    ("fireworks", ("fireworks", "explosives", "pyrotechnics")),
+    ("cannabis", ("cannabis",)),
+)
+
+
+@dataclass(frozen=True)
+class TypedFact:
+    """Deterministic typed fact extracted from a source span or claim."""
+
+    field: str
+    value: str
+    polarity: Literal["affirmed", "negated"] = "affirmed"
 
 
 def _normalize_text(text: str) -> str:
-    """Lowercase and strip `$` and numeric commas (`$4,200,000` -> `4200000`)."""
-    no_commas = re.sub(r"(?<=\d),(?=\d)", "", text)
-    return no_commas.replace("$", "").lower()
+    """Lowercase, collapse whitespace, strip `$` and numeric commas, expand `$4.2M` -> `4200000`."""
+    cleaned = re.sub(r"(?<=\d),(?=\d)", "", text).replace("$", "").lower()
+    cleaned = _MILLION_RE.sub(lambda m: str(int(round(float(m.group(1)) * 1_000_000))), cleaned)
+    cleaned = _THOUSAND_RE.sub(lambda m: str(int(round(float(m.group(1)) * 1_000))), cleaned)
+    return re.sub(r"\s+", " ", cleaned).strip()
 
 
 def _source_texts_for_case(case_id: str) -> dict[str, str]:
@@ -81,89 +76,159 @@ def _source_texts_for_case(case_id: str) -> dict[str, str]:
     return texts
 
 
-_POLARITY_PAIRS: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
-    (
-        ("0 claims", "zero claims", "loss-free", "no claims"),
-        ("open claim", "bodily injury", "incurred", "paid", "reserve", "prior claim"),
-    ),
-    (
-        ("missing", "blank", "not provided", "pending", "tbd", "omitted"),
-        ("complete", "provided", "present", "confirmed", "verified"),
-    ),
-    (
-        ("prohibited", "excluded", "outside appetite", "ineligible"),
-        ("eligible", "in-appetite", "in appetite", "approved class"),
-    ),
-)
+def _clause_polarity(clause: str) -> Literal["affirmed", "negated"]:
+    return "negated" if _NEGATION_RE.search(clause) else "affirmed"
 
 
-def _has_polarity_contradiction(quote: str, claim: str) -> bool:
-    for neg_terms, pos_terms in _POLARITY_PAIRS:
-        q_neg = any(t in quote for t in neg_terms)
-        q_pos = any(t in quote for t in pos_terms)
-        c_neg = any(t in claim for t in neg_terms)
-        c_pos = any(t in claim for t in pos_terms)
-        # If quote asserts one pole exclusively and claim asserts the opposite pole exclusively
-        if (q_neg and not q_pos and c_pos and not c_neg) or (
-            q_pos and not q_neg and c_neg and not c_pos
+def resolve_source_span(doc_text: str, section_or_quote: str) -> str | None:
+    """Resolve `section_or_quote` to an exact verifiable source span inside `doc_text`."""
+    norm_quote = _normalize_text(section_or_quote)
+    if not norm_quote:
+        return None
+    norm_doc = _normalize_text(doc_text)
+    if norm_quote in norm_doc:
+        return norm_quote
+
+    # Fall back to matching a contiguous 1-3 line/sentence span in doc_text where every
+    # concrete numeric/date/ID token in the quote exists and >=80% of content tokens match.
+    raw_units = [u.strip() for u in re.split(r"[\n]+|(?<=[.!?])\s+", doc_text) if u.strip()]
+    quote_nums = set(_NUM_OR_ID_RE.findall(norm_quote))
+    quote_words = [w for w in _WORD_RE.findall(norm_quote) if len(w) >= 4]
+    if not quote_words and not quote_nums:
+        return None
+
+    best_span: str | None = None
+    best_score = 0.0
+    for i in range(len(raw_units)):
+        for window in (1, 2, 3):
+            if i + window > len(raw_units):
+                continue
+            cand = _normalize_text(" ".join(raw_units[i : i + window]))
+            if quote_nums and not all(tok in cand for tok in quote_nums):
+                continue
+            cand_words = set(_WORD_RE.findall(cand))
+            if not quote_words:
+                return cand
+            overlap = sum(1 for w in quote_words if w in cand_words) / len(quote_words)
+            if overlap >= 0.8 and overlap > best_score:
+                best_score = overlap
+                best_span = cand
+    return best_span
+
+
+def extract_typed_facts(text: str) -> set[TypedFact]:
+    """Deterministically parse verifiable (field, value, polarity) facts from a span or claim."""
+    norm = _normalize_text(text)
+    facts: set[TypedFact] = set()
+    # Split into sentence/clause units so negation stays scoped to its clause
+    clauses = [c.strip() for c in re.split(r"[;\n]+|(?<=[.!?])\s+", norm) if c.strip()]
+    for clause in clauses:
+        pol = _clause_polarity(clause)
+
+        # 1. Annual revenue
+        for m in re.finditer(
+            r"(?:annual\s+)?revenue(?::|\s+(?:is|of|at))?\s*(\d{5,9})\b"
+            r"|\b(\d{5,9})\s+(?:annual\s+)?revenue\b",
+            clause,
         ):
-            return True
-    return False
+            val = m.group(1) or m.group(2)
+            facts.add(TypedFact("annual_revenue", val, pol))
+
+        # 2. Requested coverage / limit
+        for m in re.finditer(
+            r"(?:requested\s+)?(?:coverage|limit)(?::|\s+(?:is|of|at))?\s*(\d{5,9})\b"
+            r"|\b(\d{5,9})\s+(?:coverage\s+)?limit\b",
+            clause,
+        ):
+            val = m.group(1) or m.group(2)
+            facts.add(TypedFact("requested_coverage", val, pol))
+
+        # 3. Effective date (ISO YYYY-MM-DD)
+        for m in re.finditer(r"\b(\d{4}-\d{2}-\d{2})\b", clause):
+            if any(k in clause for k in ("effective", "date", "2026-", "2027-")):
+                facts.add(TypedFact("effective_date", m.group(1), pol))
+
+        # 4. FEIN
+        for m in re.finditer(r"\b(\d{2}-\d{7})\b", clause):
+            facts.add(TypedFact("fein", m.group(1), pol))
+
+        # 5. Loss history (loss-free vs open/incurred claims)
+        if re.search(r"\b(?:0\s+claims|zero\s+claims|loss-free|no\s+claims)\b", clause):
+            facts.add(TypedFact("loss_history", "loss_free", pol))
+        if re.search(
+            r"\b(?:open\s+bodily\s+injury|open\s+claim|clm-\d{4}-\d+|minor\s+property\s+claim)\b",
+            clause,
+        ):
+            amt_m = re.search(r"\b(\d{4,7})\b", clause)
+            val = amt_m.group(1) if amt_m else "has_claims"
+            facts.add(TypedFact("loss_history", val, pol))
+
+        # 6. Business classification
+        for canon_cls, aliases in _CLASS_CANONICAL:
+            if any(a in clause for a in aliases):
+                facts.add(TypedFact("business_classification", canon_cls, pol))
+
+        # 7. Missing / blank / pending required fields
+        if re.search(r"\b(?:missing|blank|not\s+provided|pending|tbd|omitted)\b", clause):
+            for field_tag, patterns in (
+                ("fein", ("fein",)),
+                ("effective_date", ("effective date",)),
+                ("loss_history", ("loss history", "loss run")),
+                ("location_schedule", ("location schedule", "warehouse addresses")),
+                ("payroll_breakdown", ("payroll",)),
+            ):
+                if any(p in clause for p in patterns):
+                    facts.add(TypedFact("missing_field", field_tag, pol))
+
+        # 8. Superseded attachment marker
+        sup_m = re.search(r"supersedes\s+(sub-\d+-[a-z0-9\-]+)", clause)
+        if sup_m:
+            facts.add(TypedFact("supersedes", sup_m.group(1), pol))
+
+        # 9. Carrier appetite caps / prohibited classes
+        if "prohibited_classes" in clause or "prohibited" in clause:
+            for canon_cls, aliases in _CLASS_CANONICAL:
+                if any(a in clause for a in aliases):
+                    facts.add(TypedFact("prohibited_class", canon_cls, pol))
+        if "max_coverage_usd" in clause or "max_single_loss_usd" in clause:
+            for m in re.finditer(r"\b(\d{5,8})\b", clause):
+                facts.add(TypedFact("carrier_cap", m.group(1), pol))
+
+    return facts
 
 
 def verify_citation_against_doc(
     citation: EvidenceCitation,
     doc_texts: dict[str, str],
 ) -> tuple[bool, str]:
-    """Verify that a cited passage exists in `doc_id` AND actually supports `fact_supported`."""
+    """Resolve `section_or_quote` to a source span and verify typed (field, value, polarity)."""
     raw_doc = doc_texts.get(citation.doc_id)
     if raw_doc is None:
         return False, f"Unknown doc_id '{citation.doc_id}'"
 
-    norm_doc = _normalize_text(raw_doc)
-    norm_quote = _normalize_text(citation.section_or_quote)
-    norm_fact = _normalize_text(citation.fact_supported)
-
-    if not norm_quote.strip():
-        return False, f"Empty section_or_quote on '{citation.doc_id}'"
-
-    # 1. Every concrete numeric/date/ID token in quote OR claim must exist in THAT doc
-    quote_nums = set(_NUM_OR_ID_RE.findall(norm_quote))
-    fact_nums = set(_NUM_OR_ID_RE.findall(norm_fact))
-    for tok in quote_nums | fact_nums:
-        if tok not in norm_doc:
-            return False, f"Token '{tok}' not present in cited doc '{citation.doc_id}'"
-    # If quote has concrete numbers/dates and claim introduces a DIFFERENT number/date not in quote
-    if quote_nums and fact_nums and not fact_nums.issubset(quote_nums):
-        extra = sorted(fact_nums - quote_nums)
+    resolved_span = resolve_source_span(raw_doc, citation.section_or_quote)
+    if resolved_span is None:
         return (
             False,
-            f"Claim numeric/date token(s) {extra} not supported by cited excerpt on "
-            f"'{citation.doc_id}'",
+            f"Cited excerpt '{citation.section_or_quote}' does not resolve to a source span "
+            f"in '{citation.doc_id}'",
         )
 
-    # 2. Polarity/contradiction check between cited excerpt and claimed fact
-    if _has_polarity_contradiction(norm_quote, norm_fact):
+    span_facts = extract_typed_facts(resolved_span)
+    claim_facts = extract_typed_facts(citation.fact_supported)
+    if not claim_facts:
         return (
             False,
-            f"Claim '{citation.fact_supported}' contradicts cited excerpt "
-            f"'{citation.section_or_quote}' on '{citation.doc_id}'",
+            f"Claim '{citation.fact_supported}' on '{citation.doc_id}' contains no verifiable "
+            "typed fact (ambiguous/unsupported free text)",
         )
 
-    # 3. Lexical overlap: cited passage words must actually come from THAT cited document
-    doc_words = set(_WORD_RE.findall(norm_doc))
-    quote_words = [
-        w for w in _WORD_RE.findall(norm_quote) if len(w) >= 4 and w not in _STOPWORDS
-    ]
-    if not quote_words:
-        return False, f"Cited passage '{citation.section_or_quote}' has no verifiable terms"
-    matched = sum(1 for w in quote_words if w in doc_words)
-    ratio = matched / len(quote_words)
-    if ratio < 0.65:
+    unsupported = [cf for cf in sorted(claim_facts, key=str) if cf not in span_facts]
+    if unsupported:
         return (
             False,
-            f"Cited passage not grounded in '{citation.doc_id}' "
-            f"(overlap {matched}/{len(quote_words)} = {ratio:.0%})",
+            f"Claimed fact(s) {unsupported} not supported by resolved span on "
+            f"'{citation.doc_id}' (span facts: {sorted(span_facts, key=str)})",
         )
     return True, "ok"
 

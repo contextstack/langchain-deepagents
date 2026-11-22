@@ -12,6 +12,7 @@ reconciliation, and audit trail across both planners:
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import os
 import uuid
@@ -39,7 +40,7 @@ from langchain_core.messages import AIMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import Runtime
-from langgraph.types import interrupt
+from langgraph.types import Command, interrupt
 
 from core.audit import AuditEvent
 from core.auth import AuthError, verify_user_jwt
@@ -47,7 +48,7 @@ from core.config import Settings, get_settings
 from core.db import set_tenant_context
 from core.models import RunContext
 from core.pii import PII_RULES, redact_text
-from core.policy import APPROVER_ROLES
+from core.policy import PolicyDecision, PolicyEngine
 from gateway.factory import get_chat_model
 from workflows.submission_triage.fixtures import (
     CARRIER_APPETITE_GUIDES,
@@ -163,6 +164,78 @@ class SharedBudgetMiddleware(AgentMiddleware[Any, Any]):
 def _canonical_payload_hash(payload: dict[str, Any]) -> str:
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+class ApprovalAuthorizationError(PermissionError):
+    """Raised at the trusted resume boundary when caller authentication or policy fails."""
+
+
+def _compute_approval_binding_mac(
+    *,
+    tenant_id: str,
+    approver_id: str,
+    decision: str,
+    operation_id: str,
+    approved_payload_hash: str,
+    secret: str,
+) -> str:
+    msg = (
+        f"{tenant_id}|{approver_id}|{decision}|{operation_id}|{approved_payload_hash}"
+    ).encode()
+    return hmac.new(secret.encode("utf-8"), msg, hashlib.sha256).hexdigest()
+
+
+def build_verified_approval_command(
+    *,
+    bearer_token: str | None,
+    decision: Literal["approve", "reject"],
+    approval_tenant_id: str,
+    requested_by: str,
+    operation_id: str,
+    approved_payload_hash: str,
+    settings: Settings,
+    policy: PolicyEngine | None = None,
+) -> Command[Any]:
+    """Authenticate caller & enforce PolicyEngine BEFORE constructing LangGraph Command(resume).
+
+    Strips bearer credentials completely so raw JWTs never enter checkpoints, traces, or audits.
+    """
+    if not bearer_token or not bearer_token.strip():
+        raise ApprovalAuthorizationError("Missing bearer token for approval decision")
+    raw_tok = bearer_token.strip()
+    if raw_tok.lower().startswith("bearer "):
+        raw_tok = raw_tok[7:].strip()
+    try:
+        caller = verify_user_jwt(raw_tok, secret=settings.jwt_signing_secret)
+    except AuthError as exc:
+        raise ApprovalAuthorizationError(f"Invalid bearer token: {exc}") from exc
+
+    engine = policy or PolicyEngine()
+    authz = engine.check_approval_authority(
+        caller=caller,
+        approval_tenant_id=approval_tenant_id,
+        requested_by=requested_by,
+    )
+    if authz.decision != PolicyDecision.ALLOW:
+        raise ApprovalAuthorizationError(authz.reason)
+
+    binding_mac = _compute_approval_binding_mac(
+        tenant_id=approval_tenant_id,
+        approver_id=caller.actor_id,
+        decision=decision,
+        operation_id=operation_id,
+        approved_payload_hash=approved_payload_hash,
+        secret=settings.mcp_token_secret,
+    )
+    # Credential-free server-derived record bound to (actor, decision, op_id, payload_hash)
+    server_record = {
+        "decision": decision,
+        "approver_id": caller.actor_id,
+        "operation_id": operation_id,
+        "approved_payload_hash": approved_payload_hash,
+        "binding_mac": binding_mac,
+    }
+    return Command(resume=server_record)
 
 
 def build_deep_agents_planner(
@@ -635,12 +708,12 @@ def build_submission_triage_graph(
             return "await_approval"
         return END
 
-    # Node 3: await_approval (HITL interrupt reusing repo's APPROVER_ROLES + separation of duties)
+    # Node 3: await_approval (HITL interrupt accepting ONLY server-derived, credential-free record)
     async def await_approval(
         state: SubmissionTriageState, runtime: Runtime[RunContext]
     ) -> dict[str, Any]:
         ctx = _ctx(runtime)
-        decision = interrupt(
+        raw_resume = interrupt(
             {
                 "type": "quote_approval",
                 "operation_id": state["operation_id"],
@@ -650,54 +723,57 @@ def build_submission_triage_graph(
                 "submission_brief": state["submission_brief"],
             }
         )
-        action = str(decision.get("decision", "reject"))
+        resume_dict = raw_resume if isinstance(raw_resume, dict) else {}
+        action = str(resume_dict.get("decision", ""))
+        approver_id = str(resume_dict.get("approver_id", ""))
+        resumed_op_id = str(resume_dict.get("operation_id", ""))
+        resumed_hash = str(resume_dict.get("approved_payload_hash", ""))
+        binding_mac = str(resume_dict.get("binding_mac", ""))
+
         refusal_reason: str | None = None
-        approver_id = ""
-        approver_roles: frozenset[str] = frozenset()
-
-        approver_token = decision.get("approver_token")
-        if approver_token:
-            try:
-                caller = verify_user_jwt(
-                    str(approver_token), secret=wf_deps.settings.jwt_signing_secret
-                )
-                if caller.tenant_id != ctx.tenant_id:
-                    refusal_reason = (
-                        f"Cross-tenant approver token ({caller.tenant_id} != {ctx.tenant_id})"
-                    )
-                else:
-                    approver_id = caller.actor_id
-                    approver_roles = caller.roles
-            except AuthError as exc:
-                refusal_reason = f"Invalid approver token: {exc}"
-        else:
-            approver_id = str(decision.get("approver_id", ""))
-            raw_roles = decision.get("approver_roles")
-            # Fail-closed: missing/omitted approver_roles NEVER defaults to ops-approver!
-            approver_roles = (
-                frozenset(str(r) for r in raw_roles) if isinstance(raw_roles, list) else frozenset()
+        if any(k in resume_dict for k in ("approver_token", "bearer_token", "token")):
+            refusal_reason = (
+                "Raw bearer credentials must be validated at the resume boundary, not passed "
+                "inside graph resume payloads"
             )
-
-        if refusal_reason is None and action == "approve":
-            if not approver_id or approver_id == ctx.requester_id:
-                refusal_reason = "Separation of duties: requester cannot approve own quote"
-            elif not (approver_roles & APPROVER_ROLES):
+        elif action not in {"approve", "reject"}:
+            refusal_reason = f"Invalid approval decision '{action}'"
+        elif not approver_id or approver_id == ctx.requester_id:
+            refusal_reason = "Separation of duties: requester cannot approve own quote"
+        elif resumed_op_id != str(state["operation_id"]):
+            refusal_reason = "Approval record operation_id mismatch"
+        elif resumed_hash != str(state["approved_payload_hash"]):
+            refusal_reason = "Approved payload hash mismatch"
+        else:
+            expected_mac = _compute_approval_binding_mac(
+                tenant_id=ctx.tenant_id,
+                approver_id=approver_id,
+                decision=action,
+                operation_id=str(state["operation_id"]),
+                approved_payload_hash=str(state["approved_payload_hash"]),
+                secret=wf_deps.settings.mcp_token_secret,
+            )
+            if not binding_mac or not hmac.compare_digest(binding_mac, expected_mac):
                 refusal_reason = (
-                    f"Approver '{approver_id}' lacks required role ({sorted(APPROVER_ROLES)})"
+                    "Unauthenticated or forged approval record: caller must be verified at the "
+                    "trusted resume boundary"
                 )
-            elif (
-                decision.get("approved_payload_hash") is not None
-                and decision.get("approved_payload_hash") != state["approved_payload_hash"]
-            ):
-                refusal_reason = "Approved payload hash mismatch"
+
+        # Sanitized, credential-free approval record persisted in checkpoint state
+        sanitized_record = {
+            "decision": action if refusal_reason is None else "refused",
+            "approver_id": approver_id if refusal_reason is None else "",
+            "operation_id": str(state["operation_id"]),
+            "approved_payload_hash": str(state["approved_payload_hash"]),
+        }
 
         if refusal_reason is not None:
             _record_audit(
                 AuditEvent(
                     tenant_id=ctx.tenant_id,
-                    actor_id=approver_id or ctx.requester_id,
+                    actor_id=ctx.requester_id,
                     requested_by=ctx.requester_id,
-                    approved_by=approver_id or None,
+                    approved_by=None,
                     thread_id=ctx.thread_id,
                     run_id=ctx.run_id,
                     workflow_version="submission_triage+0.1.0",
@@ -709,7 +785,7 @@ def build_submission_triage_graph(
                 )
             )
             return {
-                "approval_decision": decision,
+                "approval_decision": sanitized_record,
                 "final_status": "denied",
                 "trace_events": _append_trace(
                     state,
@@ -717,15 +793,52 @@ def build_submission_triage_graph(
                 ),
             }
         if action != "approve":
+            _record_audit(
+                AuditEvent(
+                    tenant_id=ctx.tenant_id,
+                    actor_id=approver_id,
+                    requested_by=ctx.requester_id,
+                    approved_by=approver_id,
+                    thread_id=ctx.thread_id,
+                    run_id=ctx.run_id,
+                    workflow_version="submission_triage+0.1.0",
+                    event_type="approval_decided",
+                    decision="rejected",
+                    step_or_op_key=f"approval:{state['operation_id']}:rejected",
+                    operation_id=state["operation_id"],
+                    details={"decision": "rejected"},
+                )
+            )
             return {
-                "approval_decision": decision,
+                "approval_decision": sanitized_record,
                 "final_status": "rejected",
                 "trace_events": _append_trace(
-                    state, {"node": "await_approval", "decision": "rejected"}
+                    state,
+                    {
+                        "node": "await_approval",
+                        "decision": "rejected",
+                        "approver_id": approver_id,
+                    },
                 ),
             }
+        _record_audit(
+            AuditEvent(
+                tenant_id=ctx.tenant_id,
+                actor_id=approver_id,
+                requested_by=ctx.requester_id,
+                approved_by=approver_id,
+                thread_id=ctx.thread_id,
+                run_id=ctx.run_id,
+                workflow_version="submission_triage+0.1.0",
+                event_type="approval_decided",
+                decision="approved",
+                step_or_op_key=f"approval:{state['operation_id']}:approved",
+                operation_id=state["operation_id"],
+                details={"approved_payload_hash": str(state["approved_payload_hash"])},
+            )
+        )
         return {
-            "approval_decision": decision,
+            "approval_decision": sanitized_record,
             "trace_events": _append_trace(
                 state,
                 {
@@ -1079,6 +1192,7 @@ def build_submission_triage_graph(
 
 __all__ = [
     "AIMessage",
+    "ApprovalAuthorizationError",
     "SharedBudgetExceededError",
     "SharedBudgetMiddleware",
     "SharedCallBudget",
@@ -1087,4 +1201,5 @@ __all__ = [
     "build_deep_agents_planner",
     "build_submission_read_tools",
     "build_submission_triage_graph",
+    "build_verified_approval_command",
 ]

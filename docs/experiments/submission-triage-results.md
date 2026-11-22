@@ -3,11 +3,12 @@
 - **Repository:** `contextstack-langchain-deepagents`
 - **Pre-Registered Ground Truth Commit:** `45a5f9a` ([`evals/datasets/submissions.jsonl`](../../evals/datasets/submissions.jsonl), locked in git history *before* running either planner)
 - **Fixture Set:** 12 synthetic commercial insurance submissions ([`packages/workflows/src/workflows/submission_triage/fixtures.py`](../../packages/workflows/src/workflows/submission_triage/fixtures.py)) — **4 clean** (`sub-01`..`sub-04`) and **8 messy** (`sub-05`..`sub-12`: superseded v1/v2 attachments, conflicting business classifications, missing required fields, conflicting revenue/limits, undisclosed prior claim, and out-of-appetite prohibited class)
-- **Protocol (Hardened Interleaved Pass, 144 Live Runs):**
+- **Protocol & Provenance (Hardened Interleaved Pass, 144 Live Runs):**
   - 3 trials per case per planner (72 runs per model) with arms **alternated within each `(case, trial)`** (`build_trial_schedule`) to control for provider load drift.
   - Implicit `general-purpose` subagent **disabled** on Deep Agents (`evidence_auditor` only).
   - **One shared call budget** (`max_model_calls=12`, `max_tool_calls=15`) enforced across Deep Agents' coordinator + specialist (matching Baseline's single budget).
-  - **Deterministic passage-level & exact typed-value code grading** ([`evals/submission_ab.py`](../../evals/submission_ab.py)): verifies verbatim passage grounding against each cited `doc_id`, numeric/polarity consistency between excerpt and claim, and exact typed field equality (`carrier_match`, `annual_revenue_usd`, `requested_coverage_usd`, `effective_date`), preserving the full `SubmissionBrief` for every trial.
+  - **Model-parity provenance note:** The 144 live trials below started *before* Baseline's `SummarizationMiddleware` was switched from `ops-fast` to the primary `chat_model` (fixed in `1ae0749`). A live model-parity confirmation sweep is left pending as a separate run unless requested.
+  - **Grader provenance:** Headline `Facts Supported (1ae0749 grader)` columns below reflect the lexical-overlap + polarity + exact typed-field grader at `1ae0749`. See **§1C** below for the offline re-score of all 144 saved briefs under the fixed **deterministic source-span + typed-fact `(field, value, polarity)` verifier**.
 
 ---
 
@@ -45,7 +46,20 @@
 | **Deep Agents** (`create_deep_agent` + `evidence_auditor`) | Clean (4×3) | 12 | 6/12 (50.0%) | 0/12 (0.0%) | 0/12 | 0 | 1 | 5 | 16.83 | 72,600 | \$0.00 |
 | **Deep Agents** (`create_deep_agent` + `evidence_auditor`) | Messy (8×3) | 24 | 10/24 (41.7%) | 1/24 (4.2%) | 13/24 | 0 | 0 | 11 | 19.50 | 82,742 | \$0.00 |
 
-\* Strict passage grounding requires ≥65% verbatim lexical overlap against the cited `doc_id` plus exact typed-field match (`annual_revenue_usd`, `requested_coverage_usd`, `effective_date`). In an earlier **unbounded** run without `SharedCallBudget`, `eval-dgx-coder` on `deep_agents` entered a **501-call, 31.69M-token, 54.5-minute runaway loop** on `sub-05` t1 — proving that hard shared budgets are mandatory for Deep Agents on open-weight models, while also showing that duplicating tool reads across coordinator + specialist exhausts a 15-tool budget on 15/36 runs.
+\* Strict passage grounding in the tables above uses the `1ae0749` lexical-overlap + polarity + exact typed-field grader. In an earlier **unbounded** run without `SharedCallBudget`, `eval-dgx-coder` on `deep_agents` entered a **501-call, 31.69M-token, 54.5-minute runaway loop** on `sub-05` t1 — proving that hard shared budgets are mandatory for Deep Agents on open-weight models, while also showing that duplicating tool reads across coordinator + specialist exhausts a 15-tool budget on 15/36 runs.
+
+### 1C. Offline Re-Score of Saved Briefs with Fixed Deterministic Span + Typed-Fact Grader
+
+Re-scoring all 144 saved briefs from the live run offline with the fixed deterministic source-span + typed-fact `(field, value, polarity)` verifier (`evals/submission_ab.py`) — which rejects negated claims on genuine excerpts and treats ambiguous/untyped free-text claims as unverified:
+
+| Model | Planner | Saved Trials | Disposition Accuracy (unchanged) | `1ae0749` Grader Facts Supported | Fixed Span+Typed-Fact Grader | Typed Fields OK |
+|---|---|---:|---:|---:|---:|---:|
+| `claude-sonnet-5-5` | Baseline | 36 | 35/36 (97.2%) | 15/36 (41.7%) | **0/36 (0.0%)** | 33/36 |
+| `claude-sonnet-5-5` | Deep Agents | 36 | 33/36 (91.7%) | 23/36 (63.9%) | **0/36 (0.0%)** | 34/36 |
+| DGX `Qwen3-Coder-Next-FP8` | Baseline | 36 | 35/36 (97.2%) | 7/36 (19.4%) | **0/36 (0.0%)** | 21/36 |
+| DGX `Qwen3-Coder-Next-FP8` | Deep Agents | 36 | 16/36 (44.4%) | 1/36 (2.8%) | **0/36 (0.0%)** | 13/36 |
+
+**Why all 144 saved briefs scored `0/36` under the fixed span+typed-fact grader:** Every saved brief was generated against the free-text `fact_supported: str` schema and included at least one meta/comparative prose citation (e.g., `"Broker email revenue matches the application"`, `"FEIN is provided, satisfying Apex's required field"`) that does not express a single verifiable `(field, value, polarity)` fact from the cited span alone. Treating such free-text claims as unverified eliminates false positives like negated revenue claims (`test_negated_revenue_claim_with_correct_typed_fields_fails_citation_grounding`) and shows that deterministic claim verification requires either typed-claim schema fields or structured claim formatting in future live runs.
 
 ---
 

@@ -1,4 +1,4 @@
-"""Experiment 2 boundary tests: real process-kill PostgreSQL recovery & unverifiable review."""
+"""Experiment 2 boundary tests: authenticated approval binding, process-kill recovery, & review."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 import httpx
+import psycopg
 import pytest
 import uvicorn
 from langgraph.checkpoint.memory import InMemorySaver
@@ -25,8 +26,10 @@ from core.db import apply_app_migrations
 from core.models import CallerIdentity, RunContext
 from mcp_servers.mock_carrier import MockCarrierState, create_mock_carrier_app
 from workflows.submission_triage.graph import (
+    ApprovalAuthorizationError,
     SubmissionTriageDeps,
     build_submission_triage_graph,
+    build_verified_approval_command,
 )
 from workflows.submission_triage.models import SubmissionBrief
 
@@ -97,17 +100,25 @@ async def test_exp2_behavior1_timeout_reconciles_via_status_lookup_exactly_once(
         )
         snap = await graph.aget_state(cfg)
         assert snap.interrupts and snap.interrupts[0].value["type"] == "quote_approval"
-        op_id = snap.interrupts[0].value["operation_id"]
+        intr = snap.interrupts[0].value
+        op_id = intr["operation_id"]
 
-        final = await graph.ainvoke(
-            Command(resume={"decision": "approve", "approver_token": _bob_jwt(settings)}),
-            config=cfg,
-            context=ctx,
-            durability="sync",
+        cmd = build_verified_approval_command(
+            bearer_token=f"Bearer {_bob_jwt(settings)}",
+            decision="approve",
+            approval_tenant_id="tenant-alpha",
+            requested_by="alice",
+            operation_id=op_id,
+            approved_payload_hash=intr["approved_payload_hash"],
+            settings=settings,
         )
+        final = await graph.ainvoke(cmd, config=cfg, context=ctx, durability="sync")
         assert final["final_status"] == "completed"
         assert final["carrier_ref"] and str(final["carrier_ref"]).startswith("CAR-")
         assert final["timeout_error"] is not None
+        assert any(
+            a.event_type == "reconciliation" and a.approved_by == "bob" for a in deps.audit_memory
+        )
 
         async with httpx.AsyncClient() as client:
             stats = (await client.get(f"{base_url}/admin/stats")).json()
@@ -150,14 +161,19 @@ async def test_exp2_behavior2_unverifiable_outcome_routes_to_human_without_secon
             durability="sync",
         )
         snap = await graph.aget_state(cfg)
-        op_id = snap.interrupts[0].value["operation_id"]
+        intr = snap.interrupts[0].value
+        op_id = intr["operation_id"]
 
-        await graph.ainvoke(
-            Command(resume={"decision": "approve", "approver_token": _bob_jwt(settings)}),
-            config=cfg,
-            context=ctx,
-            durability="sync",
+        cmd = build_verified_approval_command(
+            bearer_token=_bob_jwt(settings),
+            decision="approve",
+            approval_tenant_id="tenant-alpha",
+            requested_by="alice",
+            operation_id=op_id,
+            approved_payload_hash=intr["approved_payload_hash"],
+            settings=settings,
         )
+        await graph.ainvoke(cmd, config=cfg, context=ctx, durability="sync")
         review_snap = await graph.aget_state(cfg)
         assert review_snap.interrupts
         review_payload = review_snap.interrupts[0].value
@@ -202,15 +218,14 @@ async def test_exp2_real_process_kill_postgres_recovery_sends_exactly_one_post()
     async with _running_carrier(carrier_state) as base_url:
         bob_token = _bob_jwt(settings)
 
-        # Child process 1: triage -> approve -> POST commits to carrier -> os._exit(137)!
         child1_code = (
             "import asyncio\n"
             "from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver\n"
-            "from langgraph.types import Command\n"
             "from core.config import Settings\n"
             "from core.models import RunContext\n"
             "from workflows.submission_triage.graph import (\n"
-            "    SubmissionTriageDeps, build_submission_triage_graph\n"
+            "    SubmissionTriageDeps, build_submission_triage_graph,\n"
+            "    build_verified_approval_command,\n"
             ")\n"
             "async def main():\n"
             "    s = Settings(model_mode='mock')\n"
@@ -226,11 +241,15 @@ async def test_exp2_real_process_kill_postgres_recovery_sends_exactly_one_post()
             f"        cfg = {{'configurable': {{'thread_id': {thread_id!r}}}}}\n"
             "        await g.ainvoke({'submission_id': 'sub-01'}, config=cfg, context=ctx,\n"
             "            durability='sync')\n"
-            "        await g.ainvoke(\n"
-            f"            Command(resume={{'decision': 'approve',\n"
-            f"                'approver_token': {bob_token!r}}}),\n"
-            "            config=cfg, context=ctx, durability='sync',\n"
+            "        snap = await g.aget_state(cfg)\n"
+            "        intr = snap.interrupts[0].value\n"
+            "        cmd = build_verified_approval_command(\n"
+            f"            bearer_token={bob_token!r}, decision='approve',\n"
+            "            approval_tenant_id='tenant-alpha', requested_by='alice',\n"
+            "            operation_id=intr['operation_id'],\n"
+            "            approved_payload_hash=intr['approved_payload_hash'], settings=s,\n"
             "        )\n"
+            "        await g.ainvoke(cmd, config=cfg, context=ctx, durability='sync')\n"
             "asyncio.run(main())\n"
         )
         env1 = {**os.environ, "FAULT_INJECT": "after_carrier_post", "MODEL_MODE": "mock"}
@@ -246,8 +265,6 @@ async def test_exp2_real_process_kill_postgres_recovery_sends_exactly_one_post()
             f"Expected 137 crash, got {proc1.returncode}: {proc1.stderr}"
         )
 
-        # Fresh OS Process 2: ZERO shared memory! Resumes from Postgres -> MUST reconcile,
-        # NOT send a second POST!
         child2_code = (
             "import asyncio, json\n"
             "from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver\n"
@@ -295,114 +312,202 @@ async def test_exp2_real_process_kill_postgres_recovery_sends_exactly_one_post()
         assert stats["committed_writes"] == 1
         assert stats["lookup_attempts"] == 1
 
+        # Inspect serialized PostgreSQL checkpoints & writes for ABSENCE of bearer credentials!
+        async with (
+            await psycopg.AsyncConnection.connect(settings.database_admin_url) as conn,
+            conn.cursor() as cur,
+        ):
+            await cur.execute(
+                "SELECT checkpoint::text, metadata::text FROM checkpoints WHERE thread_id = %s",
+                (thread_id,),
+            )
+            cp_rows = await cur.fetchall()
+            assert len(cp_rows) >= 2
+            for cp_txt, meta_txt in cp_rows:
+                assert bob_token not in (cp_txt or "")
+                assert bob_token not in (meta_txt or "")
+                assert "eyJ" not in (cp_txt or "")
+                assert "eyJ" not in (meta_txt or "")
 
-async def test_exp2_rejects_missing_quote_fields_and_fail_closed_approval_roles() -> None:
-    """Explicit carrier/coverage required; omitted approver roles MUST fail closed."""
-    saver = InMemorySaver()
+            await cur.execute(
+                "SELECT blob FROM checkpoint_writes WHERE thread_id = %s",
+                (thread_id,),
+            )
+            write_rows = await cur.fetchall()
+            for (blob,) in write_rows:
+                raw_bytes = bytes(blob) if blob is not None else b""
+                assert bob_token.encode("utf-8") not in raw_bytes
+                assert b"eyJ" not in raw_bytes
+
+
+async def test_exp2_authenticated_approval_boundary_rejections_and_zero_carrier_posts() -> None:
+    """Unauthenticated, forged, cross-tenant, self-approval, & wrong-hash attempts -> 0 POSTs."""
     settings = Settings(model_mode="mock")
-    deps = SubmissionTriageDeps(settings=settings)
-    graph = build_submission_triage_graph(deps=deps, checkpointer=saver)
-
-    # 1. Incomplete ready_to_quote brief -> DENIED
-    ctx1 = RunContext(
-        tenant_id="tenant-alpha",
-        requester_id="alice",
-        requester_roles=frozenset({"underwriter"}),
-        thread_id="exp2-incomplete-brief",
-        run_id="run-exp2-4",
-        request_id="req-exp2-4",
-    )
-    incomplete = SubmissionBrief(
-        disposition="ready_to_quote",
-        insured_name="Northstar Analytics Inc.",
-        carrier_match=None,
-        requested_coverage_usd=None,
-        summary="Incomplete ready_to_quote brief.",
-    )
-    res = await graph.ainvoke(
-        {"submission_id": "sub-01", "submission_brief": incomplete.model_dump(mode="json")},
-        config={"configurable": {"thread_id": ctx1.thread_id}},
-        context=ctx1,
-        durability="sync",
-    )
-    assert res["final_status"] == "denied"
-
-    # 2. Omitting approver_roles MUST fail closed (never default to ops-approver!)
-    ctx2 = RunContext(
-        tenant_id="tenant-alpha",
-        requester_id="alice",
-        requester_roles=frozenset({"underwriter"}),
-        thread_id="exp2-omitted-roles",
-        run_id="run-exp2-5",
-        request_id="req-exp2-5",
-    )
-    cfg2 = {"configurable": {"thread_id": ctx2.thread_id}}
-    await graph.ainvoke({"submission_id": "sub-01"}, config=cfg2, context=ctx2, durability="sync")
-    denied_omitted = await graph.ainvoke(
-        Command(resume={"decision": "approve", "approver_id": "bob"}),
-        config=cfg2,
-        context=ctx2,
-        durability="sync",
-    )
-    assert denied_omitted["final_status"] == "denied"
-
-    # 3. Cross-tenant approver JWT MUST be refused
-    ctx3 = RunContext(
-        tenant_id="tenant-alpha",
-        requester_id="alice",
-        requester_roles=frozenset({"underwriter"}),
-        thread_id="exp2-cross-tenant-jwt",
-        run_id="run-exp2-6",
-        request_id="req-exp2-6",
-    )
-    cfg3 = {"configurable": {"thread_id": ctx3.thread_id}}
-    await graph.ainvoke({"submission_id": "sub-01"}, config=cfg3, context=ctx3, durability="sync")
-    beta_tok = mint_user_jwt(
-        CallerIdentity(tenant_id="tenant-beta", actor_id="carol", roles=frozenset({"admin"})),
-        secret=settings.jwt_signing_secret,
-    )
-    denied_beta = await graph.ainvoke(
-        Command(resume={"decision": "approve", "approver_token": beta_tok}),
-        config=cfg3,
-        context=ctx3,
-        durability="sync",
-    )
-    assert denied_beta["final_status"] == "denied"
-
-    # 4. In-memory crash-mid-post recovery check
     carrier_state = MockCarrierState(fault_mode="normal")
+
     async with _running_carrier(carrier_state) as base_url:
-        dispatched: set[str] = set()
-        d_crash = SubmissionTriageDeps(
+        saver = InMemorySaver()
+        deps = SubmissionTriageDeps(
             settings=settings,
             carrier_base_url=base_url,
             carrier_timeout_s=2.0,
-            dispatched_ops=dispatched,
-            simulate_crash_mid_post=True,
         )
-        g_crash = build_submission_triage_graph(deps=d_crash, checkpointer=saver)
-        ctx4 = RunContext(
+        graph = build_submission_triage_graph(deps=deps, checkpointer=saver)
+
+        # 1. Incomplete ready_to_quote brief -> DENIED before approval
+        ctx0 = RunContext(
             tenant_id="tenant-alpha",
             requester_id="alice",
             requester_roles=frozenset({"underwriter"}),
-            thread_id="exp2-inmem-crash",
-            run_id="run-exp2-7",
-            request_id="req-exp2-7",
+            thread_id="auth-incomplete",
+            run_id="r-a0",
+            request_id="req-a0",
         )
-        cfg4 = {"configurable": {"thread_id": ctx4.thread_id}}
-        await g_crash.ainvoke({"submission_id": "sub-01"}, config=cfg4, context=ctx4)
-        with pytest.raises(RuntimeError, match="Simulated worker crash"):
-            await g_crash.ainvoke(
-                Command(resume={"decision": "approve", "approver_token": _bob_jwt(settings)}),
-                config=cfg4,
-                context=ctx4,
+        incomplete = SubmissionBrief(
+            disposition="ready_to_quote",
+            insured_name="Northstar Analytics Inc.",
+            carrier_match=None,
+            requested_coverage_usd=None,
+            summary="Incomplete.",
+        )
+        res0 = await graph.ainvoke(
+            {"submission_id": "sub-01", "submission_brief": incomplete.model_dump(mode="json")},
+            config={"configurable": {"thread_id": ctx0.thread_id}},
+            context=ctx0,
+            durability="sync",
+        )
+        assert res0["final_status"] == "denied"
+
+        # 2. Boundary helper rejections (missing token, invalid token, cross-tenant, wrong role,
+        #    self-approval)
+        alice_approver_tok = mint_user_jwt(
+            CallerIdentity(
+                tenant_id="tenant-alpha", actor_id="alice", roles=frozenset({"ops-approver"})
+            ),
+            secret=settings.jwt_signing_secret,
+        )
+        charlie_eng_tok = mint_user_jwt(
+            CallerIdentity(
+                tenant_id="tenant-alpha", actor_id="charlie", roles=frozenset({"engineer"})
+            ),
+            secret=settings.jwt_signing_secret,
+        )
+        beta_admin_tok = mint_user_jwt(
+            CallerIdentity(
+                tenant_id="tenant-beta", actor_id="carol", roles=frozenset({"admin"})
+            ),
+            secret=settings.jwt_signing_secret,
+        )
+        for bad_tok in (None, "", "not-a-jwt", alice_approver_tok, charlie_eng_tok, beta_admin_tok):
+            with pytest.raises(ApprovalAuthorizationError):
+                build_verified_approval_command(
+                    bearer_token=bad_tok,
+                    decision="approve",
+                    approval_tenant_id="tenant-alpha",
+                    requested_by="alice",
+                    operation_id="quote_1",
+                    approved_payload_hash="abc",
+                    settings=settings,
+                )
+
+        # 3. Direct graph bypass attempts: self-asserted roles, raw bearer token, & wrong hash
+        bob_tok = _bob_jwt(settings)
+        bypass_cases = [
+            (
+                "bypass-self-asserted",
+                Command(
+                    resume={
+                        "decision": "approve",
+                        "approver_id": "bob",
+                        "approver_roles": ["ops-approver"],
+                    }
+                ),
+            ),
+            (
+                "bypass-raw-token",
+                Command(resume={"decision": "approve", "approver_token": bob_tok}),
+            ),
+        ]
+        for tid, bad_cmd in bypass_cases:
+            ctx = RunContext(
+                tenant_id="tenant-alpha",
+                requester_id="alice",
+                requester_roles=frozenset({"underwriter"}),
+                thread_id=tid,
+                run_id=f"r-{tid}",
+                request_id=f"req-{tid}",
             )
-        d_rec = SubmissionTriageDeps(
-            settings=settings,
-            carrier_base_url=base_url,
-            carrier_timeout_s=2.0,
-            dispatched_ops=dispatched,
+            cfg = {"configurable": {"thread_id": tid}}
+            await graph.ainvoke({"submission_id": "sub-01"}, config=cfg, context=ctx)
+            denied = await graph.ainvoke(bad_cmd, config=cfg, context=ctx)
+            assert denied["final_status"] == "denied"
+            # Verify raw token never persisted in state or trace
+            assert bob_tok not in json.dumps(denied, default=str)
+
+        # 4. Valid bob JWT bound to an INCORRECT payload hash -> denied at await_approval
+        ctx_hash = RunContext(
+            tenant_id="tenant-alpha",
+            requester_id="alice",
+            requester_roles=frozenset({"underwriter"}),
+            thread_id="bypass-wrong-hash",
+            run_id="r-wh",
+            request_id="req-wh",
         )
-        g_rec = build_submission_triage_graph(deps=d_rec, checkpointer=saver)
-        done = await g_rec.ainvoke(None, config=cfg4, context=ctx4)
+        cfg_hash = {"configurable": {"thread_id": ctx_hash.thread_id}}
+        await graph.ainvoke({"submission_id": "sub-01"}, config=cfg_hash, context=ctx_hash)
+        snap_h = await graph.aget_state(cfg_hash)
+        wrong_hash_cmd = build_verified_approval_command(
+            bearer_token=bob_tok,
+            decision="approve",
+            approval_tenant_id="tenant-alpha",
+            requested_by="alice",
+            operation_id=snap_h.interrupts[0].value["operation_id"],
+            approved_payload_hash="0" * 64,
+            settings=settings,
+        )
+        denied_hash = await graph.ainvoke(wrong_hash_cmd, config=cfg_hash, context=ctx_hash)
+        assert denied_hash["final_status"] == "denied"
+
+        # Assert ZERO carrier POSTs across ALL denied/bypassed approvals!
+        async with httpx.AsyncClient() as client:
+            stats = (await client.get(f"{base_url}/admin/stats")).json()
+        assert stats["http_post_attempts"] == 0
+        assert stats["committed_writes"] == 0
+
+        # 5. Authorized path succeeds with authenticated actor 'bob' in downstream audit & no JWT
+        ctx_ok = RunContext(
+            tenant_id="tenant-alpha",
+            requester_id="alice",
+            requester_roles=frozenset({"underwriter"}),
+            thread_id="auth-ok",
+            run_id="r-ok",
+            request_id="req-ok",
+        )
+        cfg_ok = {"configurable": {"thread_id": ctx_ok.thread_id}}
+        await graph.ainvoke({"submission_id": "sub-01"}, config=cfg_ok, context=ctx_ok)
+        snap_ok = await graph.aget_state(cfg_ok)
+        intr_ok = snap_ok.interrupts[0].value
+        ok_cmd = build_verified_approval_command(
+            bearer_token=bob_tok,
+            decision="approve",
+            approval_tenant_id="tenant-alpha",
+            requested_by="alice",
+            operation_id=intr_ok["operation_id"],
+            approved_payload_hash=intr_ok["approved_payload_hash"],
+            settings=settings,
+        )
+        assert bob_tok not in json.dumps(ok_cmd.resume, default=str)
+        done = await graph.ainvoke(ok_cmd, config=cfg_ok, context=ctx_ok)
         assert done["final_status"] == "completed"
+        assert bob_tok not in json.dumps(done, default=str)
+        assert any(
+            a.event_type == "tool_write"
+            and a.approved_by == "bob"
+            and a.operation_id == intr_ok["operation_id"]
+            for a in deps.audit_memory
+        )
+
+        async with httpx.AsyncClient() as client:
+            stats_after = (await client.get(f"{base_url}/admin/stats")).json()
+        assert stats_after["http_post_attempts"] == 1
+        assert stats_after["committed_writes"] == 1

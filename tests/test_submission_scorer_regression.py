@@ -1,4 +1,4 @@
-"""Regression tests for evidence-inspecting scorer, Deep Agents delegate config, & interleaving."""
+"""Regression tests for deterministic span+typed-fact scorer, Deep Agents config, & scheduling."""
 
 from __future__ import annotations
 
@@ -7,17 +7,24 @@ from pathlib import Path
 
 import pytest
 
+from core.auth import mint_user_jwt
+from core.config import Settings
+from core.models import CallerIdentity, RunContext
 from evals.submission_ab import (
     build_trial_schedule,
     score_submission_brief,
+    verify_citation_against_doc,
 )
 from gateway.mocks import ScriptedMockChatModel
 from workflows.submission_triage.graph import (
     SharedBudgetExceededError,
     SharedBudgetMiddleware,
     SharedCallBudget,
+    SubmissionTriageDeps,
     build_deep_agents_planner,
     build_submission_read_tools,
+    build_submission_triage_graph,
+    build_verified_approval_command,
 )
 from workflows.submission_triage.models import EvidenceCitation, SubmissionBrief
 
@@ -31,8 +38,64 @@ def _load_case(case_id: str) -> dict[str, object]:
     raise KeyError(case_id)
 
 
+def test_negated_revenue_claim_with_correct_typed_fields_fails_citation_grounding() -> None:
+    """Standalone regression: genuine excerpt + negated claim fails even with valid typed fields."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Annual Revenue: $4,200,000",
+                fact_supported="Northstar does not have annual revenue of $4,200,000.",
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["disposition_correct"] is True
+    # Typed fields are 100% correct so they cannot mask the citation failure!
+    assert scores["typed_fields_ok"] is True
+    assert scores["citations_grounded"] is False
+    assert scores["facts_supported"] is False
+    assert scores["citation_failures"]
+
+
+def test_ambiguous_unsupported_free_text_claim_fails_grounding() -> None:
+    """Ambiguous free-text claims with no verifiable typed fact MUST fail as unverified."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Annual Revenue: $4,200,000",
+                fact_supported="Looks strong and acceptable for underwriting.",
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["typed_fields_ok"] is True
+    assert scores["citations_grounded"] is False
+    assert scores["facts_supported"] is False
+    assert any("no verifiable typed fact" in f for f in scores["citation_failures"])
+
+
 def test_invented_citation_with_all_expected_keywords_still_fails() -> None:
-    """Acceptance Criterion #2: fabricated passage containing all keywords MUST fail grading."""
+    """Fabricated passage containing all expected keywords MUST fail span resolution."""
     case = _load_case("sub-01")
     invented_brief = SubmissionBrief(
         disposition="ready_to_quote",
@@ -45,12 +108,11 @@ def test_invented_citation_with_all_expected_keywords_still_fails() -> None:
         material_facts=[
             EvidenceCitation(
                 doc_id="sub-01-app",
-                # Packs every expected keyword, but invents a passage that does NOT exist in doc!
                 section_or_quote=(
                     "Executive Committee Appendix 99 unanimously certified Northstar "
                     "$4,200,000 revenue $2,000,000 limit effective 2026-12-01"
                 ),
-                fact_supported="Northstar Analytics revenue $4,200,000 and $2,000,000 limit.",
+                fact_supported="Annual revenue is $4,200,000 and requested limit is $2,000,000.",
             )
         ],
         summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
@@ -90,11 +152,10 @@ def test_wrong_doc_citation_for_fein_fails_grounding() -> None:
     scores = score_submission_brief(case, wrong_doc_brief)
     assert scores["citations_grounded"] is False
     assert scores["facts_supported"] is False
-    assert any("84-1234567" in f for f in scores["citation_failures"])
 
 
-def test_genuine_cited_brief_passes_passage_and_typed_field_checks() -> None:
-    """Genuine brief with verbatim passages and typed fields passes all evidence checks."""
+def test_genuine_cited_brief_passes_span_typed_fact_and_typed_field_checks() -> None:
+    """Positive control: verbatim span + matching typed fact + exact typed fields pass."""
     case = _load_case("sub-01")
     good_brief = SubmissionBrief(
         disposition="ready_to_quote",
@@ -108,12 +169,13 @@ def test_genuine_cited_brief_passes_passage_and_typed_field_checks() -> None:
             EvidenceCitation(
                 doc_id="sub-01-app",
                 section_or_quote=(
-                    "Insured: Northstar Analytics Inc. Annual Revenue: $4,200,000 "
-                    "Requested Limit: $2,000,000 Effective Date: 2026-12-01"
+                    "Annual Revenue: $4,200,000\n"
+                    "Requested Limit: $2,000,000\n"
+                    "Effective Date: 2026-12-01"
                 ),
                 fact_supported=(
-                    "Northstar Analytics Inc. has $4,200,000 revenue and requests "
-                    "$2,000,000 limit effective 2026-12-01."
+                    "Annual revenue is $4,200,000, requested limit is $2,000,000, "
+                    "effective date is 2026-12-01."
                 ),
             )
         ],
@@ -124,6 +186,33 @@ def test_genuine_cited_brief_passes_passage_and_typed_field_checks() -> None:
     assert scores["citations_grounded"] is True
     assert scores["typed_fields_ok"] is True
     assert scores["facts_supported"] is True
+
+
+def test_genuine_excerpt_with_contradicting_claim_or_wrong_typed_values_fails() -> None:
+    """Genuine loss-free excerpt + contradicting open-claim & wrong typed values MUST fail."""
+    case = _load_case("sub-01")
+    contradicting_brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=9_999_999,
+        requested_coverage_usd=5_000_000,
+        effective_date="2028-01-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="3-Year Loss History: 0 claims ($0 incurred, 2023-2026).",
+                fact_supported="Account has a major open claim with $500,000 bodily injury.",
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, contradicting_brief)
+    assert scores["citations_grounded"] is False
+    assert scores["typed_fields_ok"] is False
+    assert scores["facts_supported"] is False
+    assert len(scores["typed_failures"]) == 3
 
 
 def test_deep_agents_disables_general_purpose_and_enforces_shared_budget() -> None:
@@ -150,7 +239,6 @@ def test_deep_agents_disables_general_purpose_and_enforces_shared_budget() -> No
         assert "- evidence_auditor:" in task_tool.description
         assert "- general-purpose:" not in task_tool.description
 
-    # Verify ONE shared budget across coordinator + specialist (both model and tool limits)
     mw_coord = SharedBudgetMiddleware(budget)
     mw_spec = SharedBudgetMiddleware(budget)
     mw_coord.before_model({}, None)
@@ -164,9 +252,15 @@ def test_deep_agents_disables_general_purpose_and_enforces_shared_budget() -> No
 
 
 def test_verify_citation_edge_branches() -> None:
-    from evals.submission_ab import verify_citation_against_doc  # noqa: PLC0415
-
-    docs = {"doc-1": "Revenue is $4,200,000. 0 claims reported. Missing FEIN."}
+    docs = {
+        "doc-1": (
+            "Annual Revenue: $4,200,000\n"
+            "3-Year Loss History: 0 claims reported.\n"
+            "FEIN: [MISSING]\n"
+            "SUPERSEDES sub-05-app-v1.\n"
+            "prohibited_classes: Roofing Contractor, max_coverage_usd: 5000000"
+        )
+    }
     ok, msg = verify_citation_against_doc(
         EvidenceCitation(doc_id="unknown", section_or_quote="x", fact_supported="y"), docs
     )
@@ -175,50 +269,56 @@ def test_verify_citation_edge_branches() -> None:
     ok, msg = verify_citation_against_doc(
         EvidenceCitation(doc_id="doc-1", section_or_quote="   ", fact_supported="y"), docs
     )
-    assert not ok and "Empty" in msg
+    assert not ok and "does not resolve" in msg
 
-    ok, msg = verify_citation_against_doc(
-        EvidenceCitation(doc_id="doc-1", section_or_quote="is a", fact_supported="y"), docs
-    )
-    assert not ok and "no verifiable terms" in msg
-
-    ok, msg = verify_citation_against_doc(
+    ok, _ = verify_citation_against_doc(
         EvidenceCitation(
             doc_id="doc-1",
-            section_or_quote="Missing FEIN.",
-            fact_supported="FEIN is complete and confirmed.",
+            section_or_quote="FEIN: [MISSING]",
+            fact_supported="FEIN is missing from the application.",
         ),
         docs,
     )
-    assert not ok and "contradicts" in msg
+    assert ok
 
-
-def test_genuine_excerpt_with_contradicting_claim_or_wrong_typed_values_fails() -> None:
-    """Reviewer regression: genuine excerpt + contradicting claim & wrong typed fields MUST fail."""
-    case = _load_case("sub-01")
-    contradicting_brief = SubmissionBrief(
-        disposition="ready_to_quote",
-        insured_name="Northstar Analytics Inc.",
-        business_classification="SaaS / B2B Software",
-        annual_revenue_usd=9_999_999,  # WRONG (expected 4_200_000)
-        requested_coverage_usd=5_000_000,  # WRONG (expected 2_000_000)
-        effective_date="2028-01-01",  # WRONG (expected 2026-12-01)
-        carrier_match="carrier-apex",
-        material_facts=[
-            EvidenceCitation(
-                doc_id="sub-01-app",
-                # Genuine excerpt from sub-01-app, paired with a CONTRADICTING claim!
-                section_or_quote="3-Year Loss History: 0 claims ($0 incurred, 2023-2026).",
-                fact_supported="Account has a major open claim with $500,000 bodily injury.",
-            )
-        ],
-        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    ok, _ = verify_citation_against_doc(
+        EvidenceCitation(
+            doc_id="doc-1",
+            section_or_quote="SUPERSEDES sub-05-app-v1.",
+            fact_supported="Supersedes sub-05-app-v1.",
+        ),
+        docs,
     )
-    scores = score_submission_brief(case, contradicting_brief)
-    assert scores["citations_grounded"] is False
-    assert scores["typed_fields_ok"] is False
-    assert scores["facts_supported"] is False
-    assert len(scores["typed_failures"]) == 3
+    assert ok
+
+    ok, _ = verify_citation_against_doc(
+        EvidenceCitation(
+            doc_id="doc-1",
+            section_or_quote="prohibited_classes: Roofing Contractor, max_coverage_usd: 5000000",
+            fact_supported="Roofing is a prohibited class with max_coverage_usd 5000000.",
+        ),
+        docs,
+    )
+    assert ok
+
+    # Multi-line window resolution + punctuation-only quote branch
+    ok, _ = verify_citation_against_doc(
+        EvidenceCitation(
+            doc_id="doc-1",
+            section_or_quote="Annual Revenue 4,200,000 reported",
+            fact_supported="Annual revenue is $4,200,000.",
+        ),
+        docs,
+    )
+    assert ok
+
+    ok, msg = verify_citation_against_doc(
+        EvidenceCitation(
+            doc_id="doc-1", section_or_quote="---", fact_supported="Revenue $4,200,000"
+        ),
+        docs,
+    )
+    assert not ok and "does not resolve" in msg
 
 
 async def test_submission_ab_mock_metrics_and_read_tools_coverage() -> None:
@@ -226,18 +326,10 @@ async def test_submission_ab_mock_metrics_and_read_tools_coverage() -> None:
     from langchain_core.messages import AIMessage  # noqa: PLC0415
     from langchain_core.outputs import ChatGeneration, LLMResult  # noqa: PLC0415
     from langgraph.checkpoint.memory import InMemorySaver  # noqa: PLC0415
-    from langgraph.types import Command  # noqa: PLC0415
 
-    from core.config import Settings  # noqa: PLC0415
-    from core.models import RunContext  # noqa: PLC0415
     from evals.metrics import UsageTrackingCallback  # noqa: PLC0415
     from evals.submission_ab import run_submission_ab  # noqa: PLC0415
-    from workflows.submission_triage.graph import (  # noqa: PLC0415
-        SubmissionTriageDeps,
-        build_submission_triage_graph,
-    )
 
-    # 1. UsageTrackingCallback with both token_usage and usage_metadata
     cb = UsageTrackingCallback()
     await cb.on_chat_model_start({}, [])
     await cb.on_llm_end(
@@ -257,7 +349,6 @@ async def test_submission_ab_mock_metrics_and_read_tools_coverage() -> None:
     assert cb.stats.estimate_cost_usd("eval-anthropic") > 0
     assert cb.stats.estimate_cost_usd("eval-dgx-coder") == 0.0
 
-    # 2. All 4 shared read-only submission tools (happy + not-found error paths)
     tools = {t.name: t for t in build_submission_read_tools()}
     assert "sub-01-app" in tools["list_submission_documents"].invoke({"submission_id": "sub-01"})
     assert "not found" in tools["list_submission_documents"].invoke({"submission_id": "missing"})
@@ -276,9 +367,9 @@ async def test_submission_ab_mock_metrics_and_read_tools_coverage() -> None:
     )
     assert "not found" in tools["lookup_carrier_appetite"].invoke({"carrier_id": "nope"})
 
-    # 3. Non-ready dispositions (ask_broker, human_review) + rejected + in-memory submit
+    settings = Settings(model_mode="mock")
     graph = build_submission_triage_graph(
-        deps=SubmissionTriageDeps(settings=Settings(model_mode="mock")),
+        deps=SubmissionTriageDeps(settings=settings),
         checkpointer=InMemorySaver(),
     )
     for sub_id, expected in [
@@ -300,7 +391,11 @@ async def test_submission_ab_mock_metrics_and_read_tools_coverage() -> None:
         )
         assert out["final_status"] == expected
 
-    # Rejected approval + in-memory approved submit
+    bob_tok = mint_user_jwt(
+        CallerIdentity(tenant_id="tenant-alpha", actor_id="bob", roles=frozenset({"admin"})),
+        secret=settings.jwt_signing_secret,
+    )
+
     ctx_rej = RunContext(
         tenant_id="tenant-alpha",
         requester_id="alice",
@@ -311,8 +406,17 @@ async def test_submission_ab_mock_metrics_and_read_tools_coverage() -> None:
     )
     cfg_rej = {"configurable": {"thread_id": ctx_rej.thread_id}}
     await graph.ainvoke({"submission_id": "sub-01"}, config=cfg_rej, context=ctx_rej)
+    intr_rej = (await graph.aget_state(cfg_rej)).interrupts[0].value
     rej = await graph.ainvoke(
-        Command(resume={"decision": "reject", "approver_id": "bob"}),
+        build_verified_approval_command(
+            bearer_token=bob_tok,
+            decision="reject",
+            approval_tenant_id="tenant-alpha",
+            requested_by="alice",
+            operation_id=intr_rej["operation_id"],
+            approved_payload_hash=intr_rej["approved_payload_hash"],
+            settings=settings,
+        ),
         config=cfg_rej,
         context=ctx_rej,
     )
@@ -328,20 +432,28 @@ async def test_submission_ab_mock_metrics_and_read_tools_coverage() -> None:
     )
     cfg_ok = {"configurable": {"thread_id": ctx_ok.thread_id}}
     await graph.ainvoke({"submission_id": "sub-01"}, config=cfg_ok, context=ctx_ok)
+    intr_ok = (await graph.aget_state(cfg_ok)).interrupts[0].value
     done = await graph.ainvoke(
-        Command(resume={"decision": "approve", "approver_id": "bob", "approver_roles": ["admin"]}),
+        build_verified_approval_command(
+            bearer_token=bob_tok,
+            decision="approve",
+            approval_tenant_id="tenant-alpha",
+            requested_by="alice",
+            operation_id=intr_ok["operation_id"],
+            approved_payload_hash=intr_ok["approved_payload_hash"],
+            settings=settings,
+        ),
         config=cfg_ok,
         context=ctx_ok,
     )
     assert done["final_status"] == "completed"
 
-    # 4. Offline mock run_submission_ab smoke
     rep = await run_submission_ab(
         dataset_path=Path("evals/datasets/submissions.jsonl"),
         model_alias="eval-anthropic",
         trials=1,
         variants=("baseline",),
-        settings=Settings(model_mode="mock"),
+        settings=settings,
     )
     assert rep["summary"]["baseline"]["overall"]["runs"] == 12
 
