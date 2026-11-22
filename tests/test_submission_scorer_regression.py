@@ -559,7 +559,126 @@ def test_negative_control_unsupported_appended_claim_fails() -> None:
     assert scores["typed_fields_ok"] is True
     assert scores["citations_grounded"] is False
     assert scores["facts_supported"] is False
-    assert any("Unsupported appended claim" in f for f in scores["citation_failures"])
+    assert any("Unsupported appended" in f for f in scores["citation_failures"])
+
+
+def test_negative_control_moonbeam_labs_different_insured_fails() -> None:
+    """Audit control (1): 'A different insured named Moonbeam Labs' on Northstar revenue fails."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Annual Revenue: $4,200,000",
+                fact_supported=(
+                    "A different insured named Moonbeam Labs has annual revenue of $4,200,000."
+                ),
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["typed_fields_ok"] is True
+    assert scores["citations_grounded"] is False
+    assert scores["facts_supported"] is False
+    assert any("Entity/subject mismatch" in f for f in scores["citation_failures"])
+
+
+def test_negative_control_structured_field_mismatch_on_correct_revenue_prose_fails() -> None:
+    """Audit control (2): structured field=requested_coverage with revenue prose/excerpt fails."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Annual Revenue: $4,200,000",
+                fact_supported="Northstar Analytics Inc. has annual revenue of $4,200,000.",
+                subject="Northstar Analytics Inc.",
+                field="requested_coverage",
+                value="4200000",
+                polarity="affirmed",
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["typed_fields_ok"] is True
+    assert scores["citations_grounded"] is False
+    assert scores["facts_supported"] is False
+    assert any("Structured tuple" in f for f in scores["citation_failures"])
+
+
+def test_negative_control_unverified_inline_qualifier_earthquake_mitigation_fails() -> None:
+    """Audit control (3): 'exclusively from certified earthquake mitigation' on revenue fails."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Annual Revenue: $4,200,000",
+                fact_supported=(
+                    "Northstar has annual revenue of $4,200,000 exclusively from "
+                    "certified earthquake mitigation."
+                ),
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["typed_fields_ok"] is True
+    assert scores["citations_grounded"] is False
+    assert scores["facts_supported"] is False
+    assert any("Unsupported appended/extra assertion" in f for f in scores["citation_failures"])
+
+
+def test_negative_control_unknown_structured_field_vocabulary_fails() -> None:
+    """Structured field outside the allowed vocabulary is explicitly rejected as unreviewable."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Annual Revenue: $4,200,000",
+                fact_supported="Northstar Analytics Inc. has annual revenue of $4,200,000.",
+                subject="Northstar Analytics Inc.",
+                field="custom_unverified_field",
+                value="4200000",
+                polarity="affirmed",
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["citations_grounded"] is False
+    assert scores["unreviewable_citations"]
 
 
 def test_negative_control_absent_controlling_document_fails() -> None:

@@ -1,4 +1,6 @@
-# Historical v2 Triage Run — Arm-Blinded Offline Claim Re-Grade
+# Historical v2 Triage Run — Arm-Blinded Offline Claim Re-Grade (Provisional Automated Triage)
+
+> **Status: Provisional Automated Triage Only.** The blinded packet counts (144 attempts, 126 briefs, 960 citations, 18 no-brief attempts) are verified, but `_grade_blinded_claim` in `scripts/regrade_historical_v2.py` (`f06349b`) is a heuristic first pass that does not yet bind `(subject, field, value, polarity)` tuples or separate comparative claims from missing-citation vs. false claims. Treat the claim counts below as provisional triage pending independent adjudication on the full-source review packet.
 
 - **Source Artifact (preserved intact):** `deepagents_experiments_v2.json` (144 attempts: 126 generated briefs + 18 attempts without briefs)
 - **Original Configuration Provenance:** Baseline ran with `SummarizationMiddleware(model=ops-fast)`; Deep Agents ran with `general-purpose` disabled and shared 12-model / 15-tool budget. Historical disposition and usage counts remain attached to that original configuration.

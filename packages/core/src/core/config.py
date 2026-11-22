@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     max_model_calls: int = 12
     max_tool_calls: int = 15
     model_timeout_s: float = 60.0
-    model_max_tokens: int = 2048
+    model_max_tokens: int = 4096
     tool_timeout_s: float = 10.0
     max_tool_output_chars: int = 8000
     run_timeout_s: float = 300.0

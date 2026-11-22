@@ -239,8 +239,116 @@ def resolve_source_span(doc_text: str, section_or_quote: str) -> str | None:
     return best_span
 
 
+_ALLOWED_CITATION_FIELDS = frozenset(
+    {
+        "insured_name",
+        "annual_revenue",
+        "requested_coverage",
+        "effective_date",
+        "fein",
+        "business_classification",
+        "loss_history",
+        "missing_field",
+        "supersedes",
+        "prohibited_class",
+        "carrier_cap",
+        "carrier_rule",
+    }
+)
+_DIFFERENT_SUBJECT_RE = re.compile(
+    r"\b(?:different|another|other)\s+(?:insured|company|entity|applicant|business|account)\b",
+    re.I,
+)
+_TITLE_PHRASE_RE = re.compile(r"\b([A-Z][a-zA-Z0-9&\-\']+(?:\s+[A-Z][a-zA-Z0-9&\-\']+)+)\b")
+_NON_ENTITY_PHRASES = frozenset(
+    {
+        "annual revenue",
+        "requested limit",
+        "requested coverage",
+        "effective date",
+        "loss history",
+        "loss run",
+        "loss runs",
+        "signed application",
+        "broker email",
+        "business classification",
+        "named insured",
+        "b2b software",
+        "management consulting",
+        "it & management consulting",
+        "roofing contractor",
+        "light manufacturing",
+        "wholesale goods",
+        "accounting & legal",
+        "legal professional",
+        "location schedule",
+        "payroll breakdown",
+        "human review",
+        "underwriting review",
+        "carrier apex",
+        "carrier ironclad",
+    }
+)
+_STRUCTURAL_GLUE_WORDS = _CLAUSE_STOPWORDS | frozenset(
+    {
+        "annual",
+        "revenue",
+        "requested",
+        "coverage",
+        "limit",
+        "effective",
+        "date",
+        "fein",
+        "loss",
+        "history",
+        "claims",
+        "claim",
+        "clean",
+        "zero",
+        "free",
+        "class",
+        "classification",
+        "business",
+        "missing",
+        "blank",
+        "omitted",
+        "pending",
+        "supersedes",
+        "prohibited",
+        "maximum",
+        "single",
+        "dollars",
+        "names",
+        "account",
+        "broker",
+        "signed",
+        "requires",
+        "routed",
+        "human",
+        "underwriting",
+        "review",
+        "contradiction",
+        "between",
+        "sets",
+        "asks",
+        "attached",
+        "within",
+        "above",
+        "below",
+        "major",
+        "open",
+        "bodily",
+        "injury",
+        "minor",
+        "property",
+        "version",
+        "runs",
+    }
+)
+
+
 def _extract_named_entities(text: str) -> list[str]:
-    """Extract proper-noun company/subject names from raw (cased) text."""
+    """Extract proper-noun company/subject names anywhere in raw (cased) text."""
     found: list[str] = []
     for m in _ENTITY_SUFFIX_RE.finditer(text):
         ent = _normalize_text(m.group(1)).rstrip(".")
@@ -252,7 +360,50 @@ def _extract_named_entities(text: str) -> list[str]:
         first_word = cand.split()[0] if cand else ""
         if cand and first_word not in _NON_ENTITY_LEADERS and cand not in found:
             found.append(cand)
+    # Catch proper-noun company phrases anywhere in the claim (e.g. "named Moonbeam Labs")
+    for m in _TITLE_PHRASE_RE.finditer(text):
+        cand = _normalize_text(m.group(1)).rstrip(".")
+        words = cand.split()
+        if (
+            not cand
+            or cand in _NON_ENTITY_PHRASES
+            or all(w in _NON_ENTITY_LEADERS for w in words)
+            or any(cand in existing for existing in found)
+        ):
+            continue
+        found.append(cand)
     return found
+
+
+def _canonicalize_structured_fact(
+    field: str,
+    value: str,
+    polarity: Literal["affirmed", "negated"],
+) -> TypedFact | None:
+    """Convert structured (field, value, polarity) into a canonical TypedFact for exact matching."""
+    norm_val = _normalize_text(value).rstrip(".")
+    if not norm_val:
+        return None
+    if field in {"annual_revenue", "requested_coverage", "carrier_cap"}:
+        m = re.search(r"\b(\d{5,9})\b", norm_val)
+        return TypedFact(field, m.group(1) if m else norm_val, polarity)
+    if field == "effective_date":
+        m = re.search(r"\b(\d{4}-\d{2}-\d{2})\b", norm_val)
+        return TypedFact(field, m.group(1) if m else norm_val, polarity)
+    if field == "fein":
+        m = re.search(r"\b(\d{2}-\d{7})\b", norm_val)
+        return TypedFact(field, m.group(1) if m else norm_val, polarity)
+    if field in {"business_classification", "prohibited_class"}:
+        for canon_cls, aliases in _CLASS_CANONICAL:
+            if norm_val == canon_cls or any(a in norm_val for a in aliases):
+                return TypedFact(field, canon_cls, polarity)
+        return TypedFact(field, norm_val, polarity)
+    if field == "loss_history":
+        if re.search(r"\b(?:0|zero|no\s+claims|loss-free|loss_free|clean)\b", norm_val):
+            return TypedFact("loss_history", "loss_free", polarity)
+        m = re.search(r"\b(\d{4,7})\b", norm_val)
+        return TypedFact("loss_history", m.group(1) if m else norm_val, polarity)
+    return TypedFact(field, norm_val, polarity)
 
 
 def _entity_matches_source(entity: str, allowed_blob: str) -> bool:
@@ -310,23 +461,25 @@ def extract_typed_facts(text: str) -> set[TypedFact]:
     for clause in clauses:
         pol = _clause_polarity(clause)
 
-        # 1. Annual revenue
-        for m in re.finditer(
-            r"(?:annual\s+)?revenue(?::|\s+(?:is|of|at))?\s*(\d{5,9})\b"
-            r"|\b(\d{5,9})\s+(?:annual\s+)?revenue\b",
-            clause,
-        ):
-            val = m.group(1) or m.group(2)
-            facts.add(TypedFact("annual_revenue", val, pol))
+        # 1. Annual revenue (skip carrier max-revenue caps, handled in #9)
+        if not re.search(r"\b(?:max(?:imum)?|cap)\b", clause):
+            for m in re.finditer(
+                r"(?:annual\s+)?revenue(?::|\s+(?:is|of|at))?\s*(\d{5,9})\b"
+                r"|\b(\d{5,9})\s+(?:annual\s+)?revenue\b",
+                clause,
+            ):
+                val = m.group(1) or m.group(2)
+                facts.add(TypedFact("annual_revenue", val, pol))
 
-        # 2. Requested coverage / limit
-        for m in re.finditer(
-            r"(?:requested\s+)?(?:coverage|limit)(?::|\s+(?:is|of|at))?\s*(\d{5,9})\b"
-            r"|\b(\d{5,9})\s+(?:coverage\s+)?limit\b",
-            clause,
-        ):
-            val = m.group(1) or m.group(2)
-            facts.add(TypedFact("requested_coverage", val, pol))
+        # 2. Requested coverage / limit (skip carrier max-coverage caps, handled in #9)
+        if not re.search(r"\b(?:max(?:imum)?|cap)\b", clause):
+            for m in re.finditer(
+                r"(?:requested\s+)?(?:coverage|limit)(?::|\s+(?:is|of|at))?\s*(\d{5,9})\b"
+                r"|\b(\d{5,9})\s+(?:coverage\s+)?limit\b",
+                clause,
+            ):
+                val = m.group(1) or m.group(2)
+                facts.add(TypedFact("requested_coverage", val, pol))
 
         # 3. Effective date (ISO YYYY-MM-DD)
         for m in re.finditer(r"\b(\d{4}-\d{2}-\d{2})\b", clause):
@@ -338,7 +491,12 @@ def extract_typed_facts(text: str) -> set[TypedFact]:
             facts.add(TypedFact("fein", m.group(1), pol))
 
         # 5. Loss history (loss-free vs open/incurred claims)
-        if re.search(r"\b(?:0\s+claims|zero\s+claims|loss-free|no\s+claims)\b", clause):
+        if re.search(
+            r"\b(?:0\s+claims|zero\s+claims|loss-free|no\s+claims|"
+            r"clean\s+(?:3-year\s+)?loss(?:\s+history|\s+runs?)?|"
+            r"loss\s+history\s+is\s+clean)\b",
+            clause,
+        ):
             facts.add(TypedFact("loss_history", "loss_free", pol))
         if re.search(
             r"\b(?:open\s+bodily\s+injury|open\s+claim|clm-\d{4}-\d+|minor\s+property\s+claim)\b",
@@ -370,14 +528,42 @@ def extract_typed_facts(text: str) -> set[TypedFact]:
         if sup_m:
             facts.add(TypedFact("supersedes", sup_m.group(1), pol))
 
-        # 9. Carrier appetite caps / prohibited classes
+        # 9. Carrier appetite caps, prohibited classes, and escalation rules
         if "prohibited_classes" in clause or "prohibited" in clause:
             for canon_cls, aliases in _CLASS_CANONICAL:
                 if any(a in clause for a in aliases):
                     facts.add(TypedFact("prohibited_class", canon_cls, pol))
-        if "max_coverage_usd" in clause or "max_single_loss_usd" in clause:
+        if any(
+            k in clause
+            for k in (
+                "max_coverage_usd",
+                "max_single_loss_usd",
+                "max_revenue_usd",
+                "maximum single loss",
+                "maximum annual revenue",
+                "maximum revenue",
+                "maximum coverage",
+                "maximum limit",
+                "max single loss",
+                "max revenue",
+                "max coverage",
+                "max limit",
+            )
+        ):
             for m in re.finditer(r"\b(\d{5,8})\b", clause):
                 facts.add(TypedFact("carrier_cap", m.group(1), pol))
+        if "contradiction" in clause and "human" in clause and "review" in clause:
+            facts.add(TypedFact("carrier_rule", "contradiction_human_review", pol))
+
+    # 10. Insured entity naming (case-insensitive; legal entity suffixes only)
+    for m in re.finditer(
+        r"(?:named\s+)?insured(?:\s+(?:is|as|name))?(?::|\s+is|\s+as)\s+"
+        r"([a-z0-9][a-z0-9&\-\'\s]{1,50}?"
+        r"(?:inc|llc|corp|corporation|co|ltd|llp|lp|partners|group))\b",
+        norm,
+    ):
+        ent = re.sub(r"\s+", " ", m.group(1)).strip().rstrip(".")
+        facts.add(TypedFact("insured_name", ent, _clause_polarity(norm)))
 
     return facts
 
@@ -410,6 +596,12 @@ def verify_citation_against_doc(
         )
 
     # 1. Subject / entity binding: reject attribution to a different company/entity
+    if _DIFFERENT_SUBJECT_RE.search(citation.fact_supported):
+        return (
+            False,
+            f"Entity/subject mismatch on '{citation.doc_id}': claim explicitly attributes "
+            "fact to a different insured/company",
+        )
     allowed_blob = _allowed_subject_blob(citation.doc_id, doc_texts)
     claimed_entities: list[str] = []
     if citation.subject and citation.subject.strip():
@@ -425,7 +617,7 @@ def verify_citation_against_doc(
                 "is not present in source document or submission subject",
             )
 
-    # 2. Structured field/value/polarity check when explicitly supplied
+    # 2. Strict structured (field, value, polarity) tuple verification against span_facts
     span_facts = extract_typed_facts(resolved_span)
     span_polarity = _clause_polarity(resolved_span)
     if citation.polarity is not None and citation.polarity != span_polarity:
@@ -436,18 +628,25 @@ def verify_citation_against_doc(
                 f"Structured polarity mismatch on '{citation.doc_id}': "
                 f"citation.polarity={citation.polarity!r} != source clause {span_polarity!r}",
             )
-    if citation.field and citation.value:
-        norm_val = _normalize_text(citation.value)
-        val_nums = set(_NUM_OR_ID_RE.findall(norm_val))
-        span_nums = set(_NUM_OR_ID_RE.findall(resolved_span))
-        if val_nums and not val_nums.issubset(span_nums):
+    if citation.field is not None:
+        norm_field = citation.field.strip().lower()
+        if norm_field not in _ALLOWED_CITATION_FIELDS:
             return (
                 False,
-                f"Structured value mismatch on '{citation.doc_id}': "
-                f"{citation.field}={citation.value!r} not in resolved clause",
+                f"unreviewable: structured field '{citation.field}' on '{citation.doc_id}' "
+                "is outside allowed field vocabulary",
             )
+        if citation.value is not None:
+            eff_pol = citation.polarity or span_polarity
+            structured_fact = _canonicalize_structured_fact(norm_field, citation.value, eff_pol)
+            if structured_fact is None or structured_fact not in span_facts:
+                return (
+                    False,
+                    f"Structured tuple {structured_fact} not supported by resolved span on "
+                    f"'{citation.doc_id}' (span facts: {sorted(span_facts, key=str)})",
+                )
 
-    # 3. Split claim into atomic sub-clauses to catch unsupported appended assertions
+    # 3. Typed fact verification + whole-claim extra-assertion / qualifier grounding
     claim_facts = extract_typed_facts(citation.fact_supported)
     if not claim_facts:
         return (
@@ -464,36 +663,37 @@ def verify_citation_against_doc(
             f"'{citation.doc_id}' (span facts: {sorted(span_facts, key=str)})",
         )
 
-    # Verify every sub-clause is either backed by a verified TypedFact or lexically grounded
-    sub_clauses = [
-        sc.strip() for sc in _APPENDED_SPLIT_RE.split(citation.fact_supported) if sc.strip()
-    ]
+    # Check ALL extra substantive tokens across the whole claim (even inside the same clause!)
     span_words = set(_WORD_RE.findall(resolved_span))
     span_nums = set(_NUM_OR_ID_RE.findall(resolved_span))
-    for sc in sub_clauses:
-        sc_facts = extract_typed_facts(sc)
-        if sc_facts:
-            continue
-        norm_sc = _normalize_text(sc)
-        sc_nums = set(_NUM_OR_ID_RE.findall(norm_sc))
-        if sc_nums and not sc_nums.issubset(span_nums):
-            return (
-                False,
-                f"Unsupported appended numeric/date/ID claim on '{citation.doc_id}': {sc!r}",
-            )
-        sc_tokens = [
-            w for w in _WORD_RE.findall(norm_sc) if len(w) >= 4 and w not in _CLAUSE_STOPWORDS
-        ]
-        # Exclude already-verified entity tokens from the appended-claim token check
-        ent_tokens = set(_WORD_RE.findall(" ".join(claimed_entities).lower()))
-        meaningful = [w for w in sc_tokens if w not in ent_tokens]
-        if meaningful:
-            grounded_ratio = sum(1 for w in meaningful if w in span_words) / len(meaningful)
-            if grounded_ratio < 0.75:
-                return (
-                    False,
-                    f"Unsupported appended claim on '{citation.doc_id}': {sc!r}",
-                )
+    norm_claim = _normalize_text(citation.fact_supported)
+    claim_nums = set(_NUM_OR_ID_RE.findall(norm_claim))
+    if claim_nums and not claim_nums.issubset(span_nums):
+        return (
+            False,
+            f"Unsupported numeric/date/ID value(s) {sorted(claim_nums - span_nums)} on "
+            f"'{citation.doc_id}'",
+        )
+
+    ent_tokens = set(_WORD_RE.findall(" ".join(claimed_entities).lower()))
+    # Include canonical class/value words already verified in span_facts
+    verified_fact_tokens = set(_WORD_RE.findall(" ".join(f.value for f in claim_facts).lower()))
+    extra_ungrounded = [
+        w
+        for w in _WORD_RE.findall(norm_claim)
+        if len(w) >= 4
+        and w not in span_words
+        and w not in ent_tokens
+        and w not in verified_fact_tokens
+        and w not in _STRUCTURAL_GLUE_WORDS
+        and not w.isdigit()
+    ]
+    if extra_ungrounded:
+        return (
+            False,
+            f"Unsupported appended/extra assertion on '{citation.doc_id}': "
+            f"ungrounded qualifier(s) {sorted(set(extra_ungrounded))}",
+        )
 
     return True, "ok"
 
