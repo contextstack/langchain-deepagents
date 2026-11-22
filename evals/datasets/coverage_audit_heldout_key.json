@@ -1,0 +1,226 @@
+[
+  {
+    "packet_id": "C01",
+    "tier": "clean",
+    "prompt": "Audit packet C01 (Beacon Health Systems LLC, incident 2026-04-08). Determine coverage status and controlling Cyber Incident Response Sublimit.",
+    "expected_determination": "covered",
+    "expected_value": "500000",
+    "required_controlling_docs": [
+      "endorsement_cy_102.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_cy_102.txt"
+    ],
+    "expected_subject": "Beacon Health Systems LLC",
+    "decoy_docs": []
+  },
+  {
+    "packet_id": "C02",
+    "tier": "clean",
+    "prompt": "Audit packet C02 (Gulfcrest Hospitality Group Inc., Named Storm loss 2026-08-22 at 88 Oceanfront Blvd). Determine coverage status and controlling deductible.",
+    "expected_determination": "covered_with_deductible",
+    "expected_value": "150000",
+    "required_controlling_docs": [
+      "endorsement_ns_201.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_ns_201.txt"
+    ],
+    "expected_subject": "Gulfcrest Hospitality Group Inc.",
+    "decoy_docs": []
+  },
+  {
+    "packet_id": "C03",
+    "tier": "clean",
+    "prompt": "Audit packet C03 (Heartland Chemical Blending Corp., sudden solvent release 2026-06-11). Determine whether the release is covered or excluded.",
+    "expected_determination": "excluded",
+    "expected_value": "excluded",
+    "required_controlling_docs": [
+      "cgl_coverage_form_exclusions.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "cgl_coverage_form_exclusions.txt"
+    ],
+    "expected_subject": "Heartland Chemical Blending Corp.",
+    "decoy_docs": [
+      "carrier_product_brochure.txt"
+    ]
+  },
+  {
+    "packet_id": "C04",
+    "tier": "clean",
+    "prompt": "Audit packet C04 (Midwest Precision Stamping LLC, press breakdown 2026-05-19). Determine coverage status and controlling Equipment Breakdown limit.",
+    "expected_determination": "covered",
+    "expected_value": "750000",
+    "required_controlling_docs": [
+      "endorsement_eb_305.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_eb_305.txt"
+    ],
+    "expected_subject": "Midwest Precision Stamping LLC",
+    "decoy_docs": []
+  },
+  {
+    "packet_id": "B01",
+    "tier": "branching",
+    "prompt": "Audit packet B01 (Pacific Freightways Inc., transit loss 2026-04-22). Determine coverage status, controlling Property-in-Transit limit, and chain.",
+    "expected_determination": "covered",
+    "expected_value": "300000",
+    "required_controlling_docs": [
+      "endorsement_tr_115.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_tr_101.txt",
+      "endorsement_tr_108.txt",
+      "endorsement_tr_115.txt"
+    ],
+    "expected_subject": "Pacific Freightways Inc.",
+    "decoy_docs": [
+      "broker_draft_tr_120.txt"
+    ]
+  },
+  {
+    "packet_id": "B02",
+    "tier": "branching",
+    "prompt": "Audit packet B02 (Riverbend Millworks LLC, flood loss 2026-03-15). Determine coverage status and controlling Flood Sublimit for this loss date.",
+    "expected_determination": "covered",
+    "expected_value": "200000",
+    "required_controlling_docs": [
+      "endorsement_fl_205.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_fl_205.txt"
+    ],
+    "expected_subject": "Riverbend Millworks LLC",
+    "decoy_docs": [
+      "endorsement_fl_201.txt",
+      "prior_year_2025_dec.txt"
+    ]
+  },
+  {
+    "packet_id": "B03",
+    "tier": "branching",
+    "prompt": "Audit packet B03 (Crestline Concrete Pumping Inc., auto loss 2026-04-05 involving Truck #14). Determine whether coverage can be confirmed from the archive.",
+    "expected_determination": "insufficient_evidence",
+    "expected_value": "insufficient_evidence",
+    "required_controlling_docs": [
+      "endorsement_ba_701.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_ba_701.txt"
+    ],
+    "expected_subject": "Crestline Concrete Pumping Inc.",
+    "decoy_docs": [
+      "expired_2025_fleet_draft.txt"
+    ],
+    "expected_missing_keywords": [
+      "v-2026"
+    ]
+  },
+  {
+    "packet_id": "B04",
+    "tier": "branching",
+    "prompt": "Audit packet B04 (Summit BioLabs LLC, spoilage loss 2026-05-03). Determine coverage status and controlling Spoilage Sublimit for Summit BioLabs LLC.",
+    "expected_determination": "covered",
+    "expected_value": "250000",
+    "required_controlling_docs": [
+      "endorsement_bl_408.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_bl_408.txt"
+    ],
+    "expected_subject": "Summit BioLabs LLC",
+    "decoy_docs": [
+      "endorsement_bl_402.txt"
+    ]
+  },
+  {
+    "packet_id": "B05",
+    "tier": "branching",
+    "prompt": "Audit packet B05 (Granite Ridge Builders LLC, faulty workmanship claim 2026-05-10). Determine whether the Contractors' E&O claim is covered or excluded.",
+    "expected_determination": "excluded",
+    "expected_value": "excluded",
+    "required_controlling_docs": [
+      "endorsement_eo_109.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_eo_101.txt",
+      "endorsement_eo_109.txt"
+    ],
+    "expected_subject": "Granite Ridge Builders LLC",
+    "decoy_docs": [
+      "broker_renewal_summary_jan.txt"
+    ]
+  },
+  {
+    "packet_id": "B06",
+    "tier": "branching",
+    "prompt": "Audit packet B06 (Ironworks Fabrication Inc., fire loss 2026-04-17 at Plant 2 Toledo). Determine coverage status and controlling deductible for Plant 2.",
+    "expected_determination": "covered_with_deductible",
+    "expected_value": "35000",
+    "required_controlling_docs": [
+      "endorsement_dd_304.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_dd_301.txt",
+      "endorsement_dd_304.txt"
+    ],
+    "expected_subject": "Ironworks Fabrication Inc.",
+    "decoy_docs": [
+      "broker_summary_email.txt"
+    ]
+  },
+  {
+    "packet_id": "B07",
+    "tier": "branching",
+    "prompt": "Audit packet B07 (Evergreen Senior Living LLC, mold remediation claim 2026-06-01). Determine whether MX-502 coverage can be confirmed from the archive.",
+    "expected_determination": "insufficient_evidence",
+    "expected_value": "insufficient_evidence",
+    "required_controlling_docs": [
+      "unsigned_endorsement_mx_502.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "unsigned_endorsement_mx_502.txt"
+    ],
+    "expected_subject": "Evergreen Senior Living LLC",
+    "decoy_docs": [],
+    "expected_missing_keywords": [
+      "executed",
+      "signature",
+      "mx-502"
+    ]
+  },
+  {
+    "packet_id": "B08",
+    "tier": "branching",
+    "prompt": "Audit packet B08 (Atlas Industrial Services Corp., bodily injury claim 2026-07-15). Determine the remaining available 2026 Annual Aggregate limit after prior erosion.",
+    "expected_determination": "covered",
+    "expected_value": "750000",
+    "required_controlling_docs": [
+      "endorsement_ag_209.txt",
+      "loss_run_2026.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_ag_201.txt",
+      "endorsement_ag_209.txt",
+      "loss_run_2026.txt"
+    ],
+    "expected_subject": "Atlas Industrial Services Corp.",
+    "decoy_docs": [
+      "broker_draft_ag_215.txt"
+    ]
+  }
+]

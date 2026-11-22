@@ -1,0 +1,5 @@
+COMMERCIAL PACKAGE POLICY DECLARATIONS
+Policy Number: PKG-2026-1011
+Named Insured: Beacon Health Systems LLC
+Policy Period: 2026-01-01 to 2027-01-01
+Base Cyber Incident Response Sublimit: $100,000

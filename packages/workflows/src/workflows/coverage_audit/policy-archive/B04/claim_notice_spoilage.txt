@@ -1,0 +1,5 @@
+SPOILAGE LOSS NOTICE
+Claimant Entity: Summit BioLabs LLC
+Date of Loss: 2026-05-03
+Description: Power surge caused failure of reagent storage freezers.
+Question: What is the controlling Spoilage Sublimit for Summit BioLabs LLC?

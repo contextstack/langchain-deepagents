@@ -1,0 +1,5 @@
+INCIDENT REPORT
+Insured: Beacon Health Systems LLC
+Date of Incident: 2026-04-08
+Description: Ransomware forensics and breach notification expenses.
+Question: What is the controlling Cyber Incident Response Sublimit?

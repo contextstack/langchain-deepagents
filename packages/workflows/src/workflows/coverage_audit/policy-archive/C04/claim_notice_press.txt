@@ -1,0 +1,5 @@
+CLAIM NOTICE
+Insured: Midwest Precision Stamping LLC
+Date of Loss: 2026-05-19
+Description: Mechanical breakdown of hydraulic main cylinder on Stamping Press #4.
+Question: What is the controlling Equipment Breakdown limit for this loss?

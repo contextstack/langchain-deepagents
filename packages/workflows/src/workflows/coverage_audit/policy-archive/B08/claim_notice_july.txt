@@ -1,0 +1,5 @@
+NEW CLAIM RESERVE INQUIRY
+Insured: Atlas Industrial Services Corp.
+Date of Loss: 2026-07-15
+Description: Third-party bodily injury claim at jobsite.
+Question: What is the remaining available Annual Aggregate limit after prior 2026 erosion?

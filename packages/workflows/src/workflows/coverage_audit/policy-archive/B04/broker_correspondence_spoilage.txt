@@ -1,0 +1,4 @@
+From: A. Lin <alin@lifescibroker.example>
+Date: 2026-01-20
+Subject: Summit BioLabs spoilage coverage
+Confirmed BL-408 is executed for Summit BioLabs LLC; note BL-402 applies only to parent.

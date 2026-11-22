@@ -1,0 +1,60 @@
+[
+  {
+    "packet_id": "D01",
+    "tier": "clean",
+    "prompt": "Audit packet D01 (Harborview Cold Storage LLC, loss 2026-04-12). Determine coverage status and the controlling Per-Occurrence limit.",
+    "expected_determination": "covered",
+    "expected_value": "2000000",
+    "required_controlling_docs": [
+      "endorsement_gl_105.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_gl_105.txt"
+    ],
+    "expected_subject": "Harborview Cold Storage LLC",
+    "decoy_docs": [
+      "marketing_overview_2025.txt"
+    ]
+  },
+  {
+    "packet_id": "D02",
+    "tier": "branching",
+    "prompt": "Audit packet D02 (Cascadia Timberworks Inc., loss 2026-03-18). Determine coverage status, controlling Water Damage Sublimit, and supersession chain.",
+    "expected_determination": "covered",
+    "expected_value": "75000",
+    "required_controlling_docs": [
+      "endorsement_ed_409.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_ed_401.txt",
+      "endorsement_ed_409.txt"
+    ],
+    "expected_subject": "Cascadia Timberworks Inc.",
+    "decoy_docs": [
+      "draft_endorsement_water_2026.txt"
+    ]
+  },
+  {
+    "packet_id": "D03",
+    "tier": "branching",
+    "prompt": "Audit packet D03 (Redrock Distribution Co., loss 2026-05-02 at Warehouse Annex B, 412 Dockside Rd). Determine whether coverage can be confirmed from the archive.",
+    "expected_determination": "insufficient_evidence",
+    "expected_value": "insufficient_evidence",
+    "required_controlling_docs": [
+      "endorsement_sl_204.txt"
+    ],
+    "expected_chain": [
+      "policy_declarations.txt",
+      "endorsement_sl_204.txt"
+    ],
+    "expected_subject": "Redrock Distribution Co.",
+    "decoy_docs": [
+      "expired_2024_location_list.txt"
+    ],
+    "expected_missing_keywords": [
+      "schedule a-2026"
+    ]
+  }
+]

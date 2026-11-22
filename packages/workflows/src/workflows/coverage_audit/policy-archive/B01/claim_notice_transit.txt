@@ -1,0 +1,5 @@
+CARGO LOSS NOTICE
+Insured: Pacific Freightways Inc.
+Date of Loss: 2026-04-22
+Description: Trailer rollover destroying electronics shipment in transit.
+Question: What is the controlling Property-in-Transit limit on 2026-04-22?
