@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from langchain_core.callbacks import AsyncCallbackHandler
@@ -23,9 +23,21 @@ MODEL_PRICING_PER_1M: dict[str, tuple[float, float]] = {
 @dataclass
 class UsageStats:
     llm_calls: int = 0
+    tool_calls: int = 0
     prompt_tokens: int = 0
     completion_tokens: int = 0
     total_tokens: int = 0
+    requested_models: list[str] = field(default_factory=list)
+    response_models: list[str] = field(default_factory=list)
+    tools_called: list[str] = field(default_factory=list)
+
+    @property
+    def unique_requested_models(self) -> list[str]:
+        return sorted(set(self.requested_models))
+
+    @property
+    def unique_response_models(self) -> list[str]:
+        return sorted(set(self.response_models))
 
     def estimate_cost_usd(self, model_alias: str) -> float:
         in_rate, out_rate = MODEL_PRICING_PER_1M.get(model_alias, (3.00, 15.00))
@@ -37,7 +49,7 @@ class UsageStats:
 
 
 class UsageTrackingCallback(AsyncCallbackHandler):
-    """Captures exact model calls and token usage across both create_agent and create_deep_agent."""
+    """Captures exact model calls, tool calls, model provenance, and tokens across runs."""
 
     def __init__(self) -> None:
         super().__init__()
@@ -50,19 +62,50 @@ class UsageTrackingCallback(AsyncCallbackHandler):
         **kwargs: Any,
     ) -> None:
         self.stats.llm_calls += 1
+        inv = kwargs.get("invocation_params") or {}
+        req_model = inv.get("model") or inv.get("model_name")
+        if not req_model and isinstance(serialized, dict):
+            kw = serialized.get("kwargs") or {}
+            req_model = kw.get("model") or kw.get("model_name")
+        if req_model:
+            self.stats.requested_models.append(str(req_model))
+
+    async def on_tool_start(
+        self,
+        serialized: dict[str, Any],
+        input_str: str,
+        **kwargs: Any,
+    ) -> None:
+        self.stats.tool_calls += 1
+        name = serialized.get("name") if isinstance(serialized, dict) else None
+        if name:
+            self.stats.tools_called.append(str(name))
 
     async def on_llm_end(self, response: LLMResult, **kwargs: Any) -> None:
-        usage = (response.llm_output or {}).get("token_usage") or {}
+        llm_out = response.llm_output or {}
+        usage = llm_out.get("token_usage") or {}
         p_tok = int(usage.get("prompt_tokens", 0) or 0)
         c_tok = int(usage.get("completion_tokens", 0) or 0)
         t_tok = int(usage.get("total_tokens", 0) or (p_tok + c_tok))
 
-        # LangChain >= 0.3 / v1 also attaches usage_metadata on AIMessage generations
-        if t_tok == 0:
-            for gen_list in response.generations:
-                for gen in gen_list:
-                    msg = getattr(gen, "message", None)
-                    meta = getattr(msg, "usage_metadata", None) if msg is not None else None
+        resp_model = llm_out.get("model_name") or llm_out.get("model")
+        if resp_model:
+            self.stats.response_models.append(str(resp_model))
+
+        # LangChain >= 0.3 / v1 also attaches usage_metadata & response_metadata on AIMessage
+        for gen_list in response.generations:
+            for gen in gen_list:
+                msg = getattr(gen, "message", None)
+                if msg is None:
+                    continue
+                if not resp_model:
+                    rmeta = getattr(msg, "response_metadata", None)
+                    if isinstance(rmeta, dict):
+                        rm = rmeta.get("model_name") or rmeta.get("model")
+                        if rm:
+                            self.stats.response_models.append(str(rm))
+                if t_tok == 0:
+                    meta = getattr(msg, "usage_metadata", None)
                     if isinstance(meta, dict):
                         p_tok += int(meta.get("input_tokens", 0) or 0)
                         c_tok += int(meta.get("output_tokens", 0) or 0)

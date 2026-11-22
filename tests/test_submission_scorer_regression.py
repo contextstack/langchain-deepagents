@@ -472,3 +472,201 @@ def test_trial_schedule_alternates_arms_within_each_case() -> None:
         ("deep_agents", "sub-02", 2),
         ("baseline", "sub-02", 2),
     ]
+
+
+def test_negative_control_same_revenue_attributed_to_another_company_fails() -> None:
+    """Standalone negative control: same revenue attributed to another company MUST fail."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Annual Revenue: $4,200,000",
+                fact_supported="Contoso Logistics LLC has annual revenue of $4,200,000.",
+                subject="Contoso Logistics LLC",
+                field="annual_revenue",
+                value="4200000",
+                polarity="affirmed",
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["typed_fields_ok"] is True
+    assert scores["citations_grounded"] is False
+    assert scores["facts_supported"] is False
+    assert any("Entity/subject mismatch" in f for f in scores["citation_failures"])
+
+
+def test_negative_control_truncated_excerpt_cutting_off_source_negation_fails() -> None:
+    """Standalone negative control: excerpt cutting off leading source negation MUST fail."""
+    doc_texts = {
+        "sub-01-app": (
+            "Signed Commercial Application\n"
+            "Insured: Northstar Analytics Inc.\n"
+            "Northstar Analytics Inc. does not have Annual Revenue: $4,200,000.\n"
+        )
+    }
+    cit = EvidenceCitation(
+        doc_id="sub-01-app",
+        section_or_quote="Annual Revenue: $4,200,000",
+        fact_supported="Northstar Analytics Inc. has annual revenue of $4,200,000.",
+        subject="Northstar Analytics Inc.",
+        field="annual_revenue",
+        value="4200000",
+        polarity="affirmed",
+    )
+    ok, reason = verify_citation_against_doc(cit, doc_texts)
+    assert ok is False
+    assert "polarity" in reason.lower() or "negated" in reason.lower()
+
+
+def test_negative_control_unsupported_appended_claim_fails() -> None:
+    """Standalone negative control: genuine fact + unsupported appended clause MUST fail."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Annual Revenue: $4,200,000",
+                fact_supported=(
+                    "Northstar Analytics Inc. has annual revenue of $4,200,000, "
+                    "and underwriting already approved a special executive waiver."
+                ),
+                subject="Northstar Analytics Inc.",
+                field="annual_revenue",
+                value="4200000",
+                polarity="affirmed",
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["typed_fields_ok"] is True
+    assert scores["citations_grounded"] is False
+    assert scores["facts_supported"] is False
+    assert any("Unsupported appended claim" in f for f in scores["citation_failures"])
+
+
+def test_negative_control_absent_controlling_document_fails() -> None:
+    """Standalone negative control: omitting must_cite_docs (sub-01-app) MUST fail."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-email",
+                section_or_quote="Revenue is $4,200,000, requesting $2,000,000 limit",
+                fact_supported="Annual revenue is $4,200,000 and requested limit is $2,000,000.",
+                subject="Northstar Analytics Inc.",
+                field="annual_revenue",
+                value="4200000",
+                polarity="affirmed",
+            )
+        ],
+        summary="Northstar Analytics Inc. $4,200,000 revenue, $2,000,000 limit, 2026-12-01.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["typed_fields_ok"] is True
+    assert scores["must_cite_covered"] is False
+    assert scores["citations_grounded"] is False
+    assert scores["facts_supported"] is False
+    assert any("Absent controlling document" in f for f in scores["citation_failures"])
+
+
+def test_positive_control_structured_evidence_citation_passes() -> None:
+    """Genuine positive control with subject, field, value, and polarity passes cleanly."""
+    case = _load_case("sub-01")
+    brief = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        business_classification="SaaS / B2B Software",
+        annual_revenue_usd=4_200_000,
+        requested_coverage_usd=2_000_000,
+        effective_date="2026-12-01",
+        carrier_match="carrier-apex",
+        material_facts=[
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Annual Revenue: $4,200,000",
+                fact_supported="Northstar Analytics Inc. has annual revenue of $4,200,000.",
+                subject="Northstar Analytics Inc.",
+                field="annual_revenue",
+                value="4200000",
+                polarity="affirmed",
+            ),
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Requested Limit: $2,000,000",
+                fact_supported="Requested limit is $2,000,000.",
+                subject="Northstar Analytics Inc.",
+                field="requested_coverage",
+                value="2000000",
+                polarity="affirmed",
+            ),
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote="Effective Date: 2026-12-01",
+                fact_supported="Effective date is 2026-12-01.",
+                subject="Northstar Analytics Inc.",
+                field="effective_date",
+                value="2026-12-01",
+                polarity="affirmed",
+            ),
+        ],
+        summary="Northstar Analytics Inc. complete and eligible for carrier-apex.",
+    )
+    scores = score_submission_brief(case, brief)
+    assert scores["disposition_correct"] is True
+    assert scores["typed_fields_ok"] is True
+    assert scores["citations_grounded"] is True
+    assert scores["unreviewable_citations"] == []
+    assert scores["facts_supported"] is True
+
+
+async def test_usage_tracking_callback_records_model_provenance_and_tool_calls() -> None:
+    """UsageTrackingCallback captures exact requested/responded model IDs and tool calls."""
+    from langchain_core.messages import AIMessage  # noqa: PLC0415
+    from langchain_core.outputs import ChatGeneration, LLMResult  # noqa: PLC0415
+
+    from evals.metrics import UsageTrackingCallback  # noqa: PLC0415
+
+    cb = UsageTrackingCallback()
+    await cb.on_chat_model_start(
+        {"kwargs": {"model": "eval-anthropic"}},
+        [[]],
+        invocation_params={"model_name": "eval-anthropic"},
+    )
+    await cb.on_tool_start({"name": "read_submission_document"}, "{}")
+    msg = AIMessage(
+        content="ok",
+        usage_metadata={"input_tokens": 100, "output_tokens": 25, "total_tokens": 125},
+        response_metadata={"model_name": "anthropic/claude-sonnet-5-5"},
+    )
+    await cb.on_llm_end(LLMResult(generations=[[ChatGeneration(message=msg)]]))
+    assert cb.stats.llm_calls == 1
+    assert cb.stats.tool_calls == 1
+    assert cb.stats.tools_called == ["read_submission_document"]
+    assert cb.stats.unique_requested_models == ["eval-anthropic"]
+    assert cb.stats.unique_response_models == ["anthropic/claude-sonnet-5-5"]
+    assert cb.stats.total_tokens == 125

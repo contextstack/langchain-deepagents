@@ -105,7 +105,16 @@ BRIEF_SYNTHESIS_PROMPT = (
     "- 'ask_broker': in appetite with no contradictions, but required fields are missing.\n"
     "- 'human_review': any material contradiction across documents, undisclosed loss, "
     "prohibited class, or coverage/loss outside all available carrier appetite rules.\n"
-    "Cite exact doc_id values and verbatim passages in material_facts.\n\n"
+    "Evidence citation rules (STRICT — applies to every item in material_facts):\n"
+    "- Each EvidenceCitation must ground ONE atomic fact from ONE single doc_id.\n"
+    "- section_or_quote MUST be a verbatim quote from that doc_id.\n"
+    "- fact_supported MUST state ONLY what that single quoted passage says (do NOT blend "
+    "carrier thresholds or cross-document comparisons into a single-document citation; "
+    "put cross-document conflicts in `contradictions` and cite carrier guides separately).\n"
+    "- Populate subject (insured company or carrier name), field (e.g. annual_revenue, "
+    "requested_coverage, effective_date, fein, business_classification, loss_history, "
+    "missing_field, supersedes, prohibited_class, carrier_cap), value, and polarity "
+    "('affirmed' or 'negated').\n\n"
     "Submission ID: {submission_id}\n"
     "Investigation Findings:\n{investigation}"
 )
@@ -236,6 +245,50 @@ def build_verified_approval_command(
         "binding_mac": binding_mac,
     }
     return Command(resume=server_record)
+
+
+async def resume_quote_approval(
+    graph: Any,
+    *,
+    config: RunnableConfig,
+    context: RunContext,
+    bearer_token: str | None,
+    decision: Literal["approve", "reject"],
+    settings: Settings,
+    policy: PolicyEngine | None = None,
+    expected_payload_hash: str | None = None,
+) -> dict[str, Any]:
+    """Trusted server-side resume boundary for quote approval.
+
+    Authenticates and authorizes the caller and verifies payload-hash binding BEFORE calling
+    `graph.ainvoke(...)`. Rejected attempts never call LangGraph and never write untrusted
+    resume payloads or credentials into `checkpoints` or `checkpoint_writes` (`__resume__`).
+    """
+    snapshot = await graph.aget_state(config)
+    values = dict(getattr(snapshot, "values", {}) or {})
+    next_nodes = tuple(getattr(snapshot, "next", ()) or ())
+    operation_id = str(values.get("operation_id") or "")
+    approved_payload_hash = str(values.get("approved_payload_hash") or "")
+    if "await_approval" not in next_nodes or not operation_id or not approved_payload_hash:
+        raise ApprovalAuthorizationError(
+            "Thread is not paused at await_approval with a valid pending operation."
+        )
+    if expected_payload_hash is not None and expected_payload_hash != approved_payload_hash:
+        raise ApprovalAuthorizationError(
+            "Approved payload hash mismatch at trusted resume boundary."
+        )
+
+    cmd = build_verified_approval_command(
+        bearer_token=bearer_token,
+        decision=decision,
+        approval_tenant_id=context.tenant_id,
+        requested_by=context.requester_id,
+        operation_id=operation_id,
+        approved_payload_hash=approved_payload_hash,
+        settings=settings,
+        policy=policy,
+    )
+    return dict(await graph.ainvoke(cmd, config=config, context=context))
 
 
 def build_deep_agents_planner(

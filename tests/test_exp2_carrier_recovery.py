@@ -30,6 +30,7 @@ from workflows.submission_triage.graph import (
     SubmissionTriageDeps,
     build_submission_triage_graph,
     build_verified_approval_command,
+    resume_quote_approval,
 )
 from workflows.submission_triage.models import SubmissionBrief
 
@@ -511,3 +512,146 @@ async def test_exp2_authenticated_approval_boundary_rejections_and_zero_carrier_
             stats_after = (await client.get(f"{base_url}/admin/stats")).json()
         assert stats_after["http_post_attempts"] == 1
         assert stats_after["committed_writes"] == 1
+
+
+async def test_exp2_postgres_resume_boundary_keeps_denied_inputs_out_of_checkpoints() -> None:
+    """Denied resume_quote_approval calls never invoke LangGraph or write to __resume__."""
+    settings = get_settings()
+    settings.model_mode = "mock"
+    await apply_app_migrations(settings.database_admin_url)
+
+    carrier_state = MockCarrierState(fault_mode="normal")
+    thread_id = f"pg-boundary-{uuid.uuid4().hex[:10]}"
+
+    async with (
+        _running_carrier(carrier_state) as base_url,
+        AsyncPostgresSaver.from_conn_string(settings.database_admin_url) as saver,
+    ):
+        await saver.setup()
+        deps = SubmissionTriageDeps(
+            settings=settings,
+            carrier_base_url=base_url,
+            carrier_timeout_s=2.0,
+            use_postgres=True,
+        )
+        graph = build_submission_triage_graph(deps=deps, checkpointer=saver)
+        ctx = RunContext(
+            tenant_id="tenant-alpha",
+            requester_id="alice",
+            requester_roles=frozenset({"underwriter"}),
+            thread_id=thread_id,
+            run_id=f"r-{thread_id}",
+            request_id=f"req-{thread_id}",
+        )
+        cfg = {"configurable": {"thread_id": thread_id}}
+        await graph.ainvoke({"submission_id": "sub-01"}, config=cfg, context=ctx, durability="sync")
+
+        # Denied tokens: missing, invalid, self-approval, wrong role, cross-tenant, wrong hash
+        alice_tok = mint_user_jwt(
+            CallerIdentity(
+                tenant_id="tenant-alpha", actor_id="alice", roles=frozenset({"ops-approver"})
+            ),
+            secret=settings.jwt_signing_secret,
+        )
+        eng_tok = mint_user_jwt(
+            CallerIdentity(
+                tenant_id="tenant-alpha", actor_id="charlie", roles=frozenset({"engineer"})
+            ),
+            secret=settings.jwt_signing_secret,
+        )
+        cross_tok = mint_user_jwt(
+            CallerIdentity(
+                tenant_id="tenant-beta", actor_id="carol", roles=frozenset({"admin"})
+            ),
+            secret=settings.jwt_signing_secret,
+        )
+        bob_tok = _bob_jwt(settings)
+
+        for bad_tok in (None, "invalid.jwt.value", alice_tok, eng_tok, cross_tok):
+            with pytest.raises(ApprovalAuthorizationError):
+                await resume_quote_approval(
+                    graph,
+                    config=cfg,
+                    context=ctx,
+                    bearer_token=bad_tok,
+                    decision="approve",
+                    settings=settings,
+                )
+
+        # Wrong expected_payload_hash with valid Bob token -> rejected BEFORE graph.ainvoke
+        with pytest.raises(ApprovalAuthorizationError):
+            await resume_quote_approval(
+                graph,
+                config=cfg,
+                context=ctx,
+                bearer_token=bob_tok,
+                decision="approve",
+                settings=settings,
+                expected_payload_hash="0" * 64,
+            )
+
+        # Verify ZERO carrier POSTs and ZERO __resume__ rows or credentials in Postgres!
+        async with httpx.AsyncClient() as client:
+            stats_denied = (await client.get(f"{base_url}/admin/stats")).json()
+        assert stats_denied["http_post_attempts"] == 0
+
+        async with (
+            await psycopg.AsyncConnection.connect(settings.database_admin_url) as conn,
+            conn.cursor() as cur,
+        ):
+            await cur.execute(
+                "SELECT channel, blob FROM checkpoint_writes WHERE thread_id = %s",
+                (thread_id,),
+            )
+            writes = await cur.fetchall()
+            assert not any(ch == "__resume__" for ch, _ in writes)
+            for _, blob in writes:
+                raw = bytes(blob) if blob is not None else b""
+                for tok in (alice_tok, eng_tok, cross_tok, bob_tok):
+                    assert tok.encode("utf-8") not in raw
+                assert b"eyJ" not in raw
+
+        # Now authorize via resume_quote_approval with Bob's valid JWT -> succeeds cleanly!
+        snap = await graph.aget_state(cfg)
+        good_hash = snap.values["approved_payload_hash"]
+        res = await resume_quote_approval(
+            graph,
+            config=cfg,
+            context=ctx,
+            bearer_token=bob_tok,
+            decision="approve",
+            settings=settings,
+            expected_payload_hash=good_hash,
+        )
+        assert res["final_status"] == "completed"
+        assert res["carrier_ref"] is not None
+
+        # Inspect Postgres after authorized resume: still ZERO bearer credentials anywhere!
+        async with (
+            await psycopg.AsyncConnection.connect(settings.database_admin_url) as conn,
+            conn.cursor() as cur,
+        ):
+            await cur.execute(
+                "SELECT checkpoint::text, metadata::text FROM checkpoints WHERE thread_id = %s",
+                (thread_id,),
+            )
+            for cp_txt, meta_txt in await cur.fetchall():
+                assert "eyJ" not in (cp_txt or "")
+                assert "eyJ" not in (meta_txt or "")
+            await cur.execute(
+                "SELECT blob FROM checkpoint_writes WHERE thread_id = %s",
+                (thread_id,),
+            )
+            for (blob,) in await cur.fetchall():
+                assert b"eyJ" not in (bytes(blob) if blob is not None else b"")
+
+        # Calling resume_quote_approval on an already-completed thread is rejected
+        with pytest.raises(ApprovalAuthorizationError):
+            await resume_quote_approval(
+                graph,
+                config=cfg,
+                context=ctx,
+                bearer_token=bob_tok,
+                decision="approve",
+                settings=settings,
+            )

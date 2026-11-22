@@ -36,6 +36,114 @@ _NUM_OR_ID_RE = re.compile(r"\b(?:\d{4}-\d{2}-\d{2}|\d{2}-\d{7}|clm-\d{4}-\d+|\d
 _WORD_RE = re.compile(r"[a-z0-9][a-z0-9\-]*")
 _MILLION_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s*m(?:illion)?\b")
 _THOUSAND_RE = re.compile(r"\b(\d+(?:\.\d+)?)\s*k\b")
+_ENTITY_SUFFIX_RE = re.compile(
+    r"\b([A-Z][A-Za-z0-9&\-\']+(?:\s+[A-Z][A-Za-z0-9&\-\']+){0,4}\s+"
+    r"(?:Inc\.?|LLC|L\.L\.C\.|Corp\.?|Corporation|Co\.?|Ltd\.?|LLP|LP|Partners|Group|"
+    r"Holdings|Enterprises|Industries|Solutions|Services|Systems|Technologies|Logistics|"
+    r"Analytics|Manufacturing|Roofing|Mechanical|Consulting|Accounting|Fireworks|"
+    r"Pyrotechnics|Insurance|Specialty|Mutual|Underwriters))\b"
+)
+_LEADING_SUBJECT_RE = re.compile(
+    r"^\s*([A-Z][A-Za-z0-9&\-\']+(?:\s+[A-Z][A-Za-z0-9&\-\']+){0,3})\s+"
+    r"(?:has|have|had|is|are|was|were|does|do|did|reported|reports|requested|requests|"
+    r"shows|stated|states|operates|carries|maintains|earned|seeks)\b"
+)
+_NON_ENTITY_LEADERS = frozenset(
+    {
+        "annual",
+        "application",
+        "broker",
+        "business",
+        "carrier",
+        "claim",
+        "claims",
+        "class",
+        "classification",
+        "coverage",
+        "document",
+        "effective",
+        "email",
+        "fein",
+        "guideline",
+        "insured",
+        "limit",
+        "location",
+        "loss",
+        "named",
+        "payroll",
+        "policy",
+        "prohibited",
+        "requested",
+        "revenue",
+        "risk",
+        "schedule",
+        "signed",
+        "submission",
+        "the",
+        "this",
+        "these",
+        "underwriting",
+        "version",
+    }
+)
+_CLAUSE_STOPWORDS = frozenset(
+    {
+        "that",
+        "this",
+        "with",
+        "from",
+        "have",
+        "been",
+        "were",
+        "also",
+        "their",
+        "they",
+        "them",
+        "does",
+        "into",
+        "only",
+        "said",
+        "says",
+        "stated",
+        "states",
+        "shows",
+        "shown",
+        "lists",
+        "listed",
+        "reports",
+        "reported",
+        "notes",
+        "noted",
+        "named",
+        "insured",
+        "company",
+        "document",
+        "application",
+        "email",
+        "submission",
+        "under",
+        "over",
+        "than",
+        "more",
+        "less",
+        "both",
+        "each",
+        "same",
+        "field",
+        "value",
+        "source",
+        "carrier",
+        "required",
+        "provided",
+    }
+)
+_APPENDED_SPLIT_RE = re.compile(
+    r"[;\n]+|(?<=[.!?])\s+|,\s*(?:and|plus|also|which)\s+"
+    r"|\s+(?:and|plus|also)\s+(?=(?:it|they|the|has|have|had|is|are|was|were|does|do|did|"
+    r"no|not|zero|under|above|below|exceeds|matches|contradicts|waived|approved|verified|"
+    r"confirmed|includes|excludes|carries|maintains|reported|requested|operates|holds|"
+    r"meets|satisfies|violates|lacks|missing|omits|supersedes|\$?\d))"
+)
 
 _CLASS_CANONICAL: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("saas", ("saas", "b2b software", "cloud analytics")),
@@ -81,17 +189,32 @@ def _clause_polarity(clause: str) -> Literal["affirmed", "negated"]:
 
 
 def resolve_source_span(doc_text: str, section_or_quote: str) -> str | None:
-    """Resolve `section_or_quote` to an exact verifiable source span inside `doc_text`."""
+    """Resolve `section_or_quote` to its FULL enclosing source clause inside `doc_text`.
+
+    Returning the full enclosing line/sentence prevents truncated excerpts from cutting off
+    leading/trailing negation or subject attribution in the source document.
+    """
     norm_quote = _normalize_text(section_or_quote)
     if not norm_quote:
         return None
+    raw_units = [u.strip() for u in re.split(r"[\n]+|(?<=[.!?])\s+", doc_text) if u.strip()]
+
+    # 1. Exact substring match inside a 1..3 unit enclosing clause -> return FULL clause
+    for window in (1, 2, 3):
+        for i in range(len(raw_units) - window + 1):
+            cand = _normalize_text(" ".join(raw_units[i : i + window]))
+            if norm_quote in cand:
+                return cand
+
     norm_doc = _normalize_text(doc_text)
     if norm_quote in norm_doc:
-        return norm_quote
+        idx = norm_doc.find(norm_quote)
+        lo = max(0, idx - 120)
+        hi = min(len(norm_doc), idx + len(norm_quote) + 120)
+        return norm_doc[lo:hi].strip()
 
-    # Fall back to matching a contiguous 1-3 line/sentence span in doc_text where every
+    # 2. Fall back to matching a contiguous 1-3 line/sentence span in doc_text where every
     # concrete numeric/date/ID token in the quote exists and >=80% of content tokens match.
-    raw_units = [u.strip() for u in re.split(r"[\n]+|(?<=[.!?])\s+", doc_text) if u.strip()]
     quote_nums = set(_NUM_OR_ID_RE.findall(norm_quote))
     quote_words = [w for w in _WORD_RE.findall(norm_quote) if len(w) >= 4]
     if not quote_words and not quote_nums:
@@ -114,6 +237,68 @@ def resolve_source_span(doc_text: str, section_or_quote: str) -> str | None:
                 best_score = overlap
                 best_span = cand
     return best_span
+
+
+def _extract_named_entities(text: str) -> list[str]:
+    """Extract proper-noun company/subject names from raw (cased) text."""
+    found: list[str] = []
+    for m in _ENTITY_SUFFIX_RE.finditer(text):
+        ent = _normalize_text(m.group(1)).rstrip(".")
+        if ent and ent not in found:
+            found.append(ent)
+    lead = _LEADING_SUBJECT_RE.search(text)
+    if lead:
+        cand = _normalize_text(lead.group(1)).rstrip(".")
+        first_word = cand.split()[0] if cand else ""
+        if cand and first_word not in _NON_ENTITY_LEADERS and cand not in found:
+            found.append(cand)
+    return found
+
+
+def _entity_matches_source(entity: str, allowed_blob: str) -> bool:
+    """Return True if `entity` (or its distinctive tokens) is grounded in `allowed_blob`."""
+    norm_ent = _normalize_text(entity).rstrip(".")
+    if not norm_ent:
+        return True
+    if norm_ent in allowed_blob:
+        return True
+    generic_suffixes = {
+        "inc",
+        "llc",
+        "corp",
+        "corporation",
+        "co",
+        "ltd",
+        "llp",
+        "lp",
+        "company",
+        "group",
+        "partners",
+        "insurance",
+        "specialty",
+        "carrier",
+        "the",
+    }
+    distinctive = [
+        w for w in _WORD_RE.findall(norm_ent) if len(w) >= 3 and w not in generic_suffixes
+    ]
+    if not distinctive:
+        return False
+    return all(w in allowed_blob for w in distinctive)
+
+
+def _allowed_subject_blob(doc_id: str, doc_texts: dict[str, str]) -> str:
+    """Build normalized subject text for `doc_id` (doc itself + same-submission Insured header)."""
+    parts = [_normalize_text(doc_texts.get(doc_id, ""))]
+    # Submission docs share the insured's name from the submission's application/email headers
+    if not doc_id.startswith("carrier-"):
+        for other_id, other_text in doc_texts.items():
+            if other_id.startswith("carrier-"):
+                continue
+            for line in other_text.splitlines()[:6]:
+                if re.match(r"^\s*(?:Insured|Named\s+Insured|Account|Re)\s*:", line, re.I):
+                    parts.append(_normalize_text(line))
+    return " ".join(parts)
 
 
 def extract_typed_facts(text: str) -> set[TypedFact]:
@@ -197,30 +382,78 @@ def extract_typed_facts(text: str) -> set[TypedFact]:
     return facts
 
 
+def _is_unreviewable_reason(reason: str) -> bool:
+    return reason.startswith("unreviewable:")
+
+
 def verify_citation_against_doc(
     citation: EvidenceCitation,
     doc_texts: dict[str, str],
 ) -> tuple[bool, str]:
-    """Resolve `section_or_quote` to a source span and verify typed (field, value, polarity)."""
+    """Resolve `section_or_quote` to its FULL enclosing clause and verify subject + typed facts."""
     raw_doc = doc_texts.get(citation.doc_id)
     if raw_doc is None:
-        return False, f"Unknown doc_id '{citation.doc_id}'"
+        return False, f"unreviewable: Unknown doc_id '{citation.doc_id}'"
+
+    if not citation.section_or_quote.strip():
+        return (
+            False,
+            f"unreviewable: empty section_or_quote does not resolve on '{citation.doc_id}'",
+        )
 
     resolved_span = resolve_source_span(raw_doc, citation.section_or_quote)
     if resolved_span is None:
         return (
             False,
-            f"Cited excerpt '{citation.section_or_quote}' does not resolve to a source span "
-            f"in '{citation.doc_id}'",
+            f"unreviewable: cited excerpt '{citation.section_or_quote}' does not resolve to a "
+            f"source span in '{citation.doc_id}'",
         )
 
+    # 1. Subject / entity binding: reject attribution to a different company/entity
+    allowed_blob = _allowed_subject_blob(citation.doc_id, doc_texts)
+    claimed_entities: list[str] = []
+    if citation.subject and citation.subject.strip():
+        claimed_entities.append(citation.subject.strip())
+    for ent in _extract_named_entities(citation.fact_supported):
+        if ent not in claimed_entities:
+            claimed_entities.append(ent)
+    for ent in claimed_entities:
+        if not _entity_matches_source(ent, allowed_blob):
+            return (
+                False,
+                f"Entity/subject mismatch on '{citation.doc_id}': claimed subject '{ent}' "
+                "is not present in source document or submission subject",
+            )
+
+    # 2. Structured field/value/polarity check when explicitly supplied
     span_facts = extract_typed_facts(resolved_span)
+    span_polarity = _clause_polarity(resolved_span)
+    if citation.polarity is not None and citation.polarity != span_polarity:
+        is_loss_free = TypedFact("loss_history", "loss_free", span_polarity) in span_facts
+        if not (is_loss_free and citation.field == "loss_history"):
+            return (
+                False,
+                f"Structured polarity mismatch on '{citation.doc_id}': "
+                f"citation.polarity={citation.polarity!r} != source clause {span_polarity!r}",
+            )
+    if citation.field and citation.value:
+        norm_val = _normalize_text(citation.value)
+        val_nums = set(_NUM_OR_ID_RE.findall(norm_val))
+        span_nums = set(_NUM_OR_ID_RE.findall(resolved_span))
+        if val_nums and not val_nums.issubset(span_nums):
+            return (
+                False,
+                f"Structured value mismatch on '{citation.doc_id}': "
+                f"{citation.field}={citation.value!r} not in resolved clause",
+            )
+
+    # 3. Split claim into atomic sub-clauses to catch unsupported appended assertions
     claim_facts = extract_typed_facts(citation.fact_supported)
     if not claim_facts:
         return (
             False,
-            f"Claim '{citation.fact_supported}' on '{citation.doc_id}' contains no verifiable "
-            "typed fact (ambiguous/unsupported free text)",
+            f"unreviewable: claim '{citation.fact_supported}' on '{citation.doc_id}' contains "
+            "no verifiable typed fact (ambiguous/unsupported free text)",
         )
 
     unsupported = [cf for cf in sorted(claim_facts, key=str) if cf not in span_facts]
@@ -230,6 +463,38 @@ def verify_citation_against_doc(
             f"Claimed fact(s) {unsupported} not supported by resolved span on "
             f"'{citation.doc_id}' (span facts: {sorted(span_facts, key=str)})",
         )
+
+    # Verify every sub-clause is either backed by a verified TypedFact or lexically grounded
+    sub_clauses = [
+        sc.strip() for sc in _APPENDED_SPLIT_RE.split(citation.fact_supported) if sc.strip()
+    ]
+    span_words = set(_WORD_RE.findall(resolved_span))
+    span_nums = set(_NUM_OR_ID_RE.findall(resolved_span))
+    for sc in sub_clauses:
+        sc_facts = extract_typed_facts(sc)
+        if sc_facts:
+            continue
+        norm_sc = _normalize_text(sc)
+        sc_nums = set(_NUM_OR_ID_RE.findall(norm_sc))
+        if sc_nums and not sc_nums.issubset(span_nums):
+            return (
+                False,
+                f"Unsupported appended numeric/date/ID claim on '{citation.doc_id}': {sc!r}",
+            )
+        sc_tokens = [
+            w for w in _WORD_RE.findall(norm_sc) if len(w) >= 4 and w not in _CLAUSE_STOPWORDS
+        ]
+        # Exclude already-verified entity tokens from the appended-claim token check
+        ent_tokens = set(_WORD_RE.findall(" ".join(claimed_entities).lower()))
+        meaningful = [w for w in sc_tokens if w not in ent_tokens]
+        if meaningful:
+            grounded_ratio = sum(1 for w in meaningful if w in span_words) / len(meaningful)
+            if grounded_ratio < 0.75:
+                return (
+                    False,
+                    f"Unsupported appended claim on '{citation.doc_id}': {sc!r}",
+                )
+
     return True, "ok"
 
 
@@ -252,15 +517,33 @@ def score_submission_brief(case: dict[str, Any], brief: SubmissionBrief) -> dict
     cited_ids = {c.doc_id for c in brief.material_facts}
     must_cite = set(case.get("must_cite_docs") or [])
     citations_valid = bool(cited_ids) and cited_ids.issubset(set(doc_texts))
-    must_cite_covered = must_cite.issubset(cited_ids)
 
     # Passage-level verification: EVERY cited passage must actually be grounded in its cited doc
     citation_failures: list[str] = []
+    unreviewable_citations: list[str] = []
+    verified_doc_ids: set[str] = set()
     for cit in brief.material_facts:
         ok, reason = verify_citation_against_doc(cit, doc_texts)
-        if not ok:
+        if ok:
+            verified_doc_ids.add(cit.doc_id)
+        else:
             citation_failures.append(reason)
-    citations_grounded = citations_valid and must_cite_covered and (len(citation_failures) == 0)
+            if _is_unreviewable_reason(reason):
+                unreviewable_citations.append(reason)
+
+    # Controlling documents must exist in doc_texts AND have at least one verified citation
+    missing_controlling = sorted(d for d in must_cite if d not in verified_doc_ids)
+    must_cite_covered = must_cite.issubset(set(doc_texts)) and len(missing_controlling) == 0
+    if missing_controlling:
+        citation_failures.append(
+            f"Absent controlling document(s) without verified citation: {missing_controlling}"
+        )
+    citations_grounded = (
+        citations_valid
+        and must_cite_covered
+        and (len(citation_failures) == 0)
+        and (len(unreviewable_citations) == 0)
+    )
 
     # Typed-field grading on SubmissionBrief (exact expected values when registered!)
     typed_failures: list[str] = []
@@ -330,6 +613,7 @@ def score_submission_brief(case: dict[str, Any], brief: SubmissionBrief) -> dict
         "must_cite_covered": must_cite_covered,
         "citations_grounded": citations_grounded,
         "citation_failures": citation_failures,
+        "unreviewable_citations": unreviewable_citations,
         "typed_fields_ok": typed_fields_ok,
         "typed_failures": typed_failures,
         "facts_supported": facts_supported,
@@ -396,6 +680,7 @@ async def run_submission_ab(
             )
             t0 = time.monotonic()
             brief_dump: dict[str, Any] | None = None
+            trace_events: list[dict[str, Any]] = []
             try:
                 final = await graph.ainvoke(
                     {"submission_id": case["case_id"], "planner_variant": variant},
@@ -403,6 +688,7 @@ async def run_submission_ab(
                     context=ctx,
                     durability="sync",
                 )
+                trace_events = list(final.get("trace_events") or [])
                 brief = SubmissionBrief.model_validate(final["submission_brief"])
                 brief_dump = brief.model_dump(mode="json")
                 scores = score_submission_brief(case, brief)
@@ -418,6 +704,7 @@ async def run_submission_ab(
                     "must_cite_covered": False,
                     "citations_grounded": False,
                     "citation_failures": [],
+                    "unreviewable_citations": [],
                     "typed_fields_ok": False,
                     "typed_failures": [],
                     "facts_supported": False,
@@ -437,11 +724,16 @@ async def run_submission_ab(
                 "trial": trial,
                 "duration_s": dt,
                 "llm_calls": cb.stats.llm_calls,
+                "tool_calls": cb.stats.tool_calls,
+                "tools_called": list(cb.stats.tools_called),
+                "model_ids_requested": cb.stats.unique_requested_models,
+                "model_ids_responded": cb.stats.unique_response_models,
                 "prompt_tokens": cb.stats.prompt_tokens,
                 "completion_tokens": cb.stats.completion_tokens,
                 "total_tokens": cb.stats.total_tokens,
                 "cost_usd": cost,
                 "error": error,
+                "trace_events": trace_events,
                 "submission_brief": brief_dump,
                 **scores,
             }

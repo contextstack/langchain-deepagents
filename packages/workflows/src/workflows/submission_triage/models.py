@@ -8,11 +8,15 @@ from pydantic import BaseModel, Field
 
 
 class EvidenceCitation(BaseModel, frozen=True):
-    """Source citation grounding a material underwriting fact."""
+    """Source citation grounding a single material underwriting fact."""
 
     doc_id: str
     section_or_quote: str
     fact_supported: str
+    subject: str | None = None
+    field: str | None = None
+    value: str | None = None
+    polarity: Literal["affirmed", "negated"] | None = None
 
 
 class ContradictionFlag(BaseModel, frozen=True):
