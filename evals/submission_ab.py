@@ -81,11 +81,41 @@ def _source_texts_for_case(case_id: str) -> dict[str, str]:
     return texts
 
 
+_POLARITY_PAIRS: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
+    (
+        ("0 claims", "zero claims", "loss-free", "no claims"),
+        ("open claim", "bodily injury", "incurred", "paid", "reserve", "prior claim"),
+    ),
+    (
+        ("missing", "blank", "not provided", "pending", "tbd", "omitted"),
+        ("complete", "provided", "present", "confirmed", "verified"),
+    ),
+    (
+        ("prohibited", "excluded", "outside appetite", "ineligible"),
+        ("eligible", "in-appetite", "in appetite", "approved class"),
+    ),
+)
+
+
+def _has_polarity_contradiction(quote: str, claim: str) -> bool:
+    for neg_terms, pos_terms in _POLARITY_PAIRS:
+        q_neg = any(t in quote for t in neg_terms)
+        q_pos = any(t in quote for t in pos_terms)
+        c_neg = any(t in claim for t in neg_terms)
+        c_pos = any(t in claim for t in pos_terms)
+        # If quote asserts one pole exclusively and claim asserts the opposite pole exclusively
+        if (q_neg and not q_pos and c_pos and not c_neg) or (
+            q_pos and not q_neg and c_neg and not c_pos
+        ):
+            return True
+    return False
+
+
 def verify_citation_against_doc(
     citation: EvidenceCitation,
     doc_texts: dict[str, str],
 ) -> tuple[bool, str]:
-    """Verify that a cited passage actually exists in and supports the claim from `doc_id`."""
+    """Verify that a cited passage exists in `doc_id` AND actually supports `fact_supported`."""
     raw_doc = doc_texts.get(citation.doc_id)
     if raw_doc is None:
         return False, f"Unknown doc_id '{citation.doc_id}'"
@@ -97,13 +127,30 @@ def verify_citation_against_doc(
     if not norm_quote.strip():
         return False, f"Empty section_or_quote on '{citation.doc_id}'"
 
-    # 1. Every concrete numeric/date/ID token in the cited passage or claim must exist in THAT doc
-    cited_nums = set(_NUM_OR_ID_RE.findall(norm_quote)) | set(_NUM_OR_ID_RE.findall(norm_fact))
-    for tok in cited_nums:
+    # 1. Every concrete numeric/date/ID token in quote OR claim must exist in THAT doc
+    quote_nums = set(_NUM_OR_ID_RE.findall(norm_quote))
+    fact_nums = set(_NUM_OR_ID_RE.findall(norm_fact))
+    for tok in quote_nums | fact_nums:
         if tok not in norm_doc:
             return False, f"Token '{tok}' not present in cited doc '{citation.doc_id}'"
+    # If quote has concrete numbers/dates and claim introduces a DIFFERENT number/date not in quote
+    if quote_nums and fact_nums and not fact_nums.issubset(quote_nums):
+        extra = sorted(fact_nums - quote_nums)
+        return (
+            False,
+            f"Claim numeric/date token(s) {extra} not supported by cited excerpt on "
+            f"'{citation.doc_id}'",
+        )
 
-    # 2. Lexical overlap: cited passage words must actually come from THAT cited document
+    # 2. Polarity/contradiction check between cited excerpt and claimed fact
+    if _has_polarity_contradiction(norm_quote, norm_fact):
+        return (
+            False,
+            f"Claim '{citation.fact_supported}' contradicts cited excerpt "
+            f"'{citation.section_or_quote}' on '{citation.doc_id}'",
+        )
+
+    # 3. Lexical overlap: cited passage words must actually come from THAT cited document
     doc_words = set(_WORD_RE.findall(norm_doc))
     quote_words = [
         w for w in _WORD_RE.findall(norm_quote) if len(w) >= 4 and w not in _STOPWORDS
@@ -150,17 +197,35 @@ def score_submission_brief(case: dict[str, Any], brief: SubmissionBrief) -> dict
             citation_failures.append(reason)
     citations_grounded = citations_valid and must_cite_covered and (len(citation_failures) == 0)
 
-    # Typed-field grading on SubmissionBrief
+    # Typed-field grading on SubmissionBrief (exact expected values when registered!)
     typed_failures: list[str] = []
     if expected_disp == "ready_to_quote":
         exp_carrier = case.get("expected_carrier")
         if exp_carrier and brief.carrier_match != exp_carrier:
             typed_failures.append(f"carrier_match={brief.carrier_match} != {exp_carrier}")
-        if brief.annual_revenue_usd is None or brief.annual_revenue_usd <= 0:
+        exp_rev = case.get("expected_revenue_usd")
+        if exp_rev is not None:
+            if brief.annual_revenue_usd != int(exp_rev):
+                typed_failures.append(
+                    f"annual_revenue_usd={brief.annual_revenue_usd} != {exp_rev}"
+                )
+        elif brief.annual_revenue_usd is None or brief.annual_revenue_usd <= 0:
             typed_failures.append("missing annual_revenue_usd")
-        if brief.requested_coverage_usd is None or brief.requested_coverage_usd <= 0:
+
+        exp_cov = case.get("expected_coverage_usd")
+        if exp_cov is not None:
+            if brief.requested_coverage_usd != int(exp_cov):
+                typed_failures.append(
+                    f"requested_coverage_usd={brief.requested_coverage_usd} != {exp_cov}"
+                )
+        elif brief.requested_coverage_usd is None or brief.requested_coverage_usd <= 0:
             typed_failures.append("missing requested_coverage_usd")
-        if not brief.effective_date:
+
+        exp_eff = case.get("expected_effective_date")
+        if exp_eff is not None:
+            if brief.effective_date != str(exp_eff):
+                typed_failures.append(f"effective_date={brief.effective_date} != {exp_eff}")
+        elif not brief.effective_date:
             typed_failures.append("missing effective_date")
     if case.get("expect_contradictions") and not brief.contradictions:
         typed_failures.append("expected contradictions list to be non-empty")

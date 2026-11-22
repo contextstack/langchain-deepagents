@@ -127,6 +127,13 @@ CREATE TABLE IF NOT EXISTS mock_operations (
     created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS carrier_dispatch_log (
+    operation_id    TEXT PRIMARY KEY,
+    tenant_id       TEXT NOT NULL,
+    payload_hash    TEXT NOT NULL,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 CREATE TABLE IF NOT EXISTS audit_log (
     event_id         UUID PRIMARY KEY,
     tenant_id        TEXT NOT NULL,
@@ -181,7 +188,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
     mock_services,
     mock_tickets,
     mock_accounts,
-    mock_operations
+    mock_operations,
+    carrier_dispatch_log
 TO app_rw, api_rw;
 
 REVOKE ALL ON audit_log FROM app_rw, api_rw;
@@ -206,6 +214,7 @@ BEGIN
         'mock_tickets',
         'mock_accounts',
         'mock_operations',
+        'carrier_dispatch_log',
         'audit_log'
     ]
     LOOP

@@ -13,11 +13,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import uuid
 from dataclasses import dataclass, field
 from typing import Any, Literal, TypedDict
 
 import httpx
+import psycopg
 from deepagents import (
     GeneralPurposeSubagentProfile,
     HarnessProfile,
@@ -40,7 +42,9 @@ from langgraph.runtime import Runtime
 from langgraph.types import interrupt
 
 from core.audit import AuditEvent
+from core.auth import AuthError, verify_user_jwt
 from core.config import Settings, get_settings
+from core.db import set_tenant_context
 from core.models import RunContext
 from core.pii import PII_RULES, redact_text
 from core.policy import APPROVER_ROLES
@@ -239,9 +243,10 @@ class SubmissionTriageDeps:
     carrier_timeout_s: float = 0.5
     callbacks: list[Any] = field(default_factory=list)
     audit_memory: list[AuditEvent] = field(default_factory=list)
-    # Durable pre-send dispatch ledger surviving process/graph restarts
+    use_postgres: bool = False
+    # In-memory dispatch ledger used only when use_postgres=False
     dispatched_ops: set[str] = field(default_factory=set)
-    # Optional fault-injection hook: raise right after carrier POST returns/hangs before checkpoint
+    # Optional fault-injection hook: raise right after carrier POST before checkpoint
     simulate_crash_mid_post: bool = False
 
 
@@ -434,11 +439,6 @@ def build_submission_triage_graph(
             tenant_id=ctx.tenant_id,
             settings=wf_deps.settings,
         )
-        fast_model = get_chat_model(
-            alias="ops-fast",
-            tenant_id=ctx.tenant_id,
-            settings=wf_deps.settings,
-        )
         invoke_cfg: RunnableConfig = (
             {"callbacks": wf_deps.callbacks} if wf_deps.callbacks else {}
         )
@@ -472,7 +472,7 @@ def build_submission_triage_graph(
                     for name, pattern, _ in PII_RULES
                 ],
                 SummarizationMiddleware(
-                    model=fast_model,
+                    model=chat_model,
                     trigger=("tokens", 4000),
                     keep=("messages", 10),
                 ),
@@ -650,17 +650,35 @@ def build_submission_triage_graph(
                 "submission_brief": state["submission_brief"],
             }
         )
-        approver_id = str(decision.get("approver_id", ""))
-        raw_roles = decision.get("approver_roles")
-        approver_roles = (
-            frozenset(str(r) for r in raw_roles)
-            if raw_roles is not None
-            else frozenset({"ops-approver"})
-        )
         action = str(decision.get("decision", "reject"))
-
         refusal_reason: str | None = None
-        if action == "approve":
+        approver_id = ""
+        approver_roles: frozenset[str] = frozenset()
+
+        approver_token = decision.get("approver_token")
+        if approver_token:
+            try:
+                caller = verify_user_jwt(
+                    str(approver_token), secret=wf_deps.settings.jwt_signing_secret
+                )
+                if caller.tenant_id != ctx.tenant_id:
+                    refusal_reason = (
+                        f"Cross-tenant approver token ({caller.tenant_id} != {ctx.tenant_id})"
+                    )
+                else:
+                    approver_id = caller.actor_id
+                    approver_roles = caller.roles
+            except AuthError as exc:
+                refusal_reason = f"Invalid approver token: {exc}"
+        else:
+            approver_id = str(decision.get("approver_id", ""))
+            raw_roles = decision.get("approver_roles")
+            # Fail-closed: missing/omitted approver_roles NEVER defaults to ops-approver!
+            approver_roles = (
+                frozenset(str(r) for r in raw_roles) if isinstance(raw_roles, list) else frozenset()
+            )
+
+        if refusal_reason is None and action == "approve":
             if not approver_id or approver_id == ctx.requester_id:
                 refusal_reason = "Separation of duties: requester cannot approve own quote"
             elif not (approver_roles & APPROVER_ROLES):
@@ -744,7 +762,33 @@ def build_submission_triage_graph(
             ),
         }
 
-    # Node 5: submit_quote (Reconcile-before-resend on restart; exact approved payload only)
+    async def _claim_carrier_dispatch(
+        *, operation_id: str, tenant_id: str, payload_hash: str
+    ) -> bool:
+        """Atomically claim one-time dispatch permission across processes (Postgres or memory)."""
+        if wf_deps.use_postgres:
+            async with (
+                await psycopg.AsyncConnection.connect(wf_deps.settings.database_url) as conn,
+                conn.transaction(),
+                conn.cursor() as cur,
+            ):
+                await set_tenant_context(conn, tenant_id)
+                await cur.execute(
+                    """
+                    INSERT INTO carrier_dispatch_log (operation_id, tenant_id, payload_hash)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (operation_id) DO NOTHING
+                    RETURNING operation_id
+                    """,
+                    (operation_id, tenant_id, payload_hash),
+                )
+                return (await cur.fetchone()) is not None
+        if operation_id in wf_deps.dispatched_ops:
+            return False
+        wf_deps.dispatched_ops.add(operation_id)
+        return True
+
+    # Node 5: submit_quote (Reconcile-before-resend across processes; exact approved payload only)
     async def submit_quote(
         state: SubmissionTriageState, runtime: Runtime[RunContext]
     ) -> dict[str, Any]:
@@ -752,12 +796,16 @@ def build_submission_triage_graph(
         op_id = str(state["operation_id"])
         approver_id = str((state.get("approval_decision") or {}).get("approver_id", ""))
         payload = dict(state["attempted_payload"] or {})
-        if _canonical_payload_hash(payload) != state.get("approved_payload_hash"):
+        payload_hash = _canonical_payload_hash(payload)
+        if payload_hash != state.get("approved_payload_hash"):
             raise ValueError("Refusing to submit quote: attempted_payload hash mismatch")
 
-        # Structural reconcile-before-resend guard: if this op_id was already dispatched before
-        # a crash/restart, NEVER send a second POST — reconcile immediately!
-        if op_id in wf_deps.dispatched_ops:
+        # Durable cross-process reconcile-before-resend guard: if a prior process already claimed
+        # dispatch before crashing mid-POST, NEVER send a second POST — reconcile immediately!
+        claimed = await _claim_carrier_dispatch(
+            operation_id=op_id, tenant_id=ctx.tenant_id, payload_hash=payload_hash
+        )
+        if not claimed:
             return {
                 "timeout_error": state.get("timeout_error") or "Recovered after mid-POST crash",
                 "trace_events": _append_trace(
@@ -772,7 +820,6 @@ def build_submission_triage_graph(
             }
 
         if not wf_deps.carrier_base_url:
-            wf_deps.dispatched_ops.add(op_id)
             return {
                 "carrier_ref": f"CAR-MOCK-{op_id[-6:].upper()}",
                 "final_status": "completed",
@@ -782,13 +829,13 @@ def build_submission_triage_graph(
                 ),
             }
 
-        # Mark dispatched immediately before sending so a mid-POST crash reconciles on restart
-        wf_deps.dispatched_ops.add(op_id)
         try:
             async with httpx.AsyncClient(timeout=wf_deps.carrier_timeout_s) as client:
                 resp = await client.post(f"{wf_deps.carrier_base_url}/v1/quotes", json=payload)
                 resp.raise_for_status()
                 body = resp.json()
+            if os.getenv("FAULT_INJECT") == "after_carrier_post":
+                os._exit(137)
             if wf_deps.simulate_crash_mid_post:
                 raise RuntimeError("Simulated worker crash after carrier POST before checkpoint")
             _record_audit(
