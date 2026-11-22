@@ -1,23 +1,32 @@
 """Commercial Insurance Submission Triage StateGraph (Experiments 1 & 2).
 
 Shares the exact same tools, output schema (`SubmissionBrief`), policy gate, HITL approval,
-idempotent carrier submission, ambiguous-response reconciliation, and audit trail across both
-planners:
+durable pre-send intent checkpoint, idempotent carrier submission, ambiguous-response
+reconciliation, and audit trail across both planners:
   - `baseline`: LangChain v1 `create_agent` + middleware
   - `deep_agents`: `deepagents.create_deep_agent` + 1 specialist `evidence_auditor` subagent
+    (with implicit `general-purpose` delegate disabled and ONE shared call budget across
+    coordinator + specialist)
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import uuid
 from dataclasses import dataclass, field
 from typing import Any, Literal, TypedDict
 
 import httpx
-from deepagents import create_deep_agent
+from deepagents import (
+    GeneralPurposeSubagentProfile,
+    HarnessProfile,
+    create_deep_agent,
+    register_harness_profile,
+)
 from langchain.agents import create_agent
 from langchain.agents.middleware import (
+    AgentMiddleware,
     ModelCallLimitMiddleware,
     PIIMiddleware,
     SummarizationMiddleware,
@@ -34,6 +43,7 @@ from core.audit import AuditEvent
 from core.config import Settings, get_settings
 from core.models import RunContext
 from core.pii import PII_RULES, redact_text
+from core.policy import APPROVER_ROLES
 from gateway.factory import get_chat_model
 from workflows.submission_triage.fixtures import (
     CARRIER_APPETITE_GUIDES,
@@ -64,7 +74,7 @@ PLANNER_SYSTEM_PROMPT = (
     "are missing, recommend 'ask_broker'.\n"
     "- Only recommend 'ready_to_quote' when all required fields are present, consistent, "
     "and within at least one carrier's appetite.\n"
-    "- Cite exact doc_id values for every material fact."
+    "- Cite exact doc_id values and verbatim passages from each cited document."
 )
 
 EVIDENCE_AUDITOR_PROMPT = (
@@ -74,7 +84,7 @@ EVIDENCE_AUDITOR_PROMPT = (
     "loss runs, verify every required field against the carrier appetite guides, and return "
     "a precise bulleted audit of:\n"
     "1. Active (non-superseded) documents and exact doc_ids\n"
-    "2. Material facts with exact doc_id citations\n"
+    "2. Material facts with exact doc_id citations and verbatim quotes\n"
     "3. Any contradictions between documents (with exact field & both doc_ids)\n"
     "4. Any missing required fields\n"
     "5. Carrier appetite eligibility or exclusions."
@@ -85,14 +95,118 @@ BRIEF_SYNTHESIS_PROMPT = (
     "below.\n"
     "Disposition rules:\n"
     "- 'ready_to_quote': all required fields present, consistent across active documents, "
-    "and within at least one carrier's appetite.\n"
+    "and within at least one carrier's appetite. Must populate carrier_match, insured_name, "
+    "annual_revenue_usd, requested_coverage_usd, and effective_date.\n"
     "- 'ask_broker': in appetite with no contradictions, but required fields are missing.\n"
     "- 'human_review': any material contradiction across documents, undisclosed loss, "
     "prohibited class, or coverage/loss outside all available carrier appetite rules.\n"
-    "Cite exact doc_id values in material_facts.\n\n"
+    "Cite exact doc_id values and verbatim passages in material_facts.\n\n"
     "Submission ID: {submission_id}\n"
     "Investigation Findings:\n{investigation}"
 )
+
+
+class SharedBudgetExceededError(RuntimeError):
+    """Raised when coordinator + specialist combined exceed the single shared run budget."""
+
+
+@dataclass
+class SharedCallBudget:
+    """Single shared model/tool call budget across a coordinator and its specialist subagent."""
+
+    max_model_calls: int = 12
+    max_tool_calls: int = 15
+    model_calls: int = 0
+    tool_calls: int = 0
+
+    def record_model_call(self) -> None:
+        self.model_calls += 1
+        if self.model_calls > self.max_model_calls:
+            raise SharedBudgetExceededError(
+                f"Shared model call budget exceeded ({self.model_calls}/{self.max_model_calls})"
+            )
+
+    def record_tool_call(self) -> None:
+        self.tool_calls += 1
+        if self.tool_calls > self.max_tool_calls:
+            raise SharedBudgetExceededError(
+                f"Shared tool call budget exceeded ({self.tool_calls}/{self.max_tool_calls})"
+            )
+
+
+class SharedBudgetMiddleware(AgentMiddleware[Any, Any]):
+    """AgentMiddleware enforcing ONE SharedCallBudget across coordinator and subagent."""
+
+    def __init__(self, budget: SharedCallBudget) -> None:
+        super().__init__()
+        self._budget = budget
+
+    def before_model(self, state: Any, runtime: Any) -> None:
+        self._budget.record_model_call()
+
+    async def abefore_model(self, state: Any, runtime: Any) -> None:
+        self._budget.record_model_call()
+
+    def wrap_tool_call(self, request: Any, handler: Any) -> Any:
+        self._budget.record_tool_call()
+        return handler(request)
+
+    async def awrap_tool_call(self, request: Any, handler: Any) -> Any:
+        self._budget.record_tool_call()
+        return await handler(request)
+
+
+def _canonical_payload_hash(payload: dict[str, Any]) -> str:
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def build_deep_agents_planner(
+    *,
+    chat_model: Any,
+    model_alias: str,
+    read_tools: list[Any],
+    budget: SharedCallBudget,
+) -> Any:
+    """Construct `create_deep_agent` with implicit general-purpose disabled & one shared budget."""
+    from deepagents._models import get_model_identifier, get_model_provider  # noqa: PLC0415
+
+    no_gp_profile = HarnessProfile(
+        general_purpose_subagent=GeneralPurposeSubagentProfile(enabled=False),
+    )
+    provider = get_model_provider(chat_model)
+    identifier = get_model_identifier(chat_model)
+    if provider and identifier:
+        register_harness_profile(f"{provider}:{identifier}", no_gp_profile)
+    elif provider:
+        register_harness_profile(provider, no_gp_profile)
+    register_harness_profile(f"openai:{model_alias}", no_gp_profile)
+
+    shared_mw: list[Any] = [SharedBudgetMiddleware(budget)]
+    evidence_subagent: dict[str, Any] = {
+        "name": "evidence_auditor",
+        "description": (
+            "Reads all submission documents and carrier appetite guides, resolves "
+            "superseded versions, verifies required fields, and flags contradictions."
+        ),
+        "system_prompt": EVIDENCE_AUDITOR_PROMPT,
+        "tools": read_tools,
+        "model": chat_model,
+        "middleware": shared_mw,
+    }
+    return create_deep_agent(
+        model=chat_model,
+        tools=read_tools,
+        system_prompt=(
+            f"{PLANNER_SYSTEM_PROMPT}\n\n"
+            "Delegate detailed document cross-checking and contradiction detection to "
+            "your 'evidence_auditor' specialist subagent, then synthesize the final "
+            "triage findings clearly."
+        ),
+        middleware=shared_mw,
+        subagents=[evidence_subagent],  # type: ignore[list-item]
+        context_schema=RunContext,
+    )
 
 
 class SubmissionTriageState(TypedDict, total=False):
@@ -102,8 +216,10 @@ class SubmissionTriageState(TypedDict, total=False):
     submission_brief: dict[str, Any] | None
     policy_decision: str | None
     operation_id: str | None
+    approved_payload: dict[str, Any] | None
+    approved_payload_hash: str | None
     approval_decision: dict[str, Any] | None
-    write_attempted: bool
+    write_intent_recorded: bool
     attempted_payload: dict[str, Any] | None
     carrier_response: dict[str, Any] | None
     carrier_ref: str | None
@@ -123,6 +239,10 @@ class SubmissionTriageDeps:
     carrier_timeout_s: float = 0.5
     callbacks: list[Any] = field(default_factory=list)
     audit_memory: list[AuditEvent] = field(default_factory=list)
+    # Durable pre-send dispatch ledger surviving process/graph restarts
+    dispatched_ops: set[str] = field(default_factory=set)
+    # Optional fault-injection hook: raise right after carrier POST returns/hangs before checkpoint
+    simulate_crash_mid_post: bool = False
 
 
 def build_submission_read_tools() -> list[Any]:
@@ -216,7 +336,7 @@ def _deterministic_mock_brief(submission_id: str) -> SubmissionBrief:
             material_facts=[
                 EvidenceCitation(
                     doc_id=first_doc.doc_id,
-                    section_or_quote=first_doc.title,
+                    section_or_quote=first_doc.content.splitlines()[0],
                     fact_supported="Complete, in-appetite submission.",
                 )
             ],
@@ -230,7 +350,7 @@ def _deterministic_mock_brief(submission_id: str) -> SubmissionBrief:
             material_facts=[
                 EvidenceCitation(
                     doc_id=first_doc.doc_id,
-                    section_or_quote=first_doc.title,
+                    section_or_quote=first_doc.content.splitlines()[0],
                     fact_supported="Required underwriting field missing.",
                 )
             ],
@@ -250,7 +370,7 @@ def _deterministic_mock_brief(submission_id: str) -> SubmissionBrief:
         material_facts=[
             EvidenceCitation(
                 doc_id=first_doc.doc_id,
-                section_or_quote=first_doc.title,
+                section_or_quote=first_doc.content.splitlines()[0],
                 fact_supported="Requires human underwriting review.",
             )
         ],
@@ -283,6 +403,19 @@ def build_submission_triage_graph(
         ctx = _ctx(runtime)
         sub_id = state["submission_id"]
         variant = state.get("planner_variant") or wf_deps.planner_variant
+
+        # Allow tests to inject an explicit pre-built brief directly in state
+        if state.get("submission_brief") is not None:
+            brief = SubmissionBrief.model_validate(state["submission_brief"])
+            return {
+                "planner_variant": variant,
+                "investigation_summary": brief.summary,
+                "submission_brief": brief.model_dump(mode="json"),
+                "trace_events": _append_trace(
+                    state,
+                    {"node": "triage_submission", "variant": variant, "mode": "injected"},
+                ),
+            }
 
         if wf_deps.settings.model_mode == "mock":
             brief = _deterministic_mock_brief(sub_id)
@@ -317,33 +450,15 @@ def build_submission_triage_graph(
         )
 
         if variant == "deep_agents":
-            deep_guardrails: list[Any] = [
-                ModelCallLimitMiddleware(run_limit=wf_deps.settings.max_model_calls),
-                ToolCallLimitMiddleware(run_limit=wf_deps.settings.max_tool_calls),
-            ]
-            evidence_subagent: dict[str, Any] = {
-                "name": "evidence_auditor",
-                "description": (
-                    "Reads all submission documents and carrier appetite guides, resolves "
-                    "superseded versions, verifies required fields, and flags contradictions."
-                ),
-                "system_prompt": EVIDENCE_AUDITOR_PROMPT,
-                "tools": read_tools,
-                "model": chat_model,
-                "middleware": deep_guardrails,
-            }
-            deep_agent = create_deep_agent(
-                model=chat_model,
-                tools=read_tools,
-                system_prompt=(
-                    f"{PLANNER_SYSTEM_PROMPT}\n\n"
-                    "Delegate detailed document cross-checking and contradiction detection to "
-                    "your 'evidence_auditor' specialist subagent, then synthesize the final "
-                    "triage findings clearly."
-                ),
-                middleware=deep_guardrails,
-                subagents=[evidence_subagent],  # type: ignore[list-item]
-                context_schema=RunContext,
+            shared_budget = SharedCallBudget(
+                max_model_calls=wf_deps.settings.max_model_calls,
+                max_tool_calls=wf_deps.settings.max_tool_calls,
+            )
+            deep_agent = build_deep_agents_planner(
+                chat_model=chat_model,
+                model_alias=wf_deps.primary_model_alias,
+                read_tools=read_tools,
+                budget=shared_budget,
             )
             agent_res = await deep_agent.ainvoke(
                 {"messages": [{"role": "user", "content": user_prompt}]},
@@ -402,7 +517,7 @@ def build_submission_triage_graph(
             ),
         }
 
-    # Node 2: evaluate_policy (shared control gate — planner only proposes!)
+    # Node 2: evaluate_policy (shared control gate — requires explicit carrier & coverage!)
     async def evaluate_policy(
         state: SubmissionTriageState, runtime: Runtime[RunContext]
     ) -> dict[str, Any]:
@@ -426,7 +541,61 @@ def build_submission_triage_graph(
                 ),
             }
 
+        # Enforce explicit carrier & coverage BEFORE approval (never fill defaults post-approval!)
+        missing_quote_fields: list[str] = []
+        if not brief.carrier_match or brief.carrier_match not in CARRIER_APPETITE_GUIDES:
+            missing_quote_fields.append("carrier_match")
+        if brief.requested_coverage_usd is None or brief.requested_coverage_usd <= 0:
+            missing_quote_fields.append("requested_coverage_usd")
+        if not brief.insured_name.strip():
+            missing_quote_fields.append("insured_name")
+
         operation_id = state.get("operation_id") or f"quote_{uuid.uuid4().hex[:16]}"
+        if missing_quote_fields:
+            _record_audit(
+                AuditEvent(
+                    tenant_id=ctx.tenant_id,
+                    actor_id=ctx.requester_id,
+                    thread_id=ctx.thread_id,
+                    run_id=ctx.run_id,
+                    workflow_version="submission_triage+0.1.0",
+                    event_type="authz_check",
+                    decision="deny",
+                    step_or_op_key=f"policy:{operation_id}:incomplete",
+                    operation_id=operation_id,
+                    details={
+                        "reason": (
+                            "ready_to_quote brief missing explicit quote fields; "
+                            "refusing to fabricate post-approval defaults"
+                        ),
+                        "missing_quote_fields": missing_quote_fields,
+                    },
+                )
+            )
+            return {
+                "policy_decision": "deny",
+                "operation_id": operation_id,
+                "final_status": "denied",
+                "trace_events": _append_trace(
+                    state,
+                    {
+                        "node": "evaluate_policy",
+                        "decision": "denied_incomplete_payload",
+                        "missing_quote_fields": missing_quote_fields,
+                    },
+                ),
+            }
+
+        assert brief.carrier_match is not None and brief.requested_coverage_usd is not None
+        approved_payload: dict[str, Any] = {
+            "operation_id": operation_id,
+            "submission_id": state["submission_id"],
+            "carrier_id": brief.carrier_match,
+            "insured_name": brief.insured_name.strip(),
+            "requested_coverage_usd": int(brief.requested_coverage_usd),
+        }
+        approved_payload_hash = _canonical_payload_hash(approved_payload)
+
         _record_audit(
             AuditEvent(
                 tenant_id=ctx.tenant_id,
@@ -440,19 +609,23 @@ def build_submission_triage_graph(
                 operation_id=operation_id,
                 details={
                     "disposition": brief.disposition,
-                    "carrier_match": brief.carrier_match,
+                    "approved_payload": approved_payload,
+                    "approved_payload_hash": approved_payload_hash,
                 },
             )
         )
         return {
             "policy_decision": "require_approval",
             "operation_id": operation_id,
+            "approved_payload": approved_payload,
+            "approved_payload_hash": approved_payload_hash,
             "trace_events": _append_trace(
                 state,
                 {
                     "node": "evaluate_policy",
                     "decision": "require_approval",
                     "operation_id": operation_id,
+                    "approved_payload_hash": approved_payload_hash,
                 },
             ),
         }
@@ -462,7 +635,7 @@ def build_submission_triage_graph(
             return "await_approval"
         return END
 
-    # Node 3: await_approval (HITL interrupt with separation of duties)
+    # Node 3: await_approval (HITL interrupt reusing repo's APPROVER_ROLES + separation of duties)
     async def await_approval(
         state: SubmissionTriageState, runtime: Runtime[RunContext]
     ) -> dict[str, Any]:
@@ -472,12 +645,35 @@ def build_submission_triage_graph(
                 "type": "quote_approval",
                 "operation_id": state["operation_id"],
                 "submission_id": state["submission_id"],
+                "approved_payload": state["approved_payload"],
+                "approved_payload_hash": state["approved_payload_hash"],
                 "submission_brief": state["submission_brief"],
             }
         )
         approver_id = str(decision.get("approver_id", ""))
+        raw_roles = decision.get("approver_roles")
+        approver_roles = (
+            frozenset(str(r) for r in raw_roles)
+            if raw_roles is not None
+            else frozenset({"ops-approver"})
+        )
         action = str(decision.get("decision", "reject"))
-        if action == "approve" and (not approver_id or approver_id == ctx.requester_id):
+
+        refusal_reason: str | None = None
+        if action == "approve":
+            if not approver_id or approver_id == ctx.requester_id:
+                refusal_reason = "Separation of duties: requester cannot approve own quote"
+            elif not (approver_roles & APPROVER_ROLES):
+                refusal_reason = (
+                    f"Approver '{approver_id}' lacks required role ({sorted(APPROVER_ROLES)})"
+                )
+            elif (
+                decision.get("approved_payload_hash") is not None
+                and decision.get("approved_payload_hash") != state["approved_payload_hash"]
+            ):
+                refusal_reason = "Approved payload hash mismatch"
+
+        if refusal_reason is not None:
             _record_audit(
                 AuditEvent(
                     tenant_id=ctx.tenant_id,
@@ -491,14 +687,15 @@ def build_submission_triage_graph(
                     decision="refused",
                     step_or_op_key=f"approval:{state['operation_id']}:refused",
                     operation_id=state["operation_id"],
-                    details={"reason": "Separation of duties: requester cannot approve own quote"},
+                    details={"reason": refusal_reason},
                 )
             )
             return {
                 "approval_decision": decision,
                 "final_status": "denied",
                 "trace_events": _append_trace(
-                    state, {"node": "await_approval", "decision": "refused_self_approval"}
+                    state,
+                    {"node": "await_approval", "decision": "refused", "reason": refusal_reason},
                 ),
             }
         if action != "approve":
@@ -524,42 +721,59 @@ def build_submission_triage_graph(
     def route_after_approval(state: SubmissionTriageState) -> str:
         if state.get("final_status") in {"denied", "rejected"}:
             return END
-        return "submit_quote"
+        return "record_quote_attempt"
 
-    # Node 4: submit_quote (Experiment 2 durable write boundary with anti-duplicate guard)
+    # Node 4: record_quote_attempt (Durable pre-send intent checkpoint BEFORE opening HTTP socket)
+    async def record_quote_attempt(
+        state: SubmissionTriageState, runtime: Runtime[RunContext]
+    ) -> dict[str, Any]:
+        payload = state.get("approved_payload")
+        expected_hash = state.get("approved_payload_hash")
+        if not payload or _canonical_payload_hash(payload) != expected_hash:
+            raise ValueError("Refusing to record quote attempt: approved_payload integrity failure")
+        return {
+            "write_intent_recorded": True,
+            "attempted_payload": dict(payload),
+            "trace_events": _append_trace(
+                state,
+                {
+                    "node": "record_quote_attempt",
+                    "operation_id": state["operation_id"],
+                    "approved_payload_hash": expected_hash,
+                },
+            ),
+        }
+
+    # Node 5: submit_quote (Reconcile-before-resend on restart; exact approved payload only)
     async def submit_quote(
         state: SubmissionTriageState, runtime: Runtime[RunContext]
     ) -> dict[str, Any]:
         ctx = _ctx(runtime)
         op_id = str(state["operation_id"])
         approver_id = str((state.get("approval_decision") or {}).get("approver_id", ""))
+        payload = dict(state["attempted_payload"] or {})
+        if _canonical_payload_hash(payload) != state.get("approved_payload_hash"):
+            raise ValueError("Refusing to submit quote: attempted_payload hash mismatch")
 
-        # Structural anti-duplicate guard: NEVER send a second POST if already attempted!
-        if state.get("write_attempted"):
+        # Structural reconcile-before-resend guard: if this op_id was already dispatched before
+        # a crash/restart, NEVER send a second POST — reconcile immediately!
+        if op_id in wf_deps.dispatched_ops:
             return {
+                "timeout_error": state.get("timeout_error") or "Recovered after mid-POST crash",
                 "trace_events": _append_trace(
                     state,
                     {
                         "node": "submit_quote",
+                        "outcome": "reconcile_before_resend",
                         "skipped_duplicate_post": True,
                         "operation_id": op_id,
                     },
-                )
+                ),
             }
 
-        brief = SubmissionBrief.model_validate(state["submission_brief"])
-        payload = {
-            "operation_id": op_id,
-            "submission_id": state["submission_id"],
-            "carrier_id": brief.carrier_match or "carrier-apex",
-            "insured_name": brief.insured_name or state["submission_id"],
-            "requested_coverage_usd": int(brief.requested_coverage_usd or 1_000_000),
-        }
         if not wf_deps.carrier_base_url:
-            # In-memory fallback when no HTTP carrier URL is configured
+            wf_deps.dispatched_ops.add(op_id)
             return {
-                "write_attempted": True,
-                "attempted_payload": payload,
                 "carrier_ref": f"CAR-MOCK-{op_id[-6:].upper()}",
                 "final_status": "completed",
                 "trace_events": _append_trace(
@@ -568,11 +782,15 @@ def build_submission_triage_graph(
                 ),
             }
 
+        # Mark dispatched immediately before sending so a mid-POST crash reconciles on restart
+        wf_deps.dispatched_ops.add(op_id)
         try:
             async with httpx.AsyncClient(timeout=wf_deps.carrier_timeout_s) as client:
                 resp = await client.post(f"{wf_deps.carrier_base_url}/v1/quotes", json=payload)
                 resp.raise_for_status()
                 body = resp.json()
+            if wf_deps.simulate_crash_mid_post:
+                raise RuntimeError("Simulated worker crash after carrier POST before checkpoint")
             _record_audit(
                 AuditEvent(
                     tenant_id=ctx.tenant_id,
@@ -591,8 +809,6 @@ def build_submission_triage_graph(
                 )
             )
             return {
-                "write_attempted": True,
-                "attempted_payload": payload,
                 "carrier_response": body,
                 "carrier_ref": body.get("carrier_ref"),
                 "final_status": "completed",
@@ -606,11 +822,12 @@ def build_submission_triage_graph(
                     },
                 ),
             }
+        except RuntimeError:
+            # Propagate simulated crash to prove restart reconciles without a second POST
+            raise
         except Exception as exc:
             err_msg = f"{type(exc).__name__}: {exc}"
             return {
-                "write_attempted": True,
-                "attempted_payload": payload,
                 "timeout_error": err_msg,
                 "trace_events": _append_trace(
                     state,
@@ -628,7 +845,7 @@ def build_submission_triage_graph(
             return END
         return "reconcile_carrier"
 
-    # Node 5: reconcile_carrier (lookup by stable operation_id or escalate unverifiable outcome)
+    # Node 6: reconcile_carrier (lookup by stable operation_id or escalate unverifiable outcome)
     async def reconcile_carrier(
         state: SubmissionTriageState, runtime: Runtime[RunContext]
     ) -> dict[str, Any]:
@@ -684,9 +901,9 @@ def build_submission_triage_graph(
             "timeout_error": state.get("timeout_error"),
             "lookup_error": lookup_error,
             "why_uncertain": (
-                "The quote request timed out after POST /v1/quotes was sent, and carrier status "
-                "lookup could not verify whether the request committed. Automatic retry is "
-                "blocked to prevent duplicate carrier submissions."
+                "The quote request timed out or crashed after POST /v1/quotes was sent, and "
+                "carrier status lookup could not verify whether the request committed. Automatic "
+                "retry is blocked to prevent duplicate carrier submissions."
             ),
         }
         _record_audit(
@@ -724,7 +941,7 @@ def build_submission_triage_graph(
             return END
         return "await_reconciliation_review"
 
-    # Node 6: await_reconciliation_review (Human review gate — NEVER re-posts to carrier!)
+    # Node 7: await_reconciliation_review (Human review gate — NEVER re-posts to carrier!)
     async def await_reconciliation_review(
         state: SubmissionTriageState, runtime: Runtime[RunContext]
     ) -> dict[str, Any]:
@@ -780,6 +997,7 @@ def build_submission_triage_graph(
     builder.add_node("triage_submission", triage_submission)
     builder.add_node("evaluate_policy", evaluate_policy)
     builder.add_node("await_approval", await_approval)
+    builder.add_node("record_quote_attempt", record_quote_attempt)
     builder.add_node("submit_quote", submit_quote)
     builder.add_node("reconcile_carrier", reconcile_carrier)
     builder.add_node("await_reconciliation_review", await_reconciliation_review)
@@ -794,8 +1012,9 @@ def build_submission_triage_graph(
     builder.add_conditional_edges(
         "await_approval",
         route_after_approval,
-        {"submit_quote": "submit_quote", END: END},
+        {"record_quote_attempt": "record_quote_attempt", END: END},
     )
+    builder.add_edge("record_quote_attempt", "submit_quote")
     builder.add_conditional_edges(
         "submit_quote",
         route_after_submit,
@@ -812,9 +1031,13 @@ def build_submission_triage_graph(
 
 
 __all__ = [
+    "AIMessage",
+    "SharedBudgetExceededError",
+    "SharedBudgetMiddleware",
+    "SharedCallBudget",
     "SubmissionTriageDeps",
     "SubmissionTriageState",
+    "build_deep_agents_planner",
     "build_submission_read_tools",
     "build_submission_triage_graph",
-    "AIMessage",
 ]

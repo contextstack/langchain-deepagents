@@ -173,3 +173,143 @@ async def test_exp2_behavior2_unverifiable_outcome_routes_to_human_without_secon
         assert stats["http_post_attempts"] == 1
         assert stats["committed_writes"] == 1
         assert stats["lookup_attempts"] == 1
+
+
+async def test_exp2_crash_mid_post_reconciles_on_restart_without_resend() -> None:
+    """Crash after carrier commits POST (before checkpoint) -> restart reconciles, 1 POST total."""
+    carrier_state = MockCarrierState(fault_mode="normal")
+    async with _running_carrier(carrier_state) as base_url:
+        saver = InMemorySaver()
+        shared_dispatched: set[str] = set()
+        crashing_deps = SubmissionTriageDeps(
+            settings=Settings(model_mode="mock"),
+            planner_variant="baseline",
+            carrier_base_url=base_url,
+            carrier_timeout_s=2.0,
+            dispatched_ops=shared_dispatched,
+            simulate_crash_mid_post=True,
+        )
+        graph = build_submission_triage_graph(deps=crashing_deps, checkpointer=saver)
+        ctx = RunContext(
+            tenant_id="tenant-alpha",
+            requester_id="alice",
+            requester_roles=frozenset({"underwriter"}),
+            thread_id="exp2-crash-mid-post",
+            run_id="run-exp2-3",
+            request_id="req-exp2-3",
+        )
+        cfg = {"configurable": {"thread_id": ctx.thread_id}}
+
+        await graph.ainvoke(
+            {"submission_id": "sub-01", "planner_variant": "baseline"},
+            config=cfg,
+            context=ctx,
+            durability="sync",
+        )
+        snap = await graph.aget_state(cfg)
+        op_id = snap.interrupts[0].value["operation_id"]
+
+        # Approve -> carrier commits POST, then worker crashes before submit_quote checkpoints!
+        import pytest  # noqa: PLC0415
+
+        with pytest.raises(RuntimeError, match="Simulated worker crash"):
+            await graph.ainvoke(
+                Command(resume={"decision": "approve", "approver_id": "bob"}),
+                config=cfg,
+                context=ctx,
+                durability="sync",
+            )
+        assert op_id in shared_dispatched
+
+        # Restart fresh graph sharing checkpointer + durable dispatched ledger -> MUST reconcile,
+        # NOT send a second POST!
+        recovered_deps = SubmissionTriageDeps(
+            settings=Settings(model_mode="mock"),
+            planner_variant="baseline",
+            carrier_base_url=base_url,
+            carrier_timeout_s=2.0,
+            dispatched_ops=shared_dispatched,
+            simulate_crash_mid_post=False,
+        )
+        restarted_graph = build_submission_triage_graph(deps=recovered_deps, checkpointer=saver)
+        final = await restarted_graph.ainvoke(
+            None,
+            config=cfg,
+            context=ctx,
+            durability="sync",
+        )
+        assert final["final_status"] == "completed"
+        assert final["carrier_ref"] and str(final["carrier_ref"]).startswith("CAR-")
+
+        async with httpx.AsyncClient() as client:
+            stats = (await client.get(f"{base_url}/admin/stats")).json()
+        assert stats["http_post_attempts"] == 1
+        assert stats["committed_writes"] == 1
+        assert stats["lookup_attempts"] == 1
+
+
+async def test_exp2_rejects_missing_explicit_quote_fields_and_unauthorized_approver() -> None:
+    """Explicit carrier & coverage are required pre-approval; approver role is enforced."""
+    from workflows.submission_triage.models import SubmissionBrief  # noqa: PLC0415
+
+    saver = InMemorySaver()
+    deps = SubmissionTriageDeps(settings=Settings(model_mode="mock"))
+    graph = build_submission_triage_graph(deps=deps, checkpointer=saver)
+    ctx = RunContext(
+        tenant_id="tenant-alpha",
+        requester_id="alice",
+        requester_roles=frozenset({"underwriter"}),
+        thread_id="exp2-incomplete-brief",
+        run_id="run-exp2-4",
+        request_id="req-exp2-4",
+    )
+
+    # 1. Incomplete ready_to_quote brief (no carrier_match, no requested_coverage_usd) -> DENIED
+    incomplete = SubmissionBrief(
+        disposition="ready_to_quote",
+        insured_name="Northstar Analytics Inc.",
+        carrier_match=None,
+        requested_coverage_usd=None,
+        summary="Incomplete ready_to_quote brief.",
+    )
+    res = await graph.ainvoke(
+        {
+            "submission_id": "sub-01",
+            "submission_brief": incomplete.model_dump(mode="json"),
+        },
+        config={"configurable": {"thread_id": ctx.thread_id}},
+        context=ctx,
+        durability="sync",
+    )
+    assert res["final_status"] == "denied"
+    assert res["policy_decision"] == "deny"
+
+    # 2. Valid brief, but approver lacks ops-approver/admin role -> REFUSED
+    ctx2 = RunContext(
+        tenant_id="tenant-alpha",
+        requester_id="alice",
+        requester_roles=frozenset({"underwriter"}),
+        thread_id="exp2-unauth-approver",
+        run_id="run-exp2-5",
+        request_id="req-exp2-5",
+    )
+    cfg2 = {"configurable": {"thread_id": ctx2.thread_id}}
+    await graph.ainvoke(
+        {"submission_id": "sub-01"},
+        config=cfg2,
+        context=ctx2,
+        durability="sync",
+    )
+    denied = await graph.ainvoke(
+        Command(
+            resume={
+                "decision": "approve",
+                "approver_id": "charlie",
+                "approver_roles": ["engineer"],
+            }
+        ),
+        config=cfg2,
+        context=ctx2,
+        durability="sync",
+    )
+    assert denied["final_status"] == "denied"
