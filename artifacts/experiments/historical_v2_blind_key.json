@@ -1,0 +1,1010 @@
+{
+  "BLIND-001": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-002": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-003": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-004": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-005": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-006": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-007": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-008": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-009": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-010": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-011": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-012": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-013": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-014": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-015": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-016": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-017": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-018": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-019": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-020": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-021": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-022": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-023": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-024": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-025": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-05",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-026": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-05",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-027": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-05",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-028": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-05",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-029": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-05",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-030": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-05",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-031": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-032": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-033": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-034": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-035": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-036": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-037": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-038": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-039": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-040": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-041": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-042": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-043": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-044": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-045": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-046": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-047": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-048": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-049": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-050": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-051": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-052": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-053": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-054": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-055": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-056": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-057": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-058": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-059": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-060": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-061": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-11",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-062": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-11",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-063": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-11",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-064": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-11",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-065": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-12",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-066": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-12",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-067": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-12",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-068": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-12",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-069": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "baseline",
+    "case_id": "sub-12",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-070": {
+    "exp_key": "exp1_frontier_claude_sonnet_5_5",
+    "model_alias": "eval-anthropic",
+    "variant": "deep_agents",
+    "case_id": "sub-12",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-071": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-072": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-073": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-074": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-075": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-076": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-01",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-077": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-078": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-079": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-080": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-02",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-081": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-082": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-083": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-084": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-085": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-03",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-086": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-087": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 1
+  },
+  "BLIND-088": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 2
+  },
+  "BLIND-089": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-04",
+    "tier": "clean",
+    "trial": 3
+  },
+  "BLIND-090": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-05",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-091": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-05",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-092": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-05",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-093": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-094": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-095": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-096": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-097": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-06",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-098": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-099": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-100": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-101": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-102": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-07",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-103": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-104": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-105": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-106": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-107": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-108": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-08",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-109": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-110": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-111": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-112": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-113": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-114": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-09",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-115": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-116": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-117": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-118": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-119": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-120": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "deep_agents",
+    "case_id": "sub-10",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-121": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-11",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-122": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-11",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-123": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-11",
+    "tier": "messy",
+    "trial": 3
+  },
+  "BLIND-124": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-12",
+    "tier": "messy",
+    "trial": 1
+  },
+  "BLIND-125": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-12",
+    "tier": "messy",
+    "trial": 2
+  },
+  "BLIND-126": {
+    "exp_key": "exp1_local_dgx_qwen3_coder_next",
+    "model_alias": "eval-dgx-coder",
+    "variant": "baseline",
+    "case_id": "sub-12",
+    "tier": "messy",
+    "trial": 3
+  }
+}
