@@ -1,10 +1,18 @@
 # Submission Triage v3 — Paired A/B Rerun (Model Parity & Locked Scorer)
 
-- **Pinned Commit:** `4822832e3e3a28d032d30852892593b55e09ba26`
+- **Pinned Workflow & Scorer Commit:** `4822832e3e3a28d032d30852892593b55e09ba26` (0-line diff in `submission_triage/` and `evals/submission_ab.py` across routes)
 - **Timestamp (UTC):** `2026-11-23T01:24:35.363164+00:00`
 - **Fixtures SHA-256:** `db051e8b600b6a7383bc8693af89e7eb316a8c290dc2c5cbc653179563b32455`
 - **Scorer:** `evals/submission_ab.py` (subject + full enclosing clause + typed facts)
 - **Shared Budget & Controls:** Identical `chat_model` for investigation, summarization, Deep Agents coordinator/specialist, and synthesis; `general-purpose` disabled; alternating arm order; shared 12-model / 15-tool budget.
+- **Canceled Prior DGX 60s Attempt Log:** Retained separately at [`artifacts/experiments/triage_v3_dgx_60s_canceled.txt`](file:///Users/jeremyvaught/src/contextstack-langchain-deepagents/main/artifacts/experiments/triage_v3_dgx_60s_canceled.txt).
+
+## Per-Route Execution Provenance
+
+| Route | Execution Code SHA | Runner SHA-256 (`scripts/run_triage_v3.py`) | Effective Timeout | Concurrency | Workflow/Scorer Diff vs `4822832` |
+|---|---|---|---:|---:|---|
+| `eval-anthropic` | `4822832e3e3a` | `d38546f3a0f5` | 60.0s | 4 | none |
+| `eval-dgx-coder` | `367e05321a4f` | `293890e40d3c` | 180.0s | 1 | none (`--resume-dgx` timeout bump only) |
 
 ## Model Provenance Verification
 

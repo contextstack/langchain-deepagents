@@ -25998,5 +25998,22 @@
         }
       ]
     }
+  },
+  "route_provenance": {
+    "eval-anthropic": {
+      "execution_code_sha": "4822832e3e3a28d032d30852892593b55e09ba26",
+      "runner_sha256": "d38546f3a0f50dab2f445975e0ece84459510faaecec16903764813dfeda45c5",
+      "effective_timeout_s": 60.0,
+      "concurrency": 4,
+      "workflow_code_diff_vs_4822832": "none"
+    },
+    "eval-dgx-coder": {
+      "execution_code_sha": "367e05321a4fcdc6a75ff37a03240659880bad54",
+      "runner_sha256": "293890e40d3c93bd38e0dec7da9ba2a528d899a0a33734194ca9bd586563c197",
+      "effective_timeout_s": 180.0,
+      "concurrency": 1,
+      "workflow_code_diff_vs_4822832": "none (0 lines changed in submission_triage/ or evals/submission_ab.py; runner --resume-dgx timeout bump only)",
+      "canceled_prior_attempt_log": "artifacts/experiments/triage_v3_dgx_60s_canceled.txt"
+    }
   }
 }

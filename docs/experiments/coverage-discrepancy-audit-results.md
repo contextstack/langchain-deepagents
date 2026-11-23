@@ -1,5 +1,7 @@
 # Coverage Discrepancy Audit — Read-Only Held-Out Results
 
+> **Status:** Determinations (`72/72`), controlling values (`72/72`), zero false definitive answers (`0/12`), and token totals (`422,029` Baseline vs. `1,509,696` Deep Agents) are audited and exact. Automated evidence-pass and routing-bar scores (both v1 and v2 below) should be treated as **provisional** pending any final human adjudication on paraphrase claims. `B07`'s unsigned draft (`unsigned_endorsement_mx_502.txt`) and `B08`'s loss run (`loss_run_2026.txt`) are graded in v2 as supporting evidence without becoming operative endorsement links.
+
 - **Pinned Commit:** `7dc6bf2112d779e83ac8065c8edfa96f46fd9bbd`
 - **Timestamp (UTC):** `2026-11-22T21:56:14.061672+00:00`
 - **Model Alias:** `eval-anthropic` (`concurrency=1`, alternating arm order)

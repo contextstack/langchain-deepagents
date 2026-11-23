@@ -141,16 +141,25 @@ async def _main(smoke: bool, resume_dgx: bool) -> None:
         return
 
     results: dict[str, Any] = {}
+    route_provenance: dict[str, Any] = {}
+    runner_sha = _sha256_file(Path(__file__))
     targets: tuple[tuple[str, int, float], ...] = (
         ("eval-anthropic", 4, 60.0),
         ("eval-dgx-coder", 1, 180.0),
     )
     if resume_dgx and OUT_JSON.exists():
         existing = json.loads(OUT_JSON.read_text(encoding="utf-8"))
+        if existing.get("fixtures_sha256") != fixtures_sha:
+            raise ValueError("Refusing to merge: fixtures_sha256 mismatch with saved hosted block")
+        hosted = (existing.get("results") or {}).get("eval-anthropic") or {}
+        if len(hosted.get("runs") or []) != 72:
+            raise ValueError("Refusing to merge: saved eval-anthropic block does not have 72 rows")
         results = dict(existing.get("results") or {})
+        route_provenance = dict(existing.get("route_provenance") or {})
         commit_sha = str(existing.get("commit_sha") or commit_sha)
         targets = (("eval-dgx-coder", 1, 180.0),)
 
+    exec_sha = _git_sha()
     for model_alias, conc, timeout_s in targets:
         settings.model_timeout_s = timeout_s
         print(
@@ -166,12 +175,19 @@ async def _main(smoke: bool, resume_dgx: bool) -> None:
             concurrency=conc,
             settings=settings,
         )
+        route_provenance[model_alias] = {
+            "execution_code_sha": exec_sha,
+            "runner_sha256": runner_sha,
+            "effective_timeout_s": timeout_s,
+            "concurrency": conc,
+        }
         # Checkpoint partial results after each model
         bundle = {
             "mode": "full_144",
             "commit_sha": commit_sha,
             "fixtures_sha256": fixtures_sha,
             "timestamp_utc": datetime.now(UTC).isoformat(),
+            "route_provenance": route_provenance,
             "results": results,
         }
         OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
