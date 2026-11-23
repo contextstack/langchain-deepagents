@@ -102,7 +102,7 @@ def _render_report(bundle: dict[str, Any]) -> str:
     return "\n".join(lines) + "\n"
 
 
-async def _main(smoke: bool) -> None:
+async def _main(smoke: bool, resume_dgx: bool) -> None:
     settings = get_settings()
     settings.model_mode = "gateway"
     commit_sha = _git_sha()
@@ -141,9 +141,21 @@ async def _main(smoke: bool) -> None:
         return
 
     results: dict[str, Any] = {}
-    for model_alias, conc in (("eval-anthropic", 4), ("eval-dgx-coder", 1)):
+    targets: tuple[tuple[str, int, float], ...] = (
+        ("eval-anthropic", 4, 60.0),
+        ("eval-dgx-coder", 1, 180.0),
+    )
+    if resume_dgx and OUT_JSON.exists():
+        existing = json.loads(OUT_JSON.read_text(encoding="utf-8"))
+        results = dict(existing.get("results") or {})
+        commit_sha = str(existing.get("commit_sha") or commit_sha)
+        targets = (("eval-dgx-coder", 1, 180.0),)
+
+    for model_alias, conc, timeout_s in targets:
+        settings.model_timeout_s = timeout_s
         print(
-            f"\n=== Running full 72-attempt matrix on {model_alias} (conc={conc}) ===",
+            f"\n=== Running full 72-attempt matrix on {model_alias} "
+            f"(conc={conc}, timeout={timeout_s}s) ===",
             flush=True,
         )
         results[model_alias] = await run_submission_ab(
@@ -173,5 +185,6 @@ async def _main(smoke: bool) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--resume-dgx", action="store_true")
     args = parser.parse_args()
-    asyncio.run(_main(smoke=args.smoke))
+    asyncio.run(_main(smoke=args.smoke, resume_dgx=args.resume_dgx))

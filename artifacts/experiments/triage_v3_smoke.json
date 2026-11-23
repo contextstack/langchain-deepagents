@@ -1,0 +1,877 @@
+{
+  "mode": "smoke",
+  "commit_sha": "e4bdde46aef40d78defecd78c9ee32d7098641eb",
+  "fixtures_sha256": "db051e8b600b6a7383bc8693af89e7eb316a8c290dc2c5cbc653179563b32455",
+  "timestamp_utc": "2026-11-22T21:03:33.935963+00:00",
+  "results": {
+    "eval-anthropic": {
+      "model_alias": "eval-anthropic",
+      "trials": 1,
+      "summary": {
+        "baseline": {
+          "overall": {
+            "runs": 2,
+            "correct": 2,
+            "accuracy_pct": 100.0,
+            "facts_supported": 0,
+            "facts_supported_pct": 0.0,
+            "missed_escalations": 0,
+            "unnecessary_escalations": 0,
+            "errors": 0,
+            "avg_latency_s": 26.02,
+            "avg_llm_calls": 4.0,
+            "calls_per_correct": 4.0,
+            "tokens_per_correct": 13058,
+            "total_cost_usd": 0.1729,
+            "cost_per_correct_usd": 0.08645
+          },
+          "clean": {
+            "runs": 1,
+            "correct": 1,
+            "accuracy_pct": 100.0,
+            "facts_supported": 0,
+            "facts_supported_pct": 0.0,
+            "missed_escalations": 0,
+            "unnecessary_escalations": 0,
+            "errors": 0,
+            "avg_latency_s": 26.22,
+            "avg_llm_calls": 4.0,
+            "calls_per_correct": 4.0,
+            "tokens_per_correct": 13059,
+            "total_cost_usd": 0.0871,
+            "cost_per_correct_usd": 0.08707
+          },
+          "messy": {
+            "runs": 1,
+            "correct": 1,
+            "accuracy_pct": 100.0,
+            "facts_supported": 0,
+            "facts_supported_pct": 0.0,
+            "missed_escalations": 0,
+            "unnecessary_escalations": 0,
+            "errors": 0,
+            "avg_latency_s": 25.83,
+            "avg_llm_calls": 4.0,
+            "calls_per_correct": 4.0,
+            "tokens_per_correct": 13057,
+            "total_cost_usd": 0.0858,
+            "cost_per_correct_usd": 0.08584
+          }
+        },
+        "deep_agents": {
+          "overall": {
+            "runs": 2,
+            "correct": 2,
+            "accuracy_pct": 100.0,
+            "facts_supported": 0,
+            "facts_supported_pct": 0.0,
+            "missed_escalations": 0,
+            "unnecessary_escalations": 0,
+            "errors": 0,
+            "avg_latency_s": 49.03,
+            "avg_llm_calls": 7.5,
+            "calls_per_correct": 7.5,
+            "tokens_per_correct": 49702,
+            "total_cost_usd": 0.4837,
+            "cost_per_correct_usd": 0.24184
+          },
+          "clean": {
+            "runs": 1,
+            "correct": 1,
+            "accuracy_pct": 100.0,
+            "facts_supported": 0,
+            "facts_supported_pct": 0.0,
+            "missed_escalations": 0,
+            "unnecessary_escalations": 0,
+            "errors": 0,
+            "avg_latency_s": 49.22,
+            "avg_llm_calls": 7.0,
+            "calls_per_correct": 7.0,
+            "tokens_per_correct": 46133,
+            "total_cost_usd": 0.2336,
+            "cost_per_correct_usd": 0.23358
+          },
+          "messy": {
+            "runs": 1,
+            "correct": 1,
+            "accuracy_pct": 100.0,
+            "facts_supported": 0,
+            "facts_supported_pct": 0.0,
+            "missed_escalations": 0,
+            "unnecessary_escalations": 0,
+            "errors": 0,
+            "avg_latency_s": 48.84,
+            "avg_llm_calls": 8.0,
+            "calls_per_correct": 8.0,
+            "tokens_per_correct": 53271,
+            "total_cost_usd": 0.2501,
+            "cost_per_correct_usd": 0.2501
+          }
+        }
+      },
+      "runs": [
+        {
+          "model_alias": "eval-anthropic",
+          "variant": "baseline",
+          "case_id": "sub-01",
+          "tier": "clean",
+          "scenario_tag": "clean_saas_eo",
+          "trial": 1,
+          "duration_s": 26.22,
+          "llm_calls": 4,
+          "tool_calls": 6,
+          "tools_called": [
+            "list_submission_documents",
+            "list_carriers",
+            "read_submission_document",
+            "lookup_carrier_appetite",
+            "read_submission_document",
+            "lookup_carrier_appetite"
+          ],
+          "model_ids_requested": [
+            "eval-anthropic"
+          ],
+          "model_ids_responded": [
+            "eval-anthropic"
+          ],
+          "prompt_tokens": 9068,
+          "completion_tokens": 3991,
+          "total_tokens": 13059,
+          "cost_usd": 0.087069,
+          "error": null,
+          "trace_events": [
+            {
+              "node": "triage_submission",
+              "variant": "baseline",
+              "disposition": "ready_to_quote"
+            },
+            {
+              "node": "evaluate_policy",
+              "decision": "require_approval",
+              "operation_id": "quote_3a7e2a40db834a8d",
+              "approved_payload_hash": "082d8d868a2dae0a692f54bbb4d408fcd47576bd7fefe869b668010f9c45d151"
+            }
+          ],
+          "submission_brief": {
+            "disposition": "ready_to_quote",
+            "insured_name": "Northstar Analytics Inc.",
+            "business_classification": "SaaS / B2B Software",
+            "annual_revenue_usd": 4200000,
+            "requested_coverage_usd": 2000000,
+            "effective_date": "2026-12-01",
+            "carrier_match": "carrier-apex",
+            "material_facts": [
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Insured: Northstar Analytics Inc.",
+                "fact_supported": "The application names the insured as Northstar Analytics Inc.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "insured_name",
+                "value": "Northstar Analytics Inc.",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "FEIN: 84-1234567",
+                "fact_supported": "The application lists the FEIN as 84-1234567.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "fein",
+                "value": "84-1234567",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Class: SaaS / B2B Software (cloud analytics dashboard)",
+                "fact_supported": "The application states the business class is SaaS / B2B Software (cloud analytics dashboard).",
+                "subject": "Northstar Analytics Inc.",
+                "field": "business_classification",
+                "value": "SaaS / B2B Software",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-email",
+                "section_or_quote": "SaaS / B2B Software",
+                "fact_supported": "The broker email gives the class as SaaS / B2B Software.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "business_classification",
+                "value": "SaaS / B2B Software",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Annual Revenue: $4,200,000",
+                "fact_supported": "The application states annual revenue of $4,200,000.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "annual_revenue",
+                "value": "4200000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-email",
+                "section_or_quote": "Revenue is $4,200,000",
+                "fact_supported": "The broker email states revenue of $4,200,000.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "annual_revenue",
+                "value": "4200000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Requested Limit: $2,000,000",
+                "fact_supported": "The application requests a limit of $2,000,000.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "requested_coverage",
+                "value": "2000000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-email",
+                "section_or_quote": "requesting $2,000,000 limit",
+                "fact_supported": "The broker email requests a $2,000,000 limit.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "requested_coverage",
+                "value": "2000000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Effective Date: 2026-12-01",
+                "fact_supported": "The application states an effective date of 2026-12-01.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "effective_date",
+                "value": "2026-12-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-email",
+                "section_or_quote": "effective 2026-12-01",
+                "fact_supported": "The broker email states the coverage is effective 2026-12-01.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "effective_date",
+                "value": "2026-12-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "0 claims ($0 incurred, 2023-2026)",
+                "fact_supported": "The application reports 0 claims and $0 incurred for 2023-2026.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "loss_history",
+                "value": "0 claims, $0 incurred, 2023-2026",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "sub-01-email",
+                "section_or_quote": "Clean 3-year loss history",
+                "fact_supported": "The broker email describes a clean 3-year loss history.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "loss_history",
+                "value": "Clean 3-year loss history",
+                "polarity": "negated"
+              }
+            ],
+            "missing_fields": [],
+            "contradictions": [],
+            "summary": "Northstar Analytics Inc. (Tech E&O, SaaS / B2B Software) is ready to quote with Apex (carrier-apex). The email and application agree on class, revenue ($4.2M), limit ($2M), effective date (2026-12-01) and a clean loss history. Both documents are v1 and nothing is superseded. All Apex required fields are present, and the risk is within Apex's appetite: the class is eligible and not prohibited, revenue is under $25M, the limit is under $5M, and incurred losses are $0. Ironclad is out of appetite for SaaS. Caveats: (1) the email says a loss history is attached, but no separate loss run is in the submission, so the loss history comes only from the application and is unverified. Consider requesting the carrier loss run as a subject-to condition. (2) The application text shows no signature or date. Neither caveat changes the disposition."
+          },
+          "disposition_correct": true,
+          "expected_disposition": "ready_to_quote",
+          "actual_disposition": "ready_to_quote",
+          "missed_escalation": false,
+          "unnecessary_escalation": false,
+          "citations_valid": true,
+          "must_cite_covered": true,
+          "citations_grounded": false,
+          "citation_failures": [
+            "unreviewable: claim 'The application names the insured as Northstar Analytics Inc.' on 'sub-01-app' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "Structured polarity mismatch on 'sub-01-email': citation.polarity='negated' != source clause 'affirmed'"
+          ],
+          "unreviewable_citations": [
+            "unreviewable: claim 'The application names the insured as Northstar Analytics Inc.' on 'sub-01-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+          ],
+          "typed_fields_ok": true,
+          "typed_failures": [],
+          "facts_supported": false,
+          "matched_keywords": "4/4",
+          "cited_doc_ids": [
+            "sub-01-app",
+            "sub-01-email"
+          ]
+        },
+        {
+          "model_alias": "eval-anthropic",
+          "variant": "deep_agents",
+          "case_id": "sub-01",
+          "tier": "clean",
+          "scenario_tag": "clean_saas_eo",
+          "trial": 1,
+          "duration_s": 49.22,
+          "llm_calls": 7,
+          "tool_calls": 13,
+          "tools_called": [
+            "list_carriers",
+            "list_submission_documents",
+            "task",
+            "lookup_carrier_appetite",
+            "lookup_carrier_appetite",
+            "read_submission_document",
+            "read_submission_document",
+            "list_submission_documents",
+            "lookup_carrier_appetite",
+            "list_carriers",
+            "lookup_carrier_appetite",
+            "read_submission_document",
+            "read_submission_document"
+          ],
+          "model_ids_requested": [
+            "eval-anthropic"
+          ],
+          "model_ids_responded": [
+            "eval-anthropic"
+          ],
+          "prompt_tokens": 38201,
+          "completion_tokens": 7932,
+          "total_tokens": 46133,
+          "cost_usd": 0.233583,
+          "error": null,
+          "trace_events": [
+            {
+              "node": "triage_submission",
+              "variant": "deep_agents",
+              "disposition": "ready_to_quote"
+            },
+            {
+              "node": "evaluate_policy",
+              "decision": "require_approval",
+              "operation_id": "quote_292be92aeb2a4f99",
+              "approved_payload_hash": "5ad595387a2c419f5bfb1848a0f45fd1efd6f477582321f218728faf1f3e6371"
+            }
+          ],
+          "submission_brief": {
+            "disposition": "ready_to_quote",
+            "insured_name": "Northstar Analytics Inc.",
+            "business_classification": "SaaS / B2B Software",
+            "annual_revenue_usd": 4200000,
+            "requested_coverage_usd": 2000000,
+            "effective_date": "2026-12-01",
+            "carrier_match": "carrier-apex",
+            "material_facts": [
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Insured: Northstar Analytics Inc.",
+                "fact_supported": "The application names the insured as Northstar Analytics Inc.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "insured_name",
+                "value": "Northstar Analytics Inc.",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "FEIN: 84-1234567",
+                "fact_supported": "The application states the FEIN is 84-1234567.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "fein",
+                "value": "84-1234567",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Class: SaaS / B2B Software (cloud analytics dashboard)",
+                "fact_supported": "The application classifies the business as SaaS / B2B Software (cloud analytics dashboard).",
+                "subject": "Northstar Analytics Inc.",
+                "field": "business_classification",
+                "value": "SaaS / B2B Software",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Annual Revenue: $4,200,000",
+                "fact_supported": "The application states annual revenue of $4,200,000.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "annual_revenue",
+                "value": "4200000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Requested Limit: $2,000,000",
+                "fact_supported": "The application states a requested limit of $2,000,000.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "requested_coverage",
+                "value": "2000000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "Effective Date: 2026-12-01",
+                "fact_supported": "The application states an effective date of 2026-12-01.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "effective_date",
+                "value": "2026-12-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-app",
+                "section_or_quote": "3-Year Loss History: 0 claims ($0 incurred, 2023-2026).",
+                "fact_supported": "The application reports 0 claims and $0 incurred for 2023-2026.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "loss_history",
+                "value": "0 claims, $0 incurred",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-email",
+                "section_or_quote": "Revenue is $4,200,000",
+                "fact_supported": "The broker email states revenue is $4,200,000.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "annual_revenue",
+                "value": "4200000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-email",
+                "section_or_quote": "requesting $2,000,000 limit",
+                "fact_supported": "The broker email states a requested limit of $2,000,000.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "requested_coverage",
+                "value": "2000000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-email",
+                "section_or_quote": "effective 2026-12-01",
+                "fact_supported": "The broker email states an effective date of 2026-12-01.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "effective_date",
+                "value": "2026-12-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-01-email",
+                "section_or_quote": "Clean 3-year loss history attached.",
+                "fact_supported": "The broker email says a clean 3-year loss history is attached.",
+                "subject": "Northstar Analytics Inc.",
+                "field": "loss_history",
+                "value": "clean 3-year loss history",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-apex",
+                "section_or_quote": "\"max_revenue_usd\": 25000000",
+                "fact_supported": "Apex sets a maximum revenue of 25,000,000 USD.",
+                "subject": "carrier-apex",
+                "field": "carrier_cap",
+                "value": "max_revenue_usd 25000000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-apex",
+                "section_or_quote": "\"max_coverage_usd\": 5000000",
+                "fact_supported": "Apex sets a maximum coverage of 5,000,000 USD.",
+                "subject": "carrier-apex",
+                "field": "carrier_cap",
+                "value": "max_coverage_usd 5000000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-apex",
+                "section_or_quote": "\"max_single_loss_usd\": 100000",
+                "fact_supported": "Apex sets a maximum single loss of 100,000 USD.",
+                "subject": "carrier-apex",
+                "field": "carrier_cap",
+                "value": "max_single_loss_usd 100000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-apex",
+                "section_or_quote": "Requires clean 3-year loss runs (no single claim > $100,000)",
+                "fact_supported": "Apex notes require clean 3-year loss runs with no single claim over $100,000.",
+                "subject": "carrier-apex",
+                "field": "loss_history",
+                "value": "clean 3-year loss runs required",
+                "polarity": "affirmed"
+              }
+            ],
+            "missing_fields": [],
+            "contradictions": [],
+            "summary": "Northstar Analytics Inc. (Tech E&O, SaaS / B2B Software) requests a $2,000,000 limit effective 2026-12-01 on $4,200,000 revenue. The broker email and application (both v1, neither superseded) agree on class, revenue, limit, effective date and loss history. All seven Apex required fields are in the application, and the risk is within Apex's class, revenue, coverage and single-loss limits; Ironclad is not a fit because the class is ineligible. Recommend ready_to_quote with carrier-apex. Subjectivities to clear with the broker: the carrier-issued loss run is not attached despite the email saying it is, the loss period is stated only as 2023-2026, and the application signature is not visible. None of these is a contradiction or a missing required field."
+          },
+          "disposition_correct": true,
+          "expected_disposition": "ready_to_quote",
+          "actual_disposition": "ready_to_quote",
+          "missed_escalation": false,
+          "unnecessary_escalation": false,
+          "citations_valid": true,
+          "must_cite_covered": true,
+          "citations_grounded": false,
+          "citation_failures": [
+            "unreviewable: claim 'The application names the insured as Northstar Analytics Inc.' on 'sub-01-app' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'The broker email says a clean 3-year loss history is attached.' on 'sub-01-email' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "Claimed fact(s) [TypedFact(field='annual_revenue', value='25000000', polarity='affirmed')] not supported by resolved span on 'carrier-apex' (span facts: [TypedFact(field='business_classification', value='accounting', polarity='affirmed'), TypedFact(field='business_classification', value='cannabis', polarity='affirmed'), TypedFact(field='business_classification', value='consulting', polarity='affirmed'), TypedFact(field='business_classification', value='fireworks', polarity='affirmed'), TypedFact(field='business_classification', value='roofing', polarity='affirmed'), TypedFact(field='business_classification', value='saas', polarity='affirmed'), TypedFact(field='carrier_cap', value='100000', polarity='affirmed'), TypedFact(field='carrier_cap', value='25000000', polarity='affirmed'), TypedFact(field='carrier_cap', value='5000000', polarity='affirmed'), TypedFact(field='prohibited_class', value='accounting', polarity='affirmed'), TypedFact(field='prohibited_class', value='cannabis', polarity='affirmed'), TypedFact(field='prohibited_class', value='consulting', polarity='affirmed'), TypedFact(field='prohibited_class', value='fireworks', polarity='affirmed'), TypedFact(field='prohibited_class', value='roofing', polarity='affirmed'), TypedFact(field='prohibited_class', value='saas', polarity='affirmed')])",
+            "Claimed fact(s) [TypedFact(field='requested_coverage', value='5000000', polarity='affirmed')] not supported by resolved span on 'carrier-apex' (span facts: [TypedFact(field='business_classification', value='accounting', polarity='affirmed'), TypedFact(field='business_classification', value='cannabis', polarity='affirmed'), TypedFact(field='business_classification', value='consulting', polarity='affirmed'), TypedFact(field='business_classification', value='fireworks', polarity='affirmed'), TypedFact(field='business_classification', value='roofing', polarity='affirmed'), TypedFact(field='business_classification', value='saas', polarity='affirmed'), TypedFact(field='carrier_cap', value='100000', polarity='affirmed'), TypedFact(field='carrier_cap', value='25000000', polarity='affirmed'), TypedFact(field='carrier_cap', value='5000000', polarity='affirmed'), TypedFact(field='prohibited_class', value='accounting', polarity='affirmed'), TypedFact(field='prohibited_class', value='cannabis', polarity='affirmed'), TypedFact(field='prohibited_class', value='consulting', polarity='affirmed'), TypedFact(field='prohibited_class', value='fireworks', polarity='affirmed'), TypedFact(field='prohibited_class', value='roofing', polarity='affirmed'), TypedFact(field='prohibited_class', value='saas', polarity='affirmed')])",
+            "unreviewable: claim 'Apex sets a maximum single loss of 100,000 USD.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'Apex notes require clean 3-year loss runs with no single claim over $100,000.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)"
+          ],
+          "unreviewable_citations": [
+            "unreviewable: claim 'The application names the insured as Northstar Analytics Inc.' on 'sub-01-app' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'The broker email says a clean 3-year loss history is attached.' on 'sub-01-email' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'Apex sets a maximum single loss of 100,000 USD.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'Apex notes require clean 3-year loss runs with no single claim over $100,000.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)"
+          ],
+          "typed_fields_ok": true,
+          "typed_failures": [],
+          "facts_supported": false,
+          "matched_keywords": "4/4",
+          "cited_doc_ids": [
+            "carrier-apex",
+            "sub-01-app",
+            "sub-01-email"
+          ]
+        },
+        {
+          "model_alias": "eval-anthropic",
+          "variant": "baseline",
+          "case_id": "sub-06",
+          "tier": "messy",
+          "scenario_tag": "conflicting_business_classification",
+          "trial": 1,
+          "duration_s": 25.83,
+          "llm_calls": 4,
+          "tool_calls": 6,
+          "tools_called": [
+            "list_carriers",
+            "list_submission_documents",
+            "read_submission_document",
+            "lookup_carrier_appetite",
+            "read_submission_document",
+            "lookup_carrier_appetite"
+          ],
+          "model_ids_requested": [
+            "eval-anthropic"
+          ],
+          "model_ids_responded": [
+            "eval-anthropic"
+          ],
+          "prompt_tokens": 9168,
+          "completion_tokens": 3889,
+          "total_tokens": 13057,
+          "cost_usd": 0.085839,
+          "error": null,
+          "trace_events": [
+            {
+              "node": "triage_submission",
+              "variant": "baseline",
+              "disposition": "human_review"
+            },
+            {
+              "node": "evaluate_policy",
+              "decision": "human_review"
+            }
+          ],
+          "submission_brief": {
+            "disposition": "human_review",
+            "insured_name": "Summit Exterior Solutions LLC",
+            "business_classification": "Commercial Roofing Contractor",
+            "annual_revenue_usd": 5100000,
+            "requested_coverage_usd": 2000000,
+            "effective_date": "2026-12-01",
+            "carrier_match": null,
+            "material_facts": [
+              {
+                "doc_id": "sub-06-email",
+                "section_or_quote": "Please quote Summit Exterior Solutions LLC as IT & Management Consulting for construction software.",
+                "fact_supported": "The broker email asks for the insured to be quoted as IT & Management Consulting for construction software.",
+                "subject": "Summit Exterior Solutions LLC",
+                "field": "business_classification",
+                "value": "IT & Management Consulting",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-06-app",
+                "section_or_quote": "Primary Operations / Class: Commercial Roofing Contractor (85% revenue from flat-roof tear-off and torch-down installation; 15% estimating software)",
+                "fact_supported": "The signed application lists the insured's primary class as Commercial Roofing Contractor, with 85% of revenue from flat-roof tear-off and torch-down installation and 15% from estimating software.",
+                "subject": "Summit Exterior Solutions LLC",
+                "field": "business_classification",
+                "value": "Commercial Roofing Contractor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-06-email",
+                "section_or_quote": "Clean loss history.",
+                "fact_supported": "The broker email states the insured has a clean loss history.",
+                "subject": "Summit Exterior Solutions LLC",
+                "field": "loss_history",
+                "value": "Clean loss history",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-06-app",
+                "section_or_quote": "3-Year Loss History: 0 claims",
+                "fact_supported": "The signed application reports 0 claims in the 3-year loss history.",
+                "subject": "Summit Exterior Solutions LLC",
+                "field": "loss_history",
+                "value": "0 claims",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-apex",
+                "section_or_quote": "Roofing Contractor",
+                "fact_supported": "Carrier Apex's prohibited_classes list includes Roofing Contractor.",
+                "subject": "carrier-apex",
+                "field": "prohibited_class",
+                "value": "Roofing Contractor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-ironclad",
+                "section_or_quote": "Roofing Contractor",
+                "fact_supported": "Carrier Ironclad's prohibited_classes list includes Roofing Contractor.",
+                "subject": "carrier-ironclad",
+                "field": "prohibited_class",
+                "value": "Roofing Contractor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-apex",
+                "section_or_quote": "Any contradiction between broker email and signed application or loss run must be routed to human underwriting review.",
+                "fact_supported": "Carrier Apex's notes require any contradiction between the broker email and the signed application or loss run to be routed to human underwriting review.",
+                "subject": "carrier-apex",
+                "field": "referral_rule",
+                "value": "Route contradictions to human underwriting review",
+                "polarity": "affirmed"
+              }
+            ],
+            "missing_fields": [
+              "location_schedule (required by carrier-ironclad)",
+              "current_loss_run (not attached; needed to verify the '0 claims' statement)"
+            ],
+            "contradictions": [
+              {
+                "field": "business_classification",
+                "source_a": "sub-06-email: IT & Management Consulting for construction software",
+                "source_b": "sub-06-app: Commercial Roofing Contractor (85% revenue from flat-roof tear-off and torch-down installation; 15% estimating software)",
+                "detail": "The broker email presents the insured as an IT consulting firm, but the signed application shows a roofing contractor with 85% of revenue from torch-down roofing work. Class is a material underwriting fact. The misdescription appears to place a prohibited class into an eligible one."
+              }
+            ],
+            "summary": "Human review required for Summit Exterior Solutions LLC. The broker email says IT & Management Consulting, but the signed ACORD application says Commercial Roofing Contractor (85% of revenue from roofing). Revenue ($5.1M), limit ($2M), and effective date (2026-12-01) match across both documents. Both carriers (Apex and Ironclad) prohibit Roofing Contractor, so the risk is outside all available appetite and no carrier match is possible. Apex also requires contradictions to be routed to human underwriting review. The location schedule is missing and no loss run is attached to verify the reported 0 claims. Do not quote under the IT consulting class; ask the broker to explain the discrepancy and, if the insured is a roofer, seek a market outside these carriers."
+          },
+          "disposition_correct": true,
+          "expected_disposition": "human_review",
+          "actual_disposition": "human_review",
+          "missed_escalation": false,
+          "unnecessary_escalation": false,
+          "citations_valid": true,
+          "must_cite_covered": true,
+          "citations_grounded": false,
+          "citation_failures": [
+            "unreviewable: claim 'The broker email states the insured has a clean loss history.' on 'sub-06-email' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'Carrier Apex's notes require any contradiction between the broker email and the signed application or loss run to be routed to human underwriting review.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)"
+          ],
+          "unreviewable_citations": [
+            "unreviewable: claim 'The broker email states the insured has a clean loss history.' on 'sub-06-email' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'Carrier Apex's notes require any contradiction between the broker email and the signed application or loss run to be routed to human underwriting review.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)"
+          ],
+          "typed_fields_ok": true,
+          "typed_failures": [],
+          "facts_supported": false,
+          "matched_keywords": "3/3",
+          "cited_doc_ids": [
+            "carrier-apex",
+            "carrier-ironclad",
+            "sub-06-app",
+            "sub-06-email"
+          ]
+        },
+        {
+          "model_alias": "eval-anthropic",
+          "variant": "deep_agents",
+          "case_id": "sub-06",
+          "tier": "messy",
+          "scenario_tag": "conflicting_business_classification",
+          "trial": 1,
+          "duration_s": 48.84,
+          "llm_calls": 8,
+          "tool_calls": 13,
+          "tools_called": [
+            "list_carriers",
+            "list_submission_documents",
+            "task",
+            "list_submission_documents",
+            "list_carriers",
+            "lookup_carrier_appetite",
+            "lookup_carrier_appetite",
+            "read_submission_document",
+            "read_submission_document",
+            "lookup_carrier_appetite",
+            "lookup_carrier_appetite",
+            "read_submission_document",
+            "read_submission_document"
+          ],
+          "model_ids_requested": [
+            "eval-anthropic"
+          ],
+          "model_ids_responded": [
+            "eval-anthropic"
+          ],
+          "prompt_tokens": 45747,
+          "completion_tokens": 7524,
+          "total_tokens": 53271,
+          "cost_usd": 0.250101,
+          "error": null,
+          "trace_events": [
+            {
+              "node": "triage_submission",
+              "variant": "deep_agents",
+              "disposition": "human_review"
+            },
+            {
+              "node": "evaluate_policy",
+              "decision": "human_review"
+            }
+          ],
+          "submission_brief": {
+            "disposition": "human_review",
+            "insured_name": "Summit Exterior Solutions LLC",
+            "business_classification": "Commercial Roofing Contractor",
+            "annual_revenue_usd": 5100000,
+            "requested_coverage_usd": 2000000,
+            "effective_date": "2026-12-01",
+            "carrier_match": null,
+            "material_facts": [
+              {
+                "doc_id": "sub-06-email",
+                "section_or_quote": "Please quote Summit Exterior Solutions LLC as IT & Management Consulting for construction software.",
+                "fact_supported": "The broker email asks for the insured to be quoted as IT & Management Consulting for construction software.",
+                "subject": "Summit Exterior Solutions LLC",
+                "field": "business_classification",
+                "value": "IT & Management Consulting",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-06-app",
+                "section_or_quote": "Primary Operations / Class: Commercial Roofing Contractor (85% revenue from flat-roof tear-off and torch-down installation; 15% estimating software)",
+                "fact_supported": "The signed application classifies the insured as a Commercial Roofing Contractor, with 85% of revenue from flat-roof tear-off and torch-down installation and 15% from estimating software.",
+                "subject": "Summit Exterior Solutions LLC",
+                "field": "business_classification",
+                "value": "Commercial Roofing Contractor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-apex",
+                "section_or_quote": "Roofing Contractor",
+                "fact_supported": "Roofing Contractor is listed among Apex's prohibited classes.",
+                "subject": "carrier-apex",
+                "field": "prohibited_class",
+                "value": "Roofing Contractor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-ironclad",
+                "section_or_quote": "Roofing Contractor",
+                "fact_supported": "Roofing Contractor is listed among Ironclad's prohibited classes.",
+                "subject": "carrier-ironclad",
+                "field": "prohibited_class",
+                "value": "Roofing Contractor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-apex",
+                "section_or_quote": "Any contradiction between broker email and signed application or loss run must be routed to human underwriting review.",
+                "fact_supported": "Apex requires any contradiction between the broker email and the signed application or loss run to be routed to human underwriting review.",
+                "subject": "carrier-apex",
+                "field": "referral_rule",
+                "value": "contradictions routed to human underwriting review",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "carrier-apex",
+                "section_or_quote": "clean 3-year loss runs",
+                "fact_supported": "Apex asks for clean 3-year loss runs.",
+                "subject": "carrier-apex",
+                "field": "loss_history",
+                "value": "clean 3-year loss runs required",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-06-app",
+                "section_or_quote": "3-Year Loss History: 0 claims",
+                "fact_supported": "The signed application self-reports 0 claims over the past 3 years.",
+                "subject": "Summit Exterior Solutions LLC",
+                "field": "loss_history",
+                "value": "0 claims",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-06-email",
+                "section_or_quote": "Clean loss history.",
+                "fact_supported": "The broker email states the loss history is clean.",
+                "subject": "Summit Exterior Solutions LLC",
+                "field": "loss_history",
+                "value": "clean",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "sub-06-app",
+                "section_or_quote": "55-2211009",
+                "fact_supported": "The signed application lists the FEIN as 55-2211009.",
+                "subject": "Summit Exterior Solutions LLC",
+                "field": "fein",
+                "value": "55-2211009",
+                "polarity": "affirmed"
+              }
+            ],
+            "missing_fields": [
+              "loss_run (currently valued 3-year loss runs)",
+              "location_schedule (required by Ironclad)",
+              "coverage_line_requested",
+              "payroll_class_code_breakdown (only if workers' comp is requested)"
+            ],
+            "contradictions": [
+              {
+                "field": "business_classification",
+                "source_a": "sub-06-email: IT & Management Consulting for construction software",
+                "source_b": "sub-06-app: Commercial Roofing Contractor (85% flat-roof tear-off and torch-down installation; 15% estimating software)",
+                "detail": "The broker email describes a software/consulting risk that would fit Apex's eligible classes. The signed application describes a roofing contractor, which both Apex and Ironclad prohibit. The email may misrepresent the risk."
+              },
+              {
+                "field": "insured_name",
+                "source_a": "sub-06-email: title names 'Summit Exterior Tech Consulting'",
+                "source_b": "sub-06-app: insured is 'Summit Exterior Solutions LLC'",
+                "detail": "The email title names a different entity from the signed application, although the email body uses the application's name. This is a minor discrepancy but adds to the impression of a mislabeled risk."
+              }
+            ],
+            "summary": "Routed to human_review. The broker email classifies the risk as IT & Management Consulting, but the signed ACORD application (treated as controlling) shows a Commercial Roofing Contractor with 85% of revenue from roofing work. Roofing Contractor is prohibited by both Apex and Ironclad, so the signed class is outside all available carrier appetite, and no carrier match is made. Revenue ($5,100,000), limit ($2,000,000), effective date (2026-12-01) and the self-reported clean loss history agree across both documents. No loss run is attached, and there is no location schedule or coverage line. Missing documents would not change the outcome. An underwriter or compliance reviewer should assess possible misrepresentation. Broker questions: confirm true operations and class with a revenue split; provide currently valued 3-year loss runs; state the coverage line; explain the 'Tech Consulting' name in the email title; for Ironclad only, provide a location schedule and, if workers' comp applies, a payroll breakdown by class code."
+          },
+          "disposition_correct": true,
+          "expected_disposition": "human_review",
+          "actual_disposition": "human_review",
+          "missed_escalation": false,
+          "unnecessary_escalation": false,
+          "citations_valid": true,
+          "must_cite_covered": true,
+          "citations_grounded": false,
+          "citation_failures": [
+            "unreviewable: claim 'Apex requires any contradiction between the broker email and the signed application or loss run to be routed to human underwriting review.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'Apex asks for clean 3-year loss runs.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'The broker email states the loss history is clean.' on 'sub-06-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+          ],
+          "unreviewable_citations": [
+            "unreviewable: claim 'Apex requires any contradiction between the broker email and the signed application or loss run to be routed to human underwriting review.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'Apex asks for clean 3-year loss runs.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)",
+            "unreviewable: claim 'The broker email states the loss history is clean.' on 'sub-06-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+          ],
+          "typed_fields_ok": true,
+          "typed_failures": [],
+          "facts_supported": false,
+          "matched_keywords": "3/3",
+          "cited_doc_ids": [
+            "carrier-apex",
+            "carrier-ironclad",
+            "sub-06-app",
+            "sub-06-email"
+          ]
+        }
+      ]
+    }
+  }
+}
