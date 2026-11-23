@@ -1,0 +1,506 @@
+{
+  "COV-BLIND-001": {
+    "orig_index": 67,
+    "packet_id": "B08",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-002": {
+    "orig_index": 13,
+    "packet_id": "C03",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-003": {
+    "orig_index": 53,
+    "packet_id": "B05",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-004": {
+    "orig_index": 45,
+    "packet_id": "B04",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-005": {
+    "orig_index": 68,
+    "packet_id": "B08",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-006": {
+    "orig_index": 19,
+    "packet_id": "C04",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-007": {
+    "orig_index": 5,
+    "packet_id": "C01",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-008": {
+    "orig_index": 14,
+    "packet_id": "C03",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-009": {
+    "orig_index": 52,
+    "packet_id": "B05",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-010": {
+    "orig_index": 40,
+    "packet_id": "B03",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-011": {
+    "orig_index": 24,
+    "packet_id": "B01",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-012": {
+    "orig_index": 62,
+    "packet_id": "B07",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-013": {
+    "orig_index": 28,
+    "packet_id": "B01",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-014": {
+    "orig_index": 0,
+    "packet_id": "C01",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-015": {
+    "orig_index": 31,
+    "packet_id": "B02",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-016": {
+    "orig_index": 38,
+    "packet_id": "B03",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-017": {
+    "orig_index": 50,
+    "packet_id": "B05",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-018": {
+    "orig_index": 60,
+    "packet_id": "B07",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-019": {
+    "orig_index": 10,
+    "packet_id": "C02",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-020": {
+    "orig_index": 55,
+    "packet_id": "B06",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-021": {
+    "orig_index": 4,
+    "packet_id": "C01",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-022": {
+    "orig_index": 69,
+    "packet_id": "B08",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-023": {
+    "orig_index": 71,
+    "packet_id": "B08",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-024": {
+    "orig_index": 8,
+    "packet_id": "C02",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-025": {
+    "orig_index": 61,
+    "packet_id": "B07",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-026": {
+    "orig_index": 39,
+    "packet_id": "B03",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-027": {
+    "orig_index": 32,
+    "packet_id": "B02",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-028": {
+    "orig_index": 16,
+    "packet_id": "C03",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-029": {
+    "orig_index": 58,
+    "packet_id": "B06",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-030": {
+    "orig_index": 1,
+    "packet_id": "C01",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-031": {
+    "orig_index": 34,
+    "packet_id": "B02",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-032": {
+    "orig_index": 35,
+    "packet_id": "B02",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-033": {
+    "orig_index": 56,
+    "packet_id": "B06",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-034": {
+    "orig_index": 65,
+    "packet_id": "B07",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-035": {
+    "orig_index": 33,
+    "packet_id": "B02",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-036": {
+    "orig_index": 25,
+    "packet_id": "B01",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-037": {
+    "orig_index": 26,
+    "packet_id": "B01",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-038": {
+    "orig_index": 66,
+    "packet_id": "B08",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-039": {
+    "orig_index": 57,
+    "packet_id": "B06",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-040": {
+    "orig_index": 37,
+    "packet_id": "B03",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-041": {
+    "orig_index": 44,
+    "packet_id": "B04",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-042": {
+    "orig_index": 12,
+    "packet_id": "C03",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-043": {
+    "orig_index": 15,
+    "packet_id": "C03",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-044": {
+    "orig_index": 36,
+    "packet_id": "B03",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-045": {
+    "orig_index": 30,
+    "packet_id": "B02",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-046": {
+    "orig_index": 47,
+    "packet_id": "B04",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-047": {
+    "orig_index": 59,
+    "packet_id": "B06",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-048": {
+    "orig_index": 54,
+    "packet_id": "B06",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-049": {
+    "orig_index": 2,
+    "packet_id": "C01",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-050": {
+    "orig_index": 70,
+    "packet_id": "B08",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-051": {
+    "orig_index": 42,
+    "packet_id": "B04",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-052": {
+    "orig_index": 29,
+    "packet_id": "B01",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-053": {
+    "orig_index": 21,
+    "packet_id": "C04",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-054": {
+    "orig_index": 18,
+    "packet_id": "C04",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-055": {
+    "orig_index": 64,
+    "packet_id": "B07",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-056": {
+    "orig_index": 51,
+    "packet_id": "B05",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-057": {
+    "orig_index": 43,
+    "packet_id": "B04",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-058": {
+    "orig_index": 7,
+    "packet_id": "C02",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-059": {
+    "orig_index": 46,
+    "packet_id": "B04",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-060": {
+    "orig_index": 17,
+    "packet_id": "C03",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-061": {
+    "orig_index": 41,
+    "packet_id": "B03",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-062": {
+    "orig_index": 27,
+    "packet_id": "B01",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-063": {
+    "orig_index": 6,
+    "packet_id": "C02",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-064": {
+    "orig_index": 9,
+    "packet_id": "C02",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-065": {
+    "orig_index": 3,
+    "packet_id": "C01",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 2
+  },
+  "COV-BLIND-066": {
+    "orig_index": 23,
+    "packet_id": "C04",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-067": {
+    "orig_index": 49,
+    "packet_id": "B05",
+    "tier": "branching",
+    "variant": "deep_agents",
+    "trial": 1
+  },
+  "COV-BLIND-068": {
+    "orig_index": 48,
+    "packet_id": "B05",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 1
+  },
+  "COV-BLIND-069": {
+    "orig_index": 11,
+    "packet_id": "C02",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 3
+  },
+  "COV-BLIND-070": {
+    "orig_index": 22,
+    "packet_id": "C04",
+    "tier": "clean",
+    "variant": "baseline",
+    "trial": 3
+  },
+  "COV-BLIND-071": {
+    "orig_index": 20,
+    "packet_id": "C04",
+    "tier": "clean",
+    "variant": "deep_agents",
+    "trial": 2
+  },
+  "COV-BLIND-072": {
+    "orig_index": 63,
+    "packet_id": "B07",
+    "tier": "branching",
+    "variant": "baseline",
+    "trial": 2
+  }
+}

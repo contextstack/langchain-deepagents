@@ -22,3 +22,24 @@
 | local/Qwen3-Coder-Next-FP8 (DGX Spark) | deep_agents | overall | 36 | 20 | 16 | 16/36 | 0/36 | 0/20 | 4/92 (4.3%) | 7 | 81 |
 | local/Qwen3-Coder-Next-FP8 (DGX Spark) | deep_agents | clean | 12 | 7 | 5 | 6/12 | 0/12 | 0/7 | 1/32 (3.1%) | 6 | 25 |
 | local/Qwen3-Coder-Next-FP8 (DGX Spark) | deep_agents | messy | 24 | 13 | 11 | 10/24 | 0/24 | 0/13 | 3/60 (5.0%) | 1 | 56 |
+
+## Blinded Spot-Review Adjudication (`R01`–`R12`)
+
+- **Exact Reviewed Denominator:** `12/126` generated briefs (`12/144` total attempts, `91/960` claims). The remaining `114/126` briefs (`869/960` claims) and `18` no-brief attempts remain **explicitly provisional**.
+- **Artifact:** `artifacts/experiments/historical_triage_spot_adjudication.json` (blinded; `arm-key.json` not opened).
+- **Reviewed Claim Verdicts (`91` claims):** `supported=8`, `partial_missing_second_source=19`, `contradicted=13`, `unverified=51`.
+
+| Review ID | Case | Claims | Supported | Partial (Missing 2nd Source) | Contradicted | Unverified |
+|---|---|---:|---:|---:|---:|---:|
+| `R01` | `sub-01` | 2 | 0 | 0 | 0 | 2 |
+| `R02` | `sub-02` | 2 | 0 | 0 | 1 | 1 |
+| `R03` | `sub-03` | 12 | 3 | 3 | 1 | 5 |
+| `R04` | `sub-04` | 11 | 0 | 6 | 1 | 4 |
+| `R05` | `sub-05` | 14 | 1 | 3 | 1 | 9 |
+| `R06` | `sub-06` | 14 | 3 | 2 | 0 | 9 |
+| `R07` | `sub-07` | 6 | 1 | 3 | 2 | 0 |
+| `R08` | `sub-08` | 10 | 0 | 0 | 0 | 10 |
+| `R09` | `sub-09` | 7 | 0 | 1 | 2 | 4 |
+| `R10` | `sub-10` | 3 | 0 | 0 | 1 | 2 |
+| `R11` | `sub-11` | 6 | 0 | 0 | 4 | 2 |
+| `R12` | `sub-12` | 4 | 0 | 1 | 0 | 3 |

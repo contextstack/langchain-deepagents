@@ -90,3 +90,46 @@
 
 1. **Clean abstention case:** The frozen 12-packet held-out corpus placed both abstention cases in the branching tier (`B03`, `B07`) and has no clean-tier abstention case (`C01`–`C04` are all definitive).
 2. **Separately graded dual outcome on `B08`:** `B08` currently grades a single remaining-aggregate value (`$750,000`) rather than separately graded applicability and deductible outcomes. Adding those scenarios would require a new corpus freeze and is flagged here rather than launching a new live run.
+
+## Calibrated Grader v3 Re-Grade (Arm-Blinded, Preserving v1 & v2)
+
+- **Frozen v3 Scorer SHA-256 (`evals/coverage_audit_v3.py`):** `e2780972f1d24e072ca6c7e30de99a6a35f05b5fc9e60e8515751e001298ea7c`
+- **Blinded Packet & Key:** `artifacts/experiments/coverage_audit_heldout_blinded_v3.jsonl` & `artifacts/experiments/coverage_audit_heldout_blind_key_v3.json` (all 72 attempts graded with arm, model, trial, and usage hidden before unblinding).
+- **Combined v1/v2/v3 Artifact:** `artifacts/experiments/coverage_audit_heldout_v1_v2_v3.json`.
+
+### Held-Out v1 vs. v2 vs. v3 Aggregate Comparison
+
+| Arm | Tier | Attempted | v1 Pass | v2 Pass | v3 Verified Pass | v3 Citations Sup / Con / Unv | False Def. |
+|---|---|---:|---:|---:|---:|---:|---:|
+| `baseline` | overall | 36 | 7/36 | 0/36 | **1/36 (2.8%)** | 220 / 36 / 47 | 0 |
+| `baseline` | clean | 12 | 2/12 | 0/12 | **0/12 (0.0%)** | 67 / 10 / 21 | 0 |
+| `baseline` | branching | 24 | 5/24 | 0/24 | **1/24 (4.2%)** | 153 / 26 / 26 | 0 |
+| `deep_agents` | overall | 36 | 7/36 | 1/36 | **5/36 (13.9%)** | 220 / 40 / 40 | 0 |
+| `deep_agents` | clean | 12 | 4/12 | 0/12 | **2/12 (16.7%)** | 63 / 8 / 18 | 0 |
+| `deep_agents` | branching | 24 | 3/24 | 1/24 | **3/24 (12.5%)** | 157 / 32 / 22 | 0 |
+
+### Paired Per-Case Outcomes Under Calibrated v3 (3 Trials per Arm)
+
+| Packet | Tier | Baseline v3 | Deep Agents v3 | Baseline Maj. | DA Maj. | Paired |
+|---|---|---:|---:|---|---|---|
+| `B01` | branching | 0/3 | 1/3 | FAIL | FAIL | tie |
+| `B02` | branching | 1/3 | 1/3 | FAIL | FAIL | tie |
+| `B03` | branching | 0/3 | 0/3 | FAIL | FAIL | tie |
+| `B04` | branching | 0/3 | 0/3 | FAIL | FAIL | tie |
+| `B05` | branching | 0/3 | 0/3 | FAIL | FAIL | tie |
+| `B06` | branching | 0/3 | 1/3 | FAIL | FAIL | tie |
+| `B07` | branching | 0/3 | 0/3 | FAIL | FAIL | tie |
+| `B08` | branching | 0/3 | 0/3 | FAIL | FAIL | tie |
+| `C01` | clean | 0/3 | 2/3 | FAIL | PASS | DA win |
+| `C02` | clean | 0/3 | 0/3 | FAIL | FAIL | tie |
+| `C03` | clean | 0/3 | 0/3 | FAIL | FAIL | tie |
+| `C04` | clean | 0/3 | 0/3 | FAIL | FAIL | tie |
+
+### Pre-Registered Routing Bar Under Calibrated v3
+
+- **Baseline branching majorities:** 0/8 (1/24 verified attempts; 295,167 total branching tokens)
+- **Deep Agents branching majorities:** 0/8 (3/24 verified attempts; 1,043,360 total branching tokens)
+- **Delta (Deep Agents − Baseline, target ≥ +2):** +0
+- **Deep Agents false definitive on insufficient-evidence (target 0):** 0
+- **Token cost per verified branching attempt vs. Baseline (target ≤ 2.0×):** 1.18×
+- **Routing Bar Met (v3):** `False`

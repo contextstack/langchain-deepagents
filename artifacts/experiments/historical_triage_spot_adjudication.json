@@ -1,0 +1,844 @@
+{
+  "source_review_file": "/tmp/contextstack-historical-review.Rp92QI/independent-review.md",
+  "blinded": true,
+  "reviewed_briefs": 12,
+  "total_generated_briefs_in_v2": 126,
+  "total_attempts_in_v2": 144,
+  "no_brief_attempts_in_v2": 18,
+  "reviewed_claims": 91,
+  "total_claims_in_v2": 960,
+  "unreviewed_provisional_briefs": 114,
+  "unreviewed_provisional_claims": 869,
+  "verdict_totals": {
+    "supported": 8,
+    "partial_missing_second_source": 19,
+    "contradicted": 13,
+    "unverified": 51
+  },
+  "briefs": [
+    {
+      "review_id": "R01",
+      "case_id": "sub-01",
+      "spot_review_note": "Financial fields and clean loss history are corroborated; broad claim that all required fields are present requires both the application and carrier guide (partial/cross-doc).",
+      "claim_count": 2,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-01-email",
+          "section_or_quote": "Broker email requesting Tech E&O for Northstar Analytics Inc., SaaS/B2B Software, $4.2M revenue, $2M limit, effective 12/1/26, clean 3-year loss history.",
+          "fact_supported": "Insured name, business classification, annual revenue, requested coverage, effective date, and 3-year loss history (clean) are consistent and present.",
+          "verdict": "unverified",
+          "reason": "unreviewable: cited excerpt 'Broker email requesting Tech E&O for Northstar Analytics Inc., SaaS/B2B Software, $4.2M revenue, $2M limit, effective 12/1/26, clean 3-year loss history.' does not resolve to a source span in 'sub-01-email'"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-01-app",
+          "section_or_quote": "Signed ACORD application with identical key facts: FEIN 84-1234567, class SaaS/B2B Software, $4.2M revenue, $2M limit, effective 12/1/26, 0 claims over 3 years.",
+          "fact_supported": "All required underwriting fields are present and match the broker email; no contradictions.",
+          "verdict": "unverified",
+          "reason": "unreviewable: cited excerpt 'Signed ACORD application with identical key facts: FEIN 84-1234567, class SaaS/B2B Software, $4.2M revenue, $2M limit, effective 12/1/26, 0 claims over 3 years.' does not resolve to a source span in 'sub-01-app'"
+        }
+      ]
+    },
+    {
+      "review_id": "R02",
+      "case_id": "sub-02",
+      "spot_review_note": "Claim 1 misattributes minor property claim details ($12k closed 2024) to sub-02-email (email only says loss run attached); Claim 2 on sub-02-app substantiates the $12k claim.",
+      "claim_count": 2,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-02-email",
+          "section_or_quote": "Broker email confirms: 'Insured: Harbor Precision Parts LLC \u2014 Light Manufacturing (CNC metal brackets); Revenue: $9.5M; Coverage: $3M; Effective: 12/15/2026; Loss: 1 minor property claim ($12k, closed 2024).'",
+          "fact_supported": "insured_name, business_classification, annual_revenue_usd, requested_coverage_usd, effective_date, loss_history_3yr",
+          "verdict": "contradicted",
+          "reason": "Email only states a loss run is attached and does not state the minor property claim amount or date (those appear in sub-02-app, not sub-02-email)."
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-02-app",
+          "section_or_quote": "Signed application states: 'Location: 1200 Harbor Way, Toledo OH (42,000 sq ft, 100% sprinklered); FEIN: 47-9988776; Loss history: 1 minor property claim ($12,000, closed 2024).'",
+          "fact_supported": "location_schedule, fein, loss_history_3yr",
+          "verdict": "unverified",
+          "reason": "unreviewable: cited excerpt 'Signed application states: 'Location: 1200 Harbor Way, Toledo OH (42,000 sq ft, 100% sprinklered); FEIN: 47-9988776; Loss history: 1 minor property claim ($12,000, closed 2024).'' does not resolve to a source span in 'sub-02-app'"
+        }
+      ]
+    },
+    {
+      "review_id": "R03",
+      "case_id": "sub-03",
+      "spot_review_note": "Application substantiates $6.8M revenue; $25M carrier maximum requires carrier-apex guide (separate single-source fact from cross-source within-appetite conclusion).",
+      "claim_count": 12,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-03-email",
+          "section_or_quote": "IT & Management Consulting",
+          "fact_supported": "Broker email states the business class as IT & Management Consulting.",
+          "verdict": "supported",
+          "reason": "Verified against cited source clause."
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-03-app",
+          "section_or_quote": "Class: IT & Management Consulting",
+          "fact_supported": "Application confirms the class, which is consistent with the email and eligible at Apex.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Application confirms the class, which is consistent with the email and eligible at Apex.' on 'sub-03-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-03-email",
+          "section_or_quote": "$6,800,000 annual revenue",
+          "fact_supported": "Broker email states annual revenue of $6.8M.",
+          "verdict": "supported",
+          "reason": "Verified against cited source clause."
+        },
+        {
+          "claim_index": 4,
+          "doc_id": "sub-03-app",
+          "section_or_quote": "Annual Revenue: $6,800,000",
+          "fact_supported": "Application revenue matches the email and is within Apex's $25M maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-03-app' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Application revenue matches the email and is within Apex's $25M maximum.' on 'sub-03-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 5,
+          "doc_id": "sub-03-email",
+          "section_or_quote": "$2,000,000 requested limit",
+          "fact_supported": "Broker email requests a $2M limit.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='requested_coverage', value='2000000', polarity='affirmed')] not supported by resolved span on 'sub-03-email' (span facts: [TypedFact(field='annual_revenue', value='6800000', polarity='affirmed'), TypedFact(field='effective_date', value='2027-01-01', polarity='affirmed')])"
+        },
+        {
+          "claim_index": 6,
+          "doc_id": "sub-03-app",
+          "section_or_quote": "Requested Limit: $2,000,000",
+          "fact_supported": "Application limit matches the email and is within Apex's $5M maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-03-app' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Application limit matches the email and is within Apex's $5M maximum.' on 'sub-03-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 7,
+          "doc_id": "sub-03-email",
+          "section_or_quote": "effective 2027-01-01",
+          "fact_supported": "Broker email states the effective date.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Broker email states the effective date.' on 'sub-03-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 8,
+          "doc_id": "sub-03-app",
+          "section_or_quote": "Effective Date: 2027-01-01",
+          "fact_supported": "Application effective date matches the email.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Application effective date matches the email.' on 'sub-03-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 9,
+          "doc_id": "sub-03-email",
+          "section_or_quote": "Zero claims over the last 3 years.",
+          "fact_supported": "Broker reports no claims in the last 3 years.",
+          "verdict": "supported",
+          "reason": "Verified against cited source clause."
+        },
+        {
+          "claim_index": 10,
+          "doc_id": "sub-03-app",
+          "section_or_quote": "3-Year Loss History: Loss-free (0 claims, 2023-2026).",
+          "fact_supported": "Application loss history is consistent with the email and has no undisclosed loss. It is self-reported, with no loss run attached.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Application loss history is consistent with the email and has no undisclosed loss. It is self-reported, with no loss run attached.' on 'sub-03-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 11,
+          "doc_id": "sub-03-app",
+          "section_or_quote": "FEIN: 31-5544332",
+          "fact_supported": "FEIN is provided, satisfying one of Apex's required fields.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-03-app' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'FEIN is provided, satisfying one of Apex's required fields.' on 'sub-03-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 12,
+          "doc_id": "carrier-apex",
+          "section_or_quote": "Requires clean 3-year loss runs (no single claim > $100,000).",
+          "fact_supported": "Apex's appetite note requires clean loss runs. Only self-reported loss history is on file, so carrier-issued loss runs should be obtained to verify.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'carrier-apex': ungrounded qualifier(s) ['appetite', 'carrier-issued', 'file', 'note', 'obtained', 'self-reported', 'should', 'verify']"
+        }
+      ]
+    },
+    {
+      "review_id": "R04",
+      "case_id": "sub-04",
+      "spot_review_note": "Application substantiates $14M revenue; $40M carrier maximum requires carrier-ironclad guide (separate single-source fact from cross-source cap comparison).",
+      "claim_count": 11,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-04-app",
+          "section_or_quote": "Insured: Midland Distribution Corp",
+          "fact_supported": "Named insured; FEIN 62-7766554 is also on the application.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='fein', value='62-7766554', polarity='affirmed')] not supported by resolved span on 'sub-04-app' (span facts: [TypedFact(field='business_classification', value='warehouse', polarity='affirmed'), TypedFact(field='insured_name', value='midland distribution corp', polarity='affirmed')])"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-04-app",
+          "section_or_quote": "Class: Commercial Warehouse / Distribution",
+          "fact_supported": "Business classification, which is eligible at carrier-ironclad and not prohibited there.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Business classification, which is eligible at carrier-ironclad and not prohibited there.' on 'sub-04-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-04-email",
+          "section_or_quote": "(Commercial Warehouse / Distribution)",
+          "fact_supported": "The broker email states the same class as the application.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'The broker email states the same class as the application.' on 'sub-04-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 4,
+          "doc_id": "sub-04-app",
+          "section_or_quote": "Annual Revenue: $14,000,000",
+          "fact_supported": "Annual revenue is $14M, within Ironclad's $40M maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-04-app' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Annual revenue is $14M, within Ironclad's $40M maximum.' on 'sub-04-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 5,
+          "doc_id": "sub-04-email",
+          "section_or_quote": "Revenue $14,000,000",
+          "fact_supported": "The email revenue matches the application.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-04-email' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'The email revenue matches the application.' on 'sub-04-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 6,
+          "doc_id": "sub-04-app",
+          "section_or_quote": "Requested Limit: $4,000,000",
+          "fact_supported": "The requested limit is $4M, within Ironclad's $5M maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-04-app' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'The requested limit is $4M, within Ironclad's $5M maximum.' on 'sub-04-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 7,
+          "doc_id": "sub-04-email",
+          "section_or_quote": "requesting $4,000,000 limit",
+          "fact_supported": "The email limit matches the application.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-04-email' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'The email limit matches the application.' on 'sub-04-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 8,
+          "doc_id": "sub-04-app",
+          "section_or_quote": "Effective Date: 2026-12-01",
+          "fact_supported": "Requested effective date.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Requested effective date.' on 'sub-04-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 9,
+          "doc_id": "sub-04-email",
+          "section_or_quote": "effective 2026-12-01",
+          "fact_supported": "The email effective date matches the application.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-04-email' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'The email effective date matches the application.' on 'sub-04-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 10,
+          "doc_id": "sub-04-app",
+          "section_or_quote": "Location Schedule: 880 Logistics Blvd, Columbus OH (85,000 sq ft, ESFR sprinkler)",
+          "fact_supported": "Gives the square footage and sprinkler status that Ironclad requires.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Gives the square footage and sprinkler status that Ironclad requires.' on 'sub-04-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 11,
+          "doc_id": "sub-04-app",
+          "section_or_quote": "3-Year Loss History: 0 claims ($0 incurred, 2023-2026).",
+          "fact_supported": "Zero claims and $0 incurred, within Ironclad's $150,000 maximum single loss. The figure rests on the application's own statement.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-04-app' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: Claimed fact(s) [TypedFact(field='carrier_cap', value='150000', polarity='affirmed')] not supported by resolved span on 'sub-04-app' (span facts: [TypedFact(field='loss_history', value='loss_free', polarity='affirmed')])"
+        }
+      ]
+    },
+    {
+      "review_id": "R05",
+      "case_id": "sub-05",
+      "spot_review_note": "v2 application and email explicitly supersede v1 drafts; v2 supports revenue, limit, and FEIN.",
+      "claim_count": 14,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-05-email-v2",
+          "section_or_quote": "Please DISREGARD v1 completely.",
+          "fact_supported": "Broker email v2 FINAL is the active email and supersedes email v1.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Broker email v2 FINAL is the active email and supersedes email v1.' on 'sub-05-email-v2' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-05-app-v2",
+          "section_or_quote": "SUPERSEDES sub-05-app-v1.",
+          "fact_supported": "Signed application v2 is the active application and supersedes app v1, so v1 differences are corrections, not contradictions.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Signed application v2 is the active application and supersedes app v1, so v1 differences are corrections, not contradictions.' on 'sub-05-app-v2' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-05-app-v2",
+          "section_or_quote": "Class: SaaS / B2B Software",
+          "fact_supported": "Business classification is SaaS / B2B Software, an eligible class for Apex (the v2 email does not restate the class).",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='business_classification', value='saas', polarity='negated')] not supported by resolved span on 'sub-05-app-v2' (span facts: [TypedFact(field='business_classification', value='saas', polarity='affirmed')])"
+        },
+        {
+          "claim_index": 4,
+          "doc_id": "sub-05-app-v2",
+          "section_or_quote": "FEIN: 88-3344556",
+          "fact_supported": "FEIN is provided and matches the v2 email (FEIN 88-3344556).",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-05-app-v2': ungrounded qualifier(s) ['matches']"
+        },
+        {
+          "claim_index": 5,
+          "doc_id": "sub-05-app-v2",
+          "section_or_quote": "Annual Revenue: $3,400,000",
+          "fact_supported": "Annual revenue is $3,400,000, within Apex's $25M maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-05-app-v2' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Annual revenue is $3,400,000, within Apex's $25M maximum.' on 'sub-05-app-v2' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 6,
+          "doc_id": "sub-05-email-v2",
+          "section_or_quote": "$3,400,000 revenue",
+          "fact_supported": "The v2 email confirms the revenue figure in the application.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'The v2 email confirms the revenue figure in the application.' on 'sub-05-email-v2' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 7,
+          "doc_id": "sub-05-app-v2",
+          "section_or_quote": "Requested Limit: $2,000,000",
+          "fact_supported": "Requested limit is $2,000,000, within Apex's $5M maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-05-app-v2' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Requested limit is $2,000,000, within Apex's $5M maximum.' on 'sub-05-app-v2' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 8,
+          "doc_id": "sub-05-email-v2",
+          "section_or_quote": "$2,000,000 limit",
+          "fact_supported": "The v2 email confirms the requested limit.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'The v2 email confirms the requested limit.' on 'sub-05-email-v2' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 9,
+          "doc_id": "sub-05-app-v2",
+          "section_or_quote": "Effective Date: 2026-12-01",
+          "fact_supported": "Effective date is 2026-12-01.",
+          "verdict": "supported",
+          "reason": "Verified against cited source clause."
+        },
+        {
+          "claim_index": 10,
+          "doc_id": "sub-05-email-v2",
+          "section_or_quote": "effective 2026-12-01",
+          "fact_supported": "The v2 email confirms the effective date.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'The v2 email confirms the effective date.' on 'sub-05-email-v2' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 11,
+          "doc_id": "sub-05-app-v2",
+          "section_or_quote": "3-Year Loss History: 0 claims ($0 incurred, 2023-2026).",
+          "fact_supported": "Loss history is clean, so no loss exceeds Apex's $100K single-loss maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-05-app-v2' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: Unsupported numeric/date/ID value(s) ['100000'] on 'sub-05-app-v2'"
+        },
+        {
+          "claim_index": 12,
+          "doc_id": "sub-05-email-v2",
+          "section_or_quote": "confirmed 0 claims over 3 years",
+          "fact_supported": "The v2 email corroborates the 0-claims loss history.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'The v2 email corroborates the 0-claims loss history.' on 'sub-05-email-v2' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 13,
+          "doc_id": "sub-05-email-v1",
+          "section_or_quote": "please hold, I noticed the FEIN and effective date were missing in v1.",
+          "fact_supported": "Superseded v1 email gaps (FEIN, effective date) were corrected in v2, which is not a contradiction.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Superseded v1 email gaps (FEIN, effective date) were corrected in v2, which is not a contradiction.' on 'sub-05-email-v1' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 14,
+          "doc_id": "carrier-apex",
+          "section_or_quote": "clean 3-year loss runs",
+          "fact_supported": "Apex's notes call for clean 3-year loss runs, so a currently valued carrier loss run should be requested as a bind or subjectivity condition.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'carrier-apex': ungrounded qualifier(s) ['bind', 'call', 'condition', 'currently', 'should', 'subjectivity', 'valued']"
+        }
+      ]
+    },
+    {
+      "review_id": "R06",
+      "case_id": "sub-06",
+      "spot_review_note": "Email vs. signed application genuinely conflict on business classification; carrier guides substantiate roofing prohibition.",
+      "claim_count": 14,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-06-email",
+          "section_or_quote": "Please quote Summit Exterior Solutions LLC as IT & Management Consulting for construction software.",
+          "fact_supported": "Broker email describes the business class as IT & Management Consulting, which covers only the software side line.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-06-email': ungrounded qualifier(s) ['covers', 'describes', 'line', 'side', 'which']"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-06-app",
+          "section_or_quote": "Primary Operations / Class: Commercial Roofing Contractor (85% revenue from flat-roof tear-off and torch-down installation; 15% estimating software)",
+          "fact_supported": "Signed application, the controlling source, classifies the insured as a Commercial Roofing Contractor with 85% of revenue from roofing.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-06-app': ungrounded qualifier(s) ['classifies', 'controlling']"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-06-email",
+          "section_or_quote": "Revenue $5,100,000",
+          "fact_supported": "Email revenue matches the signed application.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Email revenue matches the signed application.' on 'sub-06-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 4,
+          "doc_id": "sub-06-app",
+          "section_or_quote": "Annual Revenue: $5,100,000",
+          "fact_supported": "Application annual revenue is $5,100,000.",
+          "verdict": "supported",
+          "reason": "Verified against cited source clause."
+        },
+        {
+          "claim_index": 5,
+          "doc_id": "sub-06-email",
+          "section_or_quote": "limit $2,000,000",
+          "fact_supported": "Email requested limit matches the application.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-06-email' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Email requested limit matches the application.' on 'sub-06-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 6,
+          "doc_id": "sub-06-app",
+          "section_or_quote": "Requested Limit: $2,000,000",
+          "fact_supported": "Application requested limit is $2,000,000.",
+          "verdict": "supported",
+          "reason": "Verified against cited source clause."
+        },
+        {
+          "claim_index": 7,
+          "doc_id": "sub-06-email",
+          "section_or_quote": "effective 2026-12-01",
+          "fact_supported": "Email effective date matches the application.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-06-email' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Email effective date matches the application.' on 'sub-06-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 8,
+          "doc_id": "sub-06-app",
+          "section_or_quote": "Effective Date: 2026-12-01",
+          "fact_supported": "Application effective date is 2026-12-01.",
+          "verdict": "supported",
+          "reason": "Verified against cited source clause."
+        },
+        {
+          "claim_index": 9,
+          "doc_id": "sub-06-app",
+          "section_or_quote": "3-Year Loss History: 0 claims.",
+          "fact_supported": "Loss history is self-reported as zero claims and is unverified because no carrier-issued loss run is attached.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-06-app': ungrounded qualifier(s) ['because', 'carrier-issued', 'self-reported', 'unverified']"
+        },
+        {
+          "claim_index": 10,
+          "doc_id": "sub-06-email",
+          "section_or_quote": "Clean loss history.",
+          "fact_supported": "Email loss history statement agrees with the application, but is also unverified.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Email loss history statement agrees with the application, but is also unverified.' on 'sub-06-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 11,
+          "doc_id": "carrier-apex",
+          "section_or_quote": "prohibited_classes includes \"Roofing Contractor\"",
+          "fact_supported": "Apex prohibits roofing contractors, so the risk is outside Apex appetite on the signed application's class.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'carrier-apex': ungrounded qualifier(s) ['appetite', 'contractors', 'outside', 'prohibits', 'risk']"
+        },
+        {
+          "claim_index": 12,
+          "doc_id": "carrier-apex",
+          "section_or_quote": "Any contradiction between broker email and signed application or loss run must be routed to human underwriting review.",
+          "fact_supported": "Apex guidelines require human underwriting review for this email versus application contradiction.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'carrier-apex': ungrounded qualifier(s) ['apex', 'guidelines', 'require', 'versus']"
+        },
+        {
+          "claim_index": 13,
+          "doc_id": "carrier-ironclad",
+          "section_or_quote": "prohibited_classes includes \"Roofing Contractor\"",
+          "fact_supported": "Ironclad also prohibits roofing contractors, so no available carrier can take the risk as roofing.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'carrier-ironclad': ungrounded qualifier(s) ['available', 'contractors', 'prohibits', 'risk', 'take']"
+        },
+        {
+          "claim_index": 14,
+          "doc_id": "sub-06-app",
+          "section_or_quote": "FEIN: 55-2211009",
+          "fact_supported": "Signed application provides the insured's FEIN.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Signed application provides the insured's FEIN.' on 'sub-06-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        }
+      ]
+    },
+    {
+      "review_id": "R07",
+      "case_id": "sub-07",
+      "spot_review_note": "Application placeholders and email support withholding definitive quote due to missing effective date and loss history; carrier cap/required-field assertions need the guide.",
+      "claim_count": 6,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-07-email",
+          "section_or_quote": "Revenue is $2,900,000 and they want $1,000,000 coverage. Still waiting on the insured to confirm target effective date and pull their 3-year loss runs from the prior carrier.",
+          "fact_supported": "Broker states revenue of $2.9M and requested coverage of $1M, and confirms the effective date and 3-year loss runs are still outstanding.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='requested_coverage', value='1000000', polarity='affirmed')] not supported by resolved span on 'sub-07-email' (span facts: [TypedFact(field='annual_revenue', value='2900000', polarity='affirmed')])"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-07-app",
+          "section_or_quote": "Class: Accounting / Legal Professional Services",
+          "fact_supported": "Business classification is Accounting / Legal Professional Services, which is eligible under Apex.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-07-app' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: Unsupported appended/extra assertion on 'sub-07-app': ungrounded qualifier(s) ['apex', 'eligible', 'which']"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-07-app",
+          "section_or_quote": "Annual Revenue: $2,900,000",
+          "fact_supported": "Application revenue matches the email and is within Apex's $25M maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-07-app' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Application revenue matches the email and is within Apex's $25M maximum.' on 'sub-07-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 4,
+          "doc_id": "sub-07-app",
+          "section_or_quote": "Requested Limit: $1,000,000",
+          "fact_supported": "Application limit matches the email and is within Apex's $5M maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-07-app' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Application limit matches the email and is within Apex's $5M maximum.' on 'sub-07-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 5,
+          "doc_id": "sub-07-app",
+          "section_or_quote": "Effective Date: [BLANK]",
+          "fact_supported": "Effective date is missing from the application.",
+          "verdict": "supported",
+          "reason": "Verified against cited source clause."
+        },
+        {
+          "claim_index": 6,
+          "doc_id": "sub-07-app",
+          "section_or_quote": "3-Year Loss History: [NOT PROVIDED]",
+          "fact_supported": "Loss history is not provided, so Apex's clean-loss-run requirement (no single claim > $100,000) cannot be verified.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='missing_field', value='loss_history', polarity='negated')] not supported by resolved span on 'sub-07-app' (span facts: [TypedFact(field='missing_field', value='loss_history', polarity='affirmed')])"
+        }
+      ]
+    },
+    {
+      "review_id": "R08",
+      "case_id": "sub-08",
+      "spot_review_note": "Absence of loss-run file is a packet-level observation; broker email only proves the broker claimed it was attached, not that it was received.",
+      "claim_count": 10,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-08-app",
+          "section_or_quote": "Class: Fireworks / Explosives Manufacturing",
+          "fact_supported": "The insured declares its business class as Fireworks / Explosives Manufacturing.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-08-app': ungrounded qualifier(s) ['declares']"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-08-email",
+          "section_or_quote": "(Fireworks / Explosives Manufacturing)",
+          "fact_supported": "The broker email confirms the same class as the application.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'The broker email confirms the same class as the application.' on 'sub-08-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-08-app",
+          "section_or_quote": "Annual Revenue: $8,000,000",
+          "fact_supported": "Annual revenue is $8,000,000, consistent with the email's 'Revenue $8,000,000'.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-08-app': ungrounded qualifier(s) ['consistent']"
+        },
+        {
+          "claim_index": 4,
+          "doc_id": "sub-08-app",
+          "section_or_quote": "Requested Limit: $3,000,000",
+          "fact_supported": "Requested limit is $3,000,000, consistent with the email's 'requesting $3,000,000 limit'.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-08-app': ungrounded qualifier(s) ['consistent', 'requesting']"
+        },
+        {
+          "claim_index": 5,
+          "doc_id": "sub-08-app",
+          "section_or_quote": "Effective Date: 2026-12-01",
+          "fact_supported": "Effective date is 2026-12-01, consistent with the email's 'effective 2026-12-01'.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-08-app': ungrounded qualifier(s) ['consistent']"
+        },
+        {
+          "claim_index": 6,
+          "doc_id": "carrier-apex",
+          "section_or_quote": "Fireworks / Explosives Manufacturing",
+          "fact_supported": "Carrier Apex lists Fireworks / Explosives Manufacturing as a prohibited class, so the risk is outside its appetite.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'carrier-apex': ungrounded qualifier(s) ['appetite', 'outside', 'risk']"
+        },
+        {
+          "claim_index": 7,
+          "doc_id": "carrier-ironclad",
+          "section_or_quote": "Fireworks / Explosives Manufacturing",
+          "fact_supported": "Carrier Ironclad lists Fireworks / Explosives Manufacturing as a prohibited class, so the risk is outside its appetite.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'carrier-ironclad': ungrounded qualifier(s) ['appetite', 'outside', 'risk']"
+        },
+        {
+          "claim_index": 8,
+          "doc_id": "sub-08-app",
+          "section_or_quote": "3-Year Loss History: 0 claims (2023-2026).",
+          "fact_supported": "Stated loss history is zero claims, but it is unverified because no loss run is attached.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-08-app': ungrounded qualifier(s) ['because', 'unverified']"
+        },
+        {
+          "claim_index": 9,
+          "doc_id": "sub-08-email",
+          "section_or_quote": "clean 3-year loss run attached",
+          "fact_supported": "The email claims a loss run is attached, but no loss run document is in the submission.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'The email claims a loss run is attached, but no loss run document is in the submission.' on 'sub-08-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 10,
+          "doc_id": "sub-08-app",
+          "section_or_quote": "400 Powder Mill Rd, Joplin MO (25,000 sq ft, sprinklered)",
+          "fact_supported": "The location schedule gives the address, square footage and sprinkler status.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'The location schedule gives the address, square footage and sprinkler status.' on 'sub-08-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        }
+      ]
+    },
+    {
+      "review_id": "R09",
+      "case_id": "sub-09",
+      "spot_review_note": "Conflicting revenue and limit figures exist in separate files; discrepancy requires both sources and carrier caps require the guide.",
+      "claim_count": 7,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-09-email",
+          "section_or_quote": "small startup with $2,000,000 annual revenue",
+          "fact_supported": "Broker email states annual revenue of $2,000,000, which contradicts the signed application.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='annual_revenue', value='2000000', polarity='negated')] not supported by resolved span on 'sub-09-email' (span facts: [TypedFact(field='annual_revenue', value='2000000', polarity='affirmed'), TypedFact(field='effective_date', value='2026-12-15', polarity='affirmed'), TypedFact(field='requested_coverage', value='1000000', polarity='affirmed')])"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-09-app",
+          "section_or_quote": "Annual Revenue: $18,500,000",
+          "fact_supported": "Signed application states annual revenue of $18,500,000, about 9x the email figure.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-09-app': ungrounded qualifier(s) ['about', 'figure']"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-09-email",
+          "section_or_quote": "requesting a $1,000,000 limit",
+          "fact_supported": "Broker email requests a $1,000,000 limit, which would fit within Apex's $5M maximum.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-09-email' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: claim 'Broker email requests a $1,000,000 limit, which would fit within Apex's $5M maximum.' on 'sub-09-email' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 4,
+          "doc_id": "sub-09-app",
+          "section_or_quote": "Requested Limit: $10,000,000 (exceeds standard $5M carrier appetite cap)",
+          "fact_supported": "Signed application requests a $10,000,000 limit, 10x the email figure and above the $5M cap at both carriers.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Signed application requests a $10,000,000 limit, 10x the email figure and above the $5M cap at both carriers.' on 'sub-09-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 5,
+          "doc_id": "sub-09-app",
+          "section_or_quote": "3-Year Loss History: 0 claims",
+          "fact_supported": "Application reports no claims in three years. This is consistent with the email's 'Clean loss history' but unverified because no loss run is attached.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-09-app': ungrounded qualifier(s) ['because', 'consistent', 'three', 'unverified', 'years']"
+        },
+        {
+          "claim_index": 6,
+          "doc_id": "carrier-apex",
+          "section_or_quote": "Any contradiction between broker email and signed application or loss run must be routed to human underwriting review.",
+          "fact_supported": "Apex's own guidelines require human underwriting review when the email and signed application contradict.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Apex's own guidelines require human underwriting review when the email and signed application contradict.' on 'carrier-apex' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 7,
+          "doc_id": "carrier-ironclad",
+          "section_or_quote": "Eligible classes: light manufacturing, warehouse, wholesale and HVAC/electrical",
+          "fact_supported": "SaaS / B2B Software is not an eligible class at Ironclad. Ironclad also caps coverage at $5M and requires a location_schedule that was not provided.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='business_classification', value='saas', polarity='negated'), TypedFact(field='requested_coverage', value='5000000', polarity='negated')] not supported by resolved span on 'carrier-ironclad' (span facts: [TypedFact(field='business_classification', value='cannabis', polarity='affirmed'), TypedFact(field='business_classification', value='fireworks', polarity='affirmed'), TypedFact(field='business_classification', value='hvac', polarity='affirmed'), TypedFact(field='business_classification', value='light_manufacturing', polarity='affirmed'), TypedFact(field='business_classification', value='roofing', polarity='affirmed'), TypedFact(field='business_classification', value='warehouse', polarity='affirmed'), TypedFact(field='business_classification', value='wholesale', polarity='affirmed'), TypedFact(field='carrier_cap', value='150000', polarity='affirmed'), TypedFact(field='carrier_cap', value='40000000', polarity='affirmed'), TypedFact(field='carrier_cap', value='5000000', polarity='affirmed'), TypedFact(field='prohibited_class', value='cannabis', polarity='affirmed'), TypedFact(field='prohibited_class', value='fireworks', polarity='affirmed'), TypedFact(field='prohibited_class', value='hvac', polarity='affirmed'), TypedFact(field='prohibited_class', value='light_manufacturing', polarity='affirmed'), TypedFact(field='prohibited_class', value='roofing', polarity='affirmed'), TypedFact(field='prohibited_class', value='warehouse', polarity='affirmed'), TypedFact(field='prohibited_class', value='wholesale', polarity='affirmed')])"
+        }
+      ]
+    },
+    {
+      "review_id": "R10",
+      "case_id": "sub-10",
+      "spot_review_note": "Email confirms missing FEIN/location schedule, but finance-team attribution and Friday deadline are unsupported; cited 2024-09-01 contradicts application's 2026-12-01; wholesale class is supported while fabricated product description & Apex prohibition fail.",
+      "claim_count": 3,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-10-email",
+          "section_or_quote": "Broker email, 2024-06-15: \"FEIN and warehouse location schedule (including sprinkler status per Ironclad\u2019s risk profile) are pending client\u2019s finance team \u2014 will follow up by EOD Friday.\"",
+          "fact_supported": "Broker acknowledges FEIN and location schedule are missing and no replacement documents have been submitted.",
+          "verdict": "unverified",
+          "reason": "unreviewable: cited excerpt 'Broker email, 2024-06-15: \"FEIN and warehouse location schedule (including sprinkler status per Ironclad\u2019s risk profile) are pending client\u2019s finance team \u2014 will follow up by EOD Friday.\"' does not resolve to a source span in 'sub-10-email'"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-10-app",
+          "section_or_quote": "Application v1, Section 3.2 (Financials): \"Annual Revenue: $11,000,000\"; Section 5.1 (Coverage Requested): \"General Liability: $2,000,000 aggregate\"; Section 2.1 (Effective Date): \"Proposed Effective Date: 2024-09-01\"; Section 4.3 (Loss History): \"No losses reported in the past 3 years.\"",
+          "fact_supported": "Consistent financials, coverage, and loss history across documents; no contradictions with Ironclad appetite.",
+          "verdict": "unverified",
+          "reason": "unreviewable: cited excerpt 'Application v1, Section 3.2 (Financials): \"Annual Revenue: $11,000,000\"; Section 5.1 (Coverage Requested): \"General Liability: $2,000,000 aggregate\"; Section 2.1 (Effective Date): \"Proposed Effective Date: 2024-09-01\"; Section 4.3 (Loss History): \"No losses reported in the past 3 years.\"' does not resolve to a source span in 'sub-10-app'"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-10-app",
+          "section_or_quote": "Application v1, Section 1.1 (Business Description): \"Wholesale distribution of consumer electronics and household goods.\"",
+          "fact_supported": "Class is 'Wholesale Goods' \u2014 eligible for Ironclad, prohibited for Apex.",
+          "verdict": "contradicted",
+          "reason": "Application supports wholesale class, but fabricated product description and asserted Apex prohibition are unsupported/contradicted."
+        }
+      ]
+    },
+    {
+      "review_id": "R11",
+      "case_id": "sub-11",
+      "spot_review_note": "Current loss run supports $420,000 open claim and supersedes prior clean report; old report is valid evidence only for what the old report stated.",
+      "claim_count": 6,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-11-email",
+          "section_or_quote": "Account has been 100% loss-free for the past 5 years!",
+          "fact_supported": "Broker represented the account as loss-free for the past 5 years, which conflicts with the current loss run.",
+          "verdict": "unverified",
+          "reason": "Unsupported appended/extra assertion on 'sub-11-email': ungrounded qualifier(s) ['conflicts', 'current', 'represented', 'which']"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-11-loss-v2",
+          "section_or_quote": "Claim #CLM-2026-0884: Date of loss 2026-06-14, OPEN bodily injury & equipment fire claim, $420,000 total incurred ($350,000 reserve + $70,000 paid).",
+          "fact_supported": "The current loss run shows an open claim with $420,000 total incurred, which was not disclosed in the broker email.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='loss_history', value='420000', polarity='negated')] not supported by resolved span on 'sub-11-loss-v2' (span facts: [TypedFact(field='effective_date', value='2026-06-14', polarity='affirmed'), TypedFact(field='loss_history', value='2026', polarity='affirmed')])"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-11-loss-v1",
+          "section_or_quote": "0 claims reported as of 2025-12-31",
+          "fact_supported": "The superseded loss run showed no claims for 2023-2025 and is the only document consistent with the broker's loss-free statement. It is superseded by sub-11-loss-v2 and was not relied upon.",
+          "verdict": "unverified",
+          "reason": "Unsupported numeric/date/ID value(s) ['11'] on 'sub-11-loss-v1'"
+        },
+        {
+          "claim_index": 4,
+          "doc_id": "sub-11-loss-v2",
+          "section_or_quote": "SUPERSEDES sub-11-loss-v1",
+          "fact_supported": "sub-11-loss-v2 is the current loss run (as of 2026-11-12) and supersedes v1.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='effective_date', value='2026-11-12', polarity='affirmed')] not supported by resolved span on 'sub-11-loss-v2' (span facts: [TypedFact(field='supersedes', value='sub-11-loss-v1', polarity='affirmed')])"
+        },
+        {
+          "claim_index": 5,
+          "doc_id": "carrier-ironclad",
+          "section_or_quote": "Commercial HVAC / Electrical (Non-Roofing)",
+          "fact_supported": "The class is eligible with Ironclad, but the $420,000 incurred claim exceeds Ironclad's $150,000 maximum single loss. Ironclad's notes also require any undisclosed claim to route to human review.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='carrier_cap', value='420000', polarity='affirmed')] not supported by resolved span on 'carrier-ironclad' (span facts: [TypedFact(field='business_classification', value='cannabis', polarity='affirmed'), TypedFact(field='business_classification', value='fireworks', polarity='affirmed'), TypedFact(field='business_classification', value='hvac', polarity='affirmed'), TypedFact(field='business_classification', value='light_manufacturing', polarity='affirmed'), TypedFact(field='business_classification', value='roofing', polarity='affirmed'), TypedFact(field='business_classification', value='warehouse', polarity='affirmed'), TypedFact(field='business_classification', value='wholesale', polarity='affirmed'), TypedFact(field='carrier_cap', value='150000', polarity='affirmed'), TypedFact(field='carrier_cap', value='40000000', polarity='affirmed'), TypedFact(field='carrier_cap', value='5000000', polarity='affirmed'), TypedFact(field='prohibited_class', value='cannabis', polarity='affirmed'), TypedFact(field='prohibited_class', value='fireworks', polarity='affirmed'), TypedFact(field='prohibited_class', value='hvac', polarity='affirmed'), TypedFact(field='prohibited_class', value='light_manufacturing', polarity='affirmed'), TypedFact(field='prohibited_class', value='roofing', polarity='affirmed'), TypedFact(field='prohibited_class', value='warehouse', polarity='affirmed'), TypedFact(field='prohibited_class', value='wholesale', polarity='affirmed')])"
+        },
+        {
+          "claim_index": 6,
+          "doc_id": "carrier-apex",
+          "section_or_quote": "Eligible classes: SaaS, IT consulting and professional services; max single loss $100,000",
+          "fact_supported": "The class is not eligible with Apex, and the $420,000 claim exceeds Apex's $100,000 maximum single loss.",
+          "verdict": "contradicted",
+          "reason": "Claimed fact(s) [TypedFact(field='carrier_cap', value='100000', polarity='negated'), TypedFact(field='carrier_cap', value='420000', polarity='negated')] not supported by resolved span on 'carrier-apex' (span facts: [TypedFact(field='business_classification', value='accounting', polarity='affirmed'), TypedFact(field='business_classification', value='cannabis', polarity='affirmed'), TypedFact(field='business_classification', value='consulting', polarity='affirmed'), TypedFact(field='business_classification', value='fireworks', polarity='affirmed'), TypedFact(field='business_classification', value='roofing', polarity='affirmed'), TypedFact(field='business_classification', value='saas', polarity='affirmed'), TypedFact(field='carrier_cap', value='100000', polarity='affirmed'), TypedFact(field='carrier_cap', value='25000000', polarity='affirmed'), TypedFact(field='carrier_cap', value='5000000', polarity='affirmed'), TypedFact(field='loss_history', value='loss_free', polarity='affirmed'), TypedFact(field='prohibited_class', value='accounting', polarity='affirmed'), TypedFact(field='prohibited_class', value='cannabis', polarity='affirmed'), TypedFact(field='prohibited_class', value='consulting', polarity='affirmed'), TypedFact(field='prohibited_class', value='fireworks', polarity='affirmed'), TypedFact(field='prohibited_class', value='roofing', polarity='affirmed'), TypedFact(field='prohibited_class', value='saas', polarity='affirmed')])"
+        }
+      ]
+    },
+    {
+      "review_id": "R12",
+      "case_id": "sub-12",
+      "spot_review_note": "Missing payroll schedule is supported by both operational sources; its status as a carrier requirement needs the guide, and broad consistency claims need all records.",
+      "claim_count": 4,
+      "claims": [
+        {
+          "claim_index": 1,
+          "doc_id": "sub-12-email",
+          "section_or_quote": "Broker email states: \"We still need to get the class-code payroll breakdown from HR before binding.\"",
+          "fact_supported": "Workers Comp payroll breakdown by class code is pending and required for WC coverage under Ironclad\u2019s underwriting guidelines.",
+          "verdict": "partial_missing_second_source",
+          "reason": "Single-source operational citation 'sub-12-email' blended with cross-document carrier-guide or consistency assertion (requires second source). Detail: unreviewable: cited excerpt 'Broker email states: \"We still need to get the class-code payroll breakdown from HR before binding.\"' does not resolve to a source span in 'sub-12-email'"
+        },
+        {
+          "claim_index": 2,
+          "doc_id": "sub-12-app",
+          "section_or_quote": "Application field: \"Workers Comp Payroll Breakdown by Class Code: [PENDING FROM HR]\"",
+          "fact_supported": "Applicant acknowledges missing required field; no contradiction with broker email.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'Applicant acknowledges missing required field; no contradiction with broker email.' on 'sub-12-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 3,
+          "doc_id": "sub-12-app",
+          "section_or_quote": "Location Schedule: 500 Oakridge Dr, Grand Rapids MI (60,000 sq ft, sprinklered)",
+          "fact_supported": "All other required fields for Ironclad are present, including location schedule.",
+          "verdict": "unverified",
+          "reason": "unreviewable: claim 'All other required fields for Ironclad are present, including location schedule.' on 'sub-12-app' contains no verifiable typed fact (ambiguous/unsupported free text)"
+        },
+        {
+          "claim_index": 4,
+          "doc_id": "sub-12-app",
+          "section_or_quote": "Insured: Oakridge Industrial Holdings | Class: Light Manufacturing | Revenue: $16,000,000 | Limit: $3,000,000 | Effective Date: 2027-01-01 | Loss History: 0 claims",
+          "fact_supported": "All core underwriting fields are consistent and present across documents.",
+          "verdict": "unverified",
+          "reason": "unreviewable: cited excerpt 'Insured: Oakridge Industrial Holdings | Class: Light Manufacturing | Revenue: $16,000,000 | Limit: $3,000,000 | Effective Date: 2027-01-01 | Loss History: 0 claims' does not resolve to a source span in 'sub-12-app'"
+        }
+      ]
+    }
+  ]
+}
