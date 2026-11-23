@@ -427,7 +427,7 @@ async def run_coverage_audit_suite(
 # chain vs. evidence-only docs, exclusion-aware polarity, rule-out allowance)
 # ---------------------------------------------------------------------------
 _DATE_RE = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
-_POLICY_NO_RE = re.compile(r"policy\s+number\s*:\s*([a-z0-9\-]+)", re.I)
+_POLICY_NO_RE = re.compile(r"policy(?:\s+number)?\s*:\s*([a-z0-9\-]+)", re.I)
 _V2_EXCLUSION_OR_GAP_RE = re.compile(
     r"\b(?:does\s+not\s+apply|does\s+not\s+bind|not\s+apply|not\s+bound|not\s+executed|"
     r"not\s+valid|excluded|exclusion|bars\s+coverage|no\s+coverage|revokes|revoked|deletes|"

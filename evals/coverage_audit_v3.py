@@ -455,35 +455,20 @@ def verify_coverage_citation_v3(
                 ),
                 "doc_id": citation.doc_id,
             }
-    if span_sites and claim_sites:
-        if not claim_sites.issubset(span_sites) and (
-            "solely for" in span_norm or "remains at" in span_norm
-        ):
-            return {
-                "verdict": "contradicted",
-                "reason": (
-                    f"Site scope mismatch on '{citation.doc_id}': span restricts to "
-                    f"{sorted(span_sites)}, claim cites {sorted(claim_sites)}."
-                ),
-                "doc_id": citation.doc_id,
-            }
-        # Sentence-level (site, numeric_amount) binding when multiple sites appear in one span
-        if len(span_sites) >= 2 and claim_nums:
-            sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+", span_norm) if s.strip()]
-            for c_site in sorted(claim_sites):
-                site_sents = [s for s in sentences if c_site in _extract_site_tokens(s)]
-                if site_sents and not any(
-                    claim_nums.issubset(set(_NUM_RE.findall(s))) for s in site_sents
-                ):
-                    return {
-                        "verdict": "contradicted",
-                        "reason": (
-                            f"Site-amount binding mismatch on '{citation.doc_id}': "
-                            f"site '{c_site}' is not associated with {sorted(claim_nums)} "
-                            "in the cited sentence."
-                        ),
-                        "doc_id": citation.doc_id,
-                    }
+    if (
+        span_sites
+        and claim_sites
+        and not claim_sites.issubset(span_sites)
+        and ("solely for" in span_norm or "remains at" in span_norm)
+    ):
+        return {
+            "verdict": "contradicted",
+            "reason": (
+                f"Site scope mismatch on '{citation.doc_id}': span restricts to "
+                f"{sorted(span_sites)}, claim cites {sorted(claim_sites)}."
+            ),
+            "doc_id": citation.doc_id,
+        }
 
     # 7. Polarity & exclusion / draft / stale-authority check
     span_is_excl_or_gap = bool(_V2_EXCLUSION_OR_GAP_RE.search(span_norm))
@@ -721,7 +706,19 @@ def score_issue_audit_brief(
     docs = load_packet_documents(packet_id, archive_root)
     expected_subject = str(key_case.get("expected_subject") or "")
     expected_issues: list[dict[str, Any]] = list(key_case["expected_issues"])
-    by_id = {iss.issue_id: iss for iss in brief.issues}
+    expected_ids = {str(exp["issue_id"]) for exp in expected_issues}
+
+    # Strict structural checks: packet_id match & unique exact expected issue_ids
+    packet_id_ok = brief.packet_id == packet_id
+    observed_ids = [iss.issue_id for iss in brief.issues]
+    duplicate_ids = sorted({i for i in observed_ids if observed_ids.count(i) > 1})
+    unexpected_ids = sorted(i for i in set(observed_ids) if i not in expected_ids)
+    structure_ok = packet_id_ok and len(duplicate_ids) == 0 and len(unexpected_ids) == 0
+
+    by_id: dict[str, Any] = {}
+    for iss in brief.issues:
+        if iss.issue_id not in by_id:
+            by_id[iss.issue_id] = iss
 
     issue_results: list[dict[str, Any]] = []
     any_false_definitive = False
@@ -738,6 +735,7 @@ def score_issue_audit_brief(
                     "value_correct": False,
                     "false_definitive_on_insufficient": False,
                     "controlling_docs_ok": False,
+                    "propositions_ok": False,
                     "scope_ok": False,
                     "dates_ok": False,
                     "missing_record_ok": False,
@@ -759,6 +757,7 @@ def score_issue_audit_brief(
 
         verdicts: list[dict[str, Any]] = []
         verified_docs: set[str] = set()
+        verified_spans_by_doc: dict[str, list[str]] = {}
         verified_spans: list[str] = []
         reasons: list[str] = []
         for cit in actual.citations:
@@ -767,7 +766,9 @@ def score_issue_audit_brief(
             if v["verdict"] == "supported":
                 verified_docs.add(cit.doc_id)
                 lines = docs[cit.doc_id].splitlines()
-                verified_spans.append(_norm(" ".join(lines[cit.line_start - 1 : cit.line_end])))
+                span_txt = _norm(" ".join(lines[cit.line_start - 1 : cit.line_end]))
+                verified_spans.append(span_txt)
+                verified_spans_by_doc.setdefault(cit.doc_id, []).append(span_txt)
             else:
                 reasons.append(f"[{v['verdict']}] {v['reason']}")
 
@@ -778,32 +779,37 @@ def score_issue_audit_brief(
         if missing_ctrl:
             reasons.append(f"Missing verified controlling doc(s): {missing_ctrl}")
 
-        blob = _norm(
-            " ".join(verified_spans)
-            + " "
-            + " ".join(c.claim_supported for c in actual.citations)
-            + " "
-            + actual.superseded_or_out_of_scope
-            + " "
-            + actual.missing_record_needed
-            + " "
-            + brief.rationale
-        )
+        # Mandatory propositions MUST be grounded in specific verified source spans (NOT rationale!)
+        propositions_ok = True
+        for prop in exp.get("required_doc_patterns") or []:
+            p_doc = str(prop["doc_id"])
+            p_pat = str(prop["pattern"])
+            doc_spans_joined = " ".join(verified_spans_by_doc.get(p_doc) or [])
+            if not doc_spans_joined or not re.search(p_pat, doc_spans_joined, re.I):
+                propositions_ok = False
+                reasons.append(
+                    f"Missing required verified source proposition on '{p_doc}' "
+                    f"(pattern: {p_pat!r})."
+                )
+
+        # Scope & dates verified strictly from verified source spans (never satisfied by rationale!)
+        verified_span_blob = _norm(" ".join(verified_spans))
         req_scope = [str(t).lower() for t in (exp.get("required_scope_tokens") or [])]
         forb_scope = [str(t).lower() for t in (exp.get("forbidden_scope_tokens") or [])]
-        # Forbidden scope tokens fail if asserted in controlling citations or determining_value
         ctrl_blob = _norm(
             actual.determining_value + " " + " ".join(c.claim_supported for c in actual.citations)
         )
-        scope_ok = all(t in blob for t in req_scope) and not any(t in ctrl_blob for t in forb_scope)
+        scope_ok = all(t in verified_span_blob for t in req_scope) and not any(
+            t in ctrl_blob for t in forb_scope
+        )
         if not scope_ok:
-            reasons.append("Scope check failed (missing required scope or forbidden site).")
+            reasons.append("Scope check failed (missing verified span scope or forbidden site).")
 
         req_dates = [str(d) for d in (exp.get("required_dates") or [])]
-        dates_ok = all(d in blob for d in req_dates)
+        dates_ok = all(d in verified_span_blob for d in req_dates)
         if not dates_ok:
-            missing_d = [d for d in req_dates if d not in blob]
-            reasons.append(f"Missing required date anchor(s): {missing_d}")
+            missing_d = [d for d in req_dates if d not in verified_span_blob]
+            reasons.append(f"Missing required verified date span(s): {missing_d}")
 
         req_miss = [str(k).lower() for k in (exp.get("expected_missing_keywords") or [])]
         miss_blob = _norm(actual.missing_record_needed + " " + brief.rationale)
@@ -815,9 +821,11 @@ def score_issue_audit_brief(
             v["verdict"] == "supported" for v in verdicts
         )
         iss_passed = (
-            outcome_correct
+            structure_ok
+            and outcome_correct
             and value_correct
             and controlling_docs_ok
+            and propositions_ok
             and scope_ok
             and dates_ok
             and missing_record_ok
@@ -836,6 +844,7 @@ def score_issue_audit_brief(
                 "actual_value": act_val,
                 "false_definitive_on_insufficient": false_def,
                 "controlling_docs_ok": controlling_docs_ok,
+                "propositions_ok": propositions_ok,
                 "scope_ok": scope_ok,
                 "dates_ok": dates_ok,
                 "missing_record_ok": missing_record_ok,
@@ -845,10 +854,13 @@ def score_issue_audit_brief(
             }
         )
 
-    all_passed = bool(issue_results) and all(r["passed"] for r in issue_results)
+    all_passed = structure_ok and bool(issue_results) and all(r["passed"] for r in issue_results)
     return {
         "scorer_version": "v3_issue",
         "packet_id": packet_id,
+        "packet_id_ok": packet_id_ok,
+        "duplicate_issue_ids": duplicate_ids,
+        "unexpected_issue_ids": unexpected_ids,
         "passed": all_passed,
         "issues_passed": sum(1 for r in issue_results if r["passed"]),
         "issues_total": len(issue_results),

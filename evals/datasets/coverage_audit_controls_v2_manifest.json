@@ -4,7 +4,7 @@
     "CTRL-C04",
     "CTRL-B08"
   ],
-  "key_sha256": "c8b54c52188f2052b48cf5411c7ba67a62907b2c40134eabddf1df773089afee",
+  "key_sha256": "dbfe84a9b80006463b85403c66c1ac22e3e5abd5c9dc84a9d58d9ea2569bfec2",
   "archive_file_count": 11,
   "archive_files_sha256": {
     "CTRL-B08/broker_note_september.txt": "35900ee059dd56ca42ac255b62c9a070cd4212c86d3628b694441be29f439782",

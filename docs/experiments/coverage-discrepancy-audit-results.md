@@ -93,7 +93,7 @@
 
 ## Calibrated Grader v3 Re-Grade (Arm-Blinded, Preserving v1 & v2)
 
-- **Frozen v3 Scorer SHA-256 (`evals/coverage_audit_v3.py`):** `c00ba6b249ae7cef376e3fb3dd65bb665b775c88c649a96462f28c475c5b2720`
+- **Frozen v3 Scorer SHA-256 (`evals/coverage_audit_v3.py`):** `c94d365cf5abc02c99dd7b70b5356b519536ec84989634df4f9cbb8826c167fc`
 - **Blinded Packet & Key:** `artifacts/experiments/coverage_audit_heldout_blinded_v3.jsonl` & `artifacts/experiments/coverage_audit_heldout_blind_key_v3.json` (all 72 attempts graded with arm, model, trial, and usage hidden before unblinding).
 - **Combined v1/v2/v3 Artifact:** `artifacts/experiments/coverage_audit_heldout_v1_v2_v3.json`.
 
@@ -101,12 +101,12 @@
 
 | Arm | Tier | Attempted | v1 Pass | v2 Pass | v3 Verified Pass | v3 Citations Sup / Con / Unv | False Def. |
 |---|---|---:|---:|---:|---:|---:|---:|
-| `baseline` | overall | 36 | 7/36 | 0/36 | **1/36 (2.8%)** | 220 / 36 / 47 | 0 |
-| `baseline` | clean | 12 | 2/12 | 0/12 | **0/12 (0.0%)** | 67 / 10 / 21 | 0 |
+| `baseline` | overall | 36 | 7/36 | 0/36 | **1/36 (2.8%)** | 222 / 33 / 48 | 0 |
+| `baseline` | clean | 12 | 2/12 | 0/12 | **0/12 (0.0%)** | 69 / 7 / 22 | 0 |
 | `baseline` | branching | 24 | 5/24 | 0/24 | **1/24 (4.2%)** | 153 / 26 / 26 | 0 |
-| `deep_agents` | overall | 36 | 7/36 | 1/36 | **5/36 (13.9%)** | 220 / 40 / 40 | 0 |
-| `deep_agents` | clean | 12 | 4/12 | 0/12 | **2/12 (16.7%)** | 63 / 8 / 18 | 0 |
-| `deep_agents` | branching | 24 | 3/24 | 1/24 | **3/24 (12.5%)** | 157 / 32 / 22 | 0 |
+| `deep_agents` | overall | 36 | 7/36 | 1/36 | **5/36 (13.9%)** | 222 / 38 / 40 | 0 |
+| `deep_agents` | clean | 12 | 4/12 | 0/12 | **2/12 (16.7%)** | 64 / 7 / 18 | 0 |
+| `deep_agents` | branching | 24 | 3/24 | 1/24 | **3/24 (12.5%)** | 158 / 31 / 22 | 0 |
 
 ### Paired Per-Case Outcomes Under Calibrated v3 (3 Trials per Arm)
 

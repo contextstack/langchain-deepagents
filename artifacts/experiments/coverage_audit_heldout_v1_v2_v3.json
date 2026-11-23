@@ -385,13 +385,12 @@
         "decoy_in_controlling": [],
         "citations_grounded": false,
         "supported_citations": 7,
-        "contradicted_citations": 1,
-        "unverified_citations": 1,
-        "contradicted_reasons": [
-          "Actor/entity mismatch on 'billing_receipt_q1.txt': subject 'Beacon Health Systems LLC' does not match document scope."
-        ],
+        "contradicted_citations": 0,
+        "unverified_citations": 2,
+        "contradicted_reasons": [],
         "unverified_reasons": [
-          "Heading-only span (lines 3-3) on 'policy_declarations.txt' does not substantiate coverage claim."
+          "Heading-only span (lines 3-3) on 'policy_declarations.txt' does not substantiate coverage claim.",
+          "Unsupported concept 'lapse' in claim_supported not present in 'billing_receipt_q1.txt'."
         ],
         "citation_verdicts": [
           {
@@ -419,8 +418,8 @@
             "citation_index": 3
           },
           {
-            "verdict": "contradicted",
-            "reason": "Actor/entity mismatch on 'billing_receipt_q1.txt': subject 'Beacon Health Systems LLC' does not match document scope.",
+            "verdict": "unverified",
+            "reason": "Unsupported concept 'lapse' in claim_supported not present in 'billing_receipt_q1.txt'.",
             "doc_id": "billing_receipt_q1.txt",
             "citation_index": 4
           },
@@ -1067,12 +1066,10 @@
         "no_decoy_used": true,
         "decoy_in_controlling": [],
         "citations_grounded": false,
-        "supported_citations": 8,
-        "contradicted_citations": 1,
+        "supported_citations": 9,
+        "contradicted_citations": 0,
         "unverified_citations": 4,
-        "contradicted_reasons": [
-          "Actor/entity mismatch on 'billing_receipt_q1.txt': subject 'Beacon Health Systems LLC' does not match document scope."
-        ],
+        "contradicted_reasons": [],
         "unverified_reasons": [
           "Heading-only span (lines 4-4) on 'claim_notice_cyber.txt' does not substantiate coverage claim.",
           "Heading-only span (lines 3-3) on 'policy_declarations.txt' does not substantiate coverage claim.",
@@ -1147,8 +1144,8 @@
             "citation_index": 10
           },
           {
-            "verdict": "contradicted",
-            "reason": "Actor/entity mismatch on 'billing_receipt_q1.txt': subject 'Beacon Health Systems LLC' does not match document scope.",
+            "verdict": "supported",
+            "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'billing_receipt_q1.txt' lines 2-2.",
             "doc_id": "billing_receipt_q1.txt",
             "citation_index": 11
           },
@@ -1411,12 +1408,10 @@
         "no_decoy_used": true,
         "decoy_in_controlling": [],
         "citations_grounded": false,
-        "supported_citations": 8,
-        "contradicted_citations": 1,
+        "supported_citations": 9,
+        "contradicted_citations": 0,
         "unverified_citations": 1,
-        "contradicted_reasons": [
-          "Actor/entity mismatch on 'billing_receipt_q1.txt': subject 'Beacon Health Systems LLC' does not match document scope."
-        ],
+        "contradicted_reasons": [],
         "unverified_reasons": [
           "Heading-only span (lines 4-4) on 'endorsement_cy_102.txt' does not substantiate coverage claim."
         ],
@@ -1446,8 +1441,8 @@
             "citation_index": 3
           },
           {
-            "verdict": "contradicted",
-            "reason": "Actor/entity mismatch on 'billing_receipt_q1.txt': subject 'Beacon Health Systems LLC' does not match document scope.",
+            "verdict": "supported",
+            "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'billing_receipt_q1.txt' lines 2-2.",
             "doc_id": "billing_receipt_q1.txt",
             "citation_index": 4
           },
@@ -1723,12 +1718,10 @@
         "no_decoy_used": true,
         "decoy_in_controlling": [],
         "citations_grounded": false,
-        "supported_citations": 7,
-        "contradicted_citations": 1,
+        "supported_citations": 8,
+        "contradicted_citations": 0,
         "unverified_citations": 1,
-        "contradicted_reasons": [
-          "Actor/entity mismatch on 'billing_receipt_q1.txt': subject 'Beacon Health Systems LLC' does not match document scope."
-        ],
+        "contradicted_reasons": [],
         "unverified_reasons": [
           "Heading-only span (lines 3-3) on 'policy_declarations.txt' does not substantiate coverage claim."
         ],
@@ -1758,8 +1751,8 @@
             "citation_index": 3
           },
           {
-            "verdict": "contradicted",
-            "reason": "Actor/entity mismatch on 'billing_receipt_q1.txt': subject 'Beacon Health Systems LLC' does not match document scope.",
+            "verdict": "supported",
+            "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'billing_receipt_q1.txt' lines 2-2.",
             "doc_id": "billing_receipt_q1.txt",
             "citation_index": 4
           },
@@ -18995,10 +18988,8 @@
         "value_correct": true,
         "expected_value": "35000",
         "actual_value": "35000",
-        "controlling_docs_ok": false,
-        "missing_required_controlling_docs": [
-          "endorsement_dd_304.txt:missing_35000"
-        ],
+        "controlling_docs_ok": true,
+        "missing_required_controlling_docs": [],
         "ordered_chain_ok": true,
         "operative_chain_expected": [
           "policy_declarations.txt",
@@ -19009,11 +19000,10 @@
         "no_decoy_used": true,
         "decoy_in_controlling": [],
         "citations_grounded": false,
-        "supported_citations": 8,
-        "contradicted_citations": 2,
+        "supported_citations": 9,
+        "contradicted_citations": 1,
         "unverified_citations": 0,
         "contradicted_reasons": [
-          "Site-amount binding mismatch on 'endorsement_dd_304.txt': site 'plant 1' is not associated with ['35000', '50000'] in the cited sentence.",
           "Polarity contradiction on 'broker_summary_email.txt': negated polarity on affirmed source span."
         ],
         "unverified_reasons": [],
@@ -19067,8 +19057,8 @@
             "citation_index": 7
           },
           {
-            "verdict": "contradicted",
-            "reason": "Site-amount binding mismatch on 'endorsement_dd_304.txt': site 'plant 1' is not associated with ['35000', '50000'] in the cited sentence.",
+            "verdict": "supported",
+            "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_dd_304.txt' lines 6-6.",
             "doc_id": "endorsement_dd_304.txt",
             "citation_index": 8
           },
@@ -24153,7 +24143,7 @@
       "max_duration_s": 50.67
     }
   },
-  "v3_scorer_sha256": "c00ba6b249ae7cef376e3fb3dd65bb665b775c88c649a96462f28c475c5b2720",
+  "v3_scorer_sha256": "c94d365cf5abc02c99dd7b70b5356b519536ec84989634df4f9cbb8826c167fc",
   "routing_bar_v3": {
     "baseline": {
       "branching_cases_passed": 0,

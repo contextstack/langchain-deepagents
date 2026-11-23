@@ -301,3 +301,37 @@ def test_v3_independent_relationship_role_swap_controls() -> None:
         load_packet_documents("B08"),
     )
     assert r4["verdict"] == "contradicted"
+
+    # 5. Positive control: true compound B06 Plant 2 ($35k) + Plant 1 ($50k) paraphrase -> supported
+    r_b06_ok = verify_coverage_citation_v3(
+        CoverageCitation(
+            doc_id="endorsement_dd_304.txt",
+            line_start=6,
+            line_end=6,
+            verbatim_quote=(
+                "Amends Endorsement DD-301 solely for Plant 2 (Toledo): controlling deductible "
+                "for Plant 2 is $35,000 per occurrence. Plant 1 remains at $50,000."
+            ),
+            claim_supported=(
+                "DD-304 sets the controlling deductible for Plant 2 (Toledo) at $35,000 "
+                "per occurrence and leaves Plant 1 at $50,000."
+            ),
+            subject="Ironworks Fabrication Inc.",
+        ),
+        load_packet_documents("B06"),
+    )
+    assert r_b06_ok["verdict"] == "supported"
+
+    # 6. Positive control: exact C01 same-policy paid-in-full receipt claim -> supported
+    r_c01_ok = verify_coverage_citation_v3(
+        CoverageCitation(
+            doc_id="billing_receipt_q1.txt",
+            line_start=2,
+            line_end=2,
+            verbatim_quote="Policy: PKG-2026-1011 | Paid in Full: $42,800 | Date: 2026-01-03",
+            claim_supported="Premium for policy PKG-2026-1011 was paid in full.",
+            subject="Beacon Health Systems LLC",
+        ),
+        load_packet_documents("C01"),
+    )
+    assert r_c01_ok["verdict"] == "supported"

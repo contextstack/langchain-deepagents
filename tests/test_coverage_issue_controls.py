@@ -234,6 +234,52 @@ def test_stub_negative_controls_omitted_wrong_deductible_wrong_scope_false_defin
     assert r_fdef["passed"] is False
     assert r_fdef["false_definitive_on_insufficient"] is True
 
+    # 5. Prelaunch regression: replacing endorsement citations with authentic line-5 effective
+    #    dates only (putting dates/sites in rationale) MUST fail propositions_ok!
+    date_only_e18a = CoverageCitation(
+        doc_id="endorsement_e18_a_theft.txt",
+        line_start=5,
+        line_end=5,
+        verbatim_quote="Effective Date: 2026-01-01",
+        claim_supported="E18-A effective date is 2026-01-01.",
+        subject="Harborline Maritime LLC",
+    )
+    date_only_e18b = CoverageCitation(
+        doc_id="endorsement_e18_b_deductible.txt",
+        line_start=5,
+        line_end=5,
+        verbatim_quote="Effective Date: 2026-09-01",
+        claim_supported="E18-B effective date is 2026-09-01.",
+        subject="Harborline Maritime LLC",
+    )
+    weak_ded = good_b08.issues[1].model_copy(
+        update={
+            "citations": [date_only_e18a, good_b08.issues[1].citations[1], date_only_e18b],
+        }
+    )
+    weak_b08 = good_b08.model_copy(
+        update={
+            "issues": [good_b08.issues[0], weak_ded],
+            "rationale": "Harbor HBR-4 dates 2026-08-27 and 2026-09-01.",
+        }
+    )
+    r_weak = score_issue_audit_brief(key_b08, weak_b08, archive_root=CTRL_ARCHIVE)
+    assert r_weak["passed"] is False
+    assert r_weak["issue_results"][1]["propositions_ok"] is False
+
+    # 6. Duplicate issue_id and mismatched packet_id MUST fail structure checks
+    dup_b08 = good_b08.model_copy(
+        update={"issues": [good_b08.issues[0], good_b08.issues[0], good_b08.issues[1]]}
+    )
+    r_dup = score_issue_audit_brief(key_b08, dup_b08, archive_root=CTRL_ARCHIVE)
+    assert r_dup["passed"] is False
+    assert r_dup["duplicate_issue_ids"] == ["theft_coverage_applicability"]
+
+    bad_pid = good_b08.model_copy(update={"packet_id": "WRONG-ID"})
+    r_pid = score_issue_audit_brief(key_b08, bad_pid, archive_root=CTRL_ARCHIVE)
+    assert r_pid["passed"] is False
+    assert r_pid["packet_id_ok"] is False
+
 
 async def test_run_issue_audit_attempt_mock_and_gateway_stub(
     monkeypatch: pytest.MonkeyPatch,

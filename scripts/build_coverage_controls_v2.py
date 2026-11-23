@@ -131,6 +131,16 @@ def main() -> None:
                         "policy_section_06_machinery.txt",
                         "intake_record_machinery.txt",
                     ],
+                    "required_doc_patterns": [
+                        {
+                            "doc_id": "policy_section_06_machinery.txt",
+                            "pattern": r"signed.*selection\s+form|ms-10",
+                        },
+                        {
+                            "doc_id": "intake_record_machinery.txt",
+                            "pattern": r"no\s+signed.*selection\s+form|does\s+not\s+establish",
+                        },
+                    ],
                     "expected_missing_keywords": ["selection form", "ms-10", "issuance record"],
                 }
             ],
@@ -153,6 +163,16 @@ def main() -> None:
                         "endorsement_e18_a_theft.txt",
                         "site_schedule_2026.txt",
                     ],
+                    "required_doc_patterns": [
+                        {
+                            "doc_id": "endorsement_e18_a_theft.txt",
+                            "pattern": r"theft.*hbr-4",
+                        },
+                        {
+                            "doc_id": "site_schedule_2026.txt",
+                            "pattern": r"hbr-4.*harbor",
+                        },
+                    ],
                     "required_scope_tokens": ["hbr-4", "harbor"],
                     "forbidden_scope_tokens": ["hbr-9", "bayview"],
                 },
@@ -164,6 +184,24 @@ def main() -> None:
                         "endorsement_e18_a_theft.txt",
                         "endorsement_e18_b_deductible.txt",
                         "incident_report_harbor.txt",
+                    ],
+                    "required_doc_patterns": [
+                        {
+                            "doc_id": "endorsement_e18_a_theft.txt",
+                            "pattern": r"5000.*deductible|deductible.*5000",
+                        },
+                        {
+                            "doc_id": "endorsement_e18_b_deductible.txt",
+                            "pattern": r"2026-09-01",
+                        },
+                        {
+                            "doc_id": "endorsement_e18_b_deductible.txt",
+                            "pattern": r"only|does\s+not\s+apply\s+retroactively|does\s+not\s+change\s+theft",
+                        },
+                        {
+                            "doc_id": "incident_report_harbor.txt",
+                            "pattern": r"actual\s+date\s+of\s+loss.*2026-08-27",
+                        },
                     ],
                     "required_dates": ["2026-08-27", "2026-09-01"],
                     "forbidden_scope_tokens": ["hbr-9", "bayview"],
