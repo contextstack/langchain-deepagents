@@ -51,3 +51,40 @@
 - **Token cost per verified branching attempt vs. Baseline (target ≤ 2.0×):** 5.89×
 - **Routing Bar Met:** `False`
 
+
+## Offline Grader v2 Re-Grade (Preserving v1 & v2 Side-by-Side)
+
+- **Dual-Version Artifacts (zero new live calls):** `artifacts/experiments/coverage_audit_pilot_v1_v2.json` and `artifacts/experiments/coverage_audit_heldout_v1_v2.json` preserve all raw model outputs, v1 scores, and v2 scores side-by-side.
+- **Dev Pilot Validation (`D01`–`D03`):** v1 passed `0/6`, v2 passed `1/6` (v2 enforces exact line-span entailment, ordered operative supersession chains, separate evidence-only docs on B07/B08, exclusion polarity, and allows rule-out citations while rejecting B01 heading-only/empty-chain and unrelated-claim negative controls).
+
+### Held-Out v1 vs. v2 Aggregate Comparison
+
+| Arm | Tier | Attempted | v1 Passed | v2 Passed | v2 Ordered Chain OK | v2 Controlling Clause OK | v2 Citations Grounded | False Def. |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `baseline` | overall | 36 | 7/36 (19.4%) | 0/36 (0.0%) | 36/36 | 33/36 | 0/36 | 0 |
+| `baseline` | clean | 12 | 2/12 (16.7%) | 0/12 (0.0%) | 12/12 | 12/12 | 0/12 | 0 |
+| `baseline` | branching | 24 | 5/24 (20.8%) | 0/24 (0.0%) | 24/24 | 21/24 | 0/24 | 0 |
+| `deep_agents` | overall | 36 | 7/36 (19.4%) | 1/36 (2.8%) | 36/36 | 32/36 | 1/36 | 0 |
+| `deep_agents` | clean | 12 | 4/12 (33.3%) | 0/12 (0.0%) | 12/12 | 12/12 | 0/12 | 0 |
+| `deep_agents` | branching | 24 | 3/24 (12.5%) | 1/24 (4.2%) | 24/24 | 20/24 | 1/24 | 0 |
+
+### Observed Usage Maxima vs. Enforced Equal Caps (16 calls / 32 tools / 96k tok)
+
+| Arm | Max LLM Calls | Max Tool Calls | Max Total Tokens | Max Latency (s) |
+|---|---:|---:|---:|---:|
+| `baseline` | 4 | 9 | 13,369 | 29.61 |
+| `deep_agents` | 8 | 19 | 49,212 | 50.67 |
+
+### Routing Bar Under v2 Grader
+
+- **Baseline branching cases passed (majority of 3):** 0/8
+- **Deep Agents branching cases passed (majority of 3):** 0/8
+- **Delta (Deep Agents − Baseline, target ≥ +2):** +0
+- **Deep Agents false definitive on insufficient-evidence (target 0):** 0
+- **Token cost per verified branching attempt vs. Baseline (target ≤ 2.0×):** None×
+- **Routing Bar Met (v2):** `False`
+
+### Protocol Substitution Notes (Flagged Before Any Corpus Expansion)
+
+1. **Clean abstention case:** The frozen 12-packet held-out corpus placed both abstention cases in the branching tier (`B03`, `B07`) and has no clean-tier abstention case (`C01`–`C04` are all definitive).
+2. **Separately graded dual outcome on `B08`:** `B08` currently grades a single remaining-aggregate value (`$750,000`) rather than separately graded applicability and deductible outcomes. Adding those scenarios would require a new corpus freeze and is flagged here rather than launching a new live run.

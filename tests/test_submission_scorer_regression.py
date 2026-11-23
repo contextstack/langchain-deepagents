@@ -789,3 +789,58 @@ async def test_usage_tracking_callback_records_model_provenance_and_tool_calls()
     assert cb.stats.unique_requested_models == ["eval-anthropic"]
     assert cb.stats.unique_response_models == ["anthropic/claude-sonnet-5-5"]
     assert cb.stats.total_tokens == 125
+
+
+def test_structured_fact_canonicalizer_all_field_types() -> None:
+    """Exercise structured tuple verification across all allowed field types."""
+    docs = {
+        "sub-01-app": (
+            "Signed Application\n"
+            "Insured: Northstar Analytics Inc.\n"
+            "FEIN: 84-1234567\n"
+            "Class: SaaS / B2B Software\n"
+            "Annual Revenue: $4,200,000\n"
+            "Effective Date: 2026-12-01\n"
+            "3-Year Loss History: 0 claims reported.\n"
+        )
+    }
+    for quote, claim, fld, val in (
+        (
+            "Effective Date: 2026-12-01",
+            "Effective date is 2026-12-01.",
+            "effective_date",
+            "2026-12-01",
+        ),
+        ("FEIN: 84-1234567", "FEIN is 84-1234567.", "fein", "84-1234567"),
+        (
+            "Class: SaaS / B2B Software",
+            "Business classification is SaaS / B2B Software.",
+            "business_classification",
+            "SaaS / B2B Software",
+        ),
+        (
+            "3-Year Loss History: 0 claims reported.",
+            "Loss history is 0 claims.",
+            "loss_history",
+            "0 claims",
+        ),
+        (
+            "Insured: Northstar Analytics Inc.",
+            "Named insured is Northstar Analytics Inc.",
+            "insured_name",
+            "Northstar Analytics Inc.",
+        ),
+    ):
+        ok, reason = verify_citation_against_doc(
+            EvidenceCitation(
+                doc_id="sub-01-app",
+                section_or_quote=quote,
+                fact_supported=claim,
+                subject="Northstar Analytics Inc.",
+                field=fld,
+                value=val,
+                polarity="affirmed",
+            ),
+            docs,
+        )
+        assert ok is True, reason

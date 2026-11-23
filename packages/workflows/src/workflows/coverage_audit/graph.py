@@ -228,13 +228,14 @@ async def run_coverage_audit_attempt(
     prompt: str,
     deps: CoverageAuditDeps,
     context: RunContext,
+    read_log: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Execute one isolated read-only Coverage Discrepancy Audit attempt under shared budget."""
-    read_log: list[dict[str, Any]] = []
+    active_read_log: list[dict[str, Any]] = read_log if read_log is not None else []
     read_tools = build_coverage_audit_tools(
         allowed_packet_id=packet_id,
         archive_root=deps.archive_root,
-        read_log=read_log,
+        read_log=active_read_log,
     )
     budget = CoverageAuditBudget(
         max_model_calls=deps.max_model_calls,
@@ -248,7 +249,7 @@ async def run_coverage_audit_attempt(
             "packet_id": packet_id,
             "variant": deps.planner_variant,
             "brief": brief.model_dump(mode="json"),
-            "doc_reads": read_log,
+            "doc_reads": active_read_log,
             "budget_used": {
                 "model_calls": budget.model_calls,
                 "tool_calls": budget.tool_calls,
@@ -262,6 +263,16 @@ async def run_coverage_audit_attempt(
         settings=deps.settings,
     )
     invoke_cfg: RunnableConfig = {"callbacks": deps.callbacks} if deps.callbacks else {}
+
+    def _sync_callback_tokens() -> None:
+        observed = 0
+        for cb in deps.callbacks:
+            stats = getattr(cb, "stats", None)
+            if stats is not None:
+                observed = max(observed, int(getattr(stats, "total_tokens", 0) or 0))
+        delta = observed - budget.total_tokens
+        if delta > 0:
+            budget.record_tokens(delta)
 
     async def _execute() -> CoverageAuditBrief:
         if deps.planner_variant == "deep_agents":
@@ -292,13 +303,8 @@ async def run_coverage_audit_attempt(
             config=invoke_cfg,
             context=context,
         )
-        # Check token budget before synthesis
-        for cb in deps.callbacks:
-            stats = getattr(cb, "stats", None)
-            if stats is not None and getattr(stats, "total_tokens", 0) > budget.max_total_tokens:
-                raise CoverageBudgetExceededError(
-                    f"Token budget exceeded ({stats.total_tokens}/{budget.max_total_tokens})"
-                )
+        # Enforce token budget BEFORE synthesis
+        _sync_callback_tokens()
 
         last_msg = agent_res["messages"][-1]
         investigation = str(getattr(last_msg, "content", last_msg))
@@ -312,6 +318,8 @@ async def run_coverage_audit_attempt(
             ),
             config=invoke_cfg,
         )
+        # Enforce token budget AFTER synthesis as well
+        _sync_callback_tokens()
         return brief_obj
 
     brief_out = await asyncio.wait_for(_execute(), timeout=deps.timeout_s)
@@ -319,7 +327,7 @@ async def run_coverage_audit_attempt(
         "packet_id": packet_id,
         "variant": deps.planner_variant,
         "brief": brief_out.model_dump(mode="json"),
-        "doc_reads": read_log,
+        "doc_reads": active_read_log,
         "budget_used": {
             "model_calls": budget.model_calls,
             "tool_calls": budget.tool_calls,

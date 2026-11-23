@@ -1,0 +1,1670 @@
+{
+  "mode": "dev_pilot_6",
+  "commit_sha": "487a3f765f964606809532fc018466b24bb59620",
+  "timestamp_utc": "2026-11-22T21:16:45.550642+00:00",
+  "model_alias": "eval-anthropic",
+  "manifest": {
+    "archive_root": "packages/workflows/src/workflows/coverage_audit/policy-archive",
+    "dev_packets": [
+      "D01",
+      "D02",
+      "D03"
+    ],
+    "heldout_packets": [
+      "C01",
+      "C02",
+      "C03",
+      "C04",
+      "B01",
+      "B02",
+      "B03",
+      "B04",
+      "B05",
+      "B06",
+      "B07",
+      "B08"
+    ],
+    "dev_key_sha256": "3b1d6bd33c116e22b4a5d854d44d0ef6b155a71199ed5e359914c29e6e9ba37d",
+    "heldout_key_sha256": "76816a5246ab901e45b9725fc4f9c932a35d2a398ed2b55aa0b719f619f7164c",
+    "archive_file_count": 91,
+    "archive_files_sha256": {
+      "B01/broker_draft_tr_120.txt": "267f8285fc5916777064012cd27ba928f469fd69230315a8b355a444933f2475",
+      "B01/carrier_underwriting_memo.txt": "19ab39981fbda5add180816ce01315f2ea5d7522736d05402c884dc1f98d5dff",
+      "B01/claim_notice_transit.txt": "e7269e42d85dbbb8f83d752a6a1bed0b15a482b78a53a609b1c4e3f1eb2b8bc2",
+      "B01/endorsement_tr_101.txt": "61c0bb52d4a6141ec4c78c691a203a0a862a3771e4ca316acd70eb88c99e1361",
+      "B01/endorsement_tr_108.txt": "4bbbf11b294f3453e201a7b80d9e91cf3270d11caa2c2c18b50bcb3f117411d7",
+      "B01/endorsement_tr_115.txt": "6514b32fa379a73d2be8ad80c0503dd48cbda320f7c95d36eadefbdaaeb857d9",
+      "B01/fleet_safety_certificate.txt": "aab2a21db1da42217311767523dc6458f6f505ba039b6ec270b548480dff7875",
+      "B01/policy_declarations.txt": "11e3000b6a8aa7c08fb8f77f8adb499180d2d26aa8a954dced0fd5b475039eae",
+      "B02/broker_summary_april.txt": "2a00fc3d890c896fe4e3d627ef22736a8a21d529114c868ebd65f4d72508f8b5",
+      "B02/claim_notice_march_flood.txt": "df8b4b8d526d5471aa9e0d92dc8f3df39753314732884da92465e15ad552f16d",
+      "B02/elevation_certificate.txt": "5284b11212bc3420752a59b46c041c31214a326dce21d15d0139c33f3488239b",
+      "B02/endorsement_fl_201.txt": "e1730711c49d1a1bf7a2ce606d3367aa2a24d0717e46c1a33dfd6a36904f416e",
+      "B02/endorsement_fl_205.txt": "c10f4c91e7c8503b05ecd1f90381606d0b13ce192d6bb33a946049e86415e80f",
+      "B02/policy_declarations.txt": "377806965b2b500fcce7fd50c3537d9b4058a87d18c2f9420a58054c9ce1f5b0",
+      "B02/prior_year_2025_dec.txt": "d1a4538c192c208237caef536eabbcb36b3565c494a1220c096b036becc0d1e0",
+      "B03/broker_email_schedule_pending.txt": "585556f9193bf8328b635ffa9776f77576706e0e6d30f5f9850ff2d170bc3dcc",
+      "B03/claim_notice_unit14.txt": "841179505510dab2c417812957fa017a800acc3d41322bf894082c50e8896efa",
+      "B03/driver_mvr_summary.txt": "5e002c7ec49e2145f42b1933825f1159386b42923769eae65eba0d4ca6778ff7",
+      "B03/endorsement_ba_701.txt": "6f32cb040890c0e5d5176cf8e8128eb60fe35540d6c84ffd9189ad09c5a1b841",
+      "B03/expired_2025_fleet_draft.txt": "885c2e59ce9e62a2e33ad0e1866d3b1d620f92938423240e48da7026f7311595",
+      "B03/maintenance_invoice_unit14.txt": "bec544907e229a87ceefe7b31de30318cf9f4b8fe4d998e7ae0ecb5d997f6921",
+      "B03/policy_declarations.txt": "a142918e0f1760d2536f2c5aaf34343c8c52d7fa003d9a5468c8342b643a116c",
+      "B04/broker_correspondence_spoilage.txt": "397e89072d9bcdc97288f2fd92a66a129628b041da2cdf32ee5740c3e2cb1b41",
+      "B04/claim_notice_spoilage.txt": "b498ac825903dbe7d794a994919234f8a86db2c13f2ad30e53efd228cff44ec2",
+      "B04/corporate_org_chart.txt": "7b73cd02ba15fd09aad1f662c6953fb5eebd0a081e6f79026134506ed82b2cc8",
+      "B04/endorsement_bl_402.txt": "2d5bf674f1a790646b0674ddae11dd61fec94dc8b4cdd340992fb964d2d0f4e7",
+      "B04/endorsement_bl_408.txt": "c35f69a4ed25e4f0a02b33475b51e363c32e576c847cf6ebd043be623d5c6392",
+      "B04/freezer_alarm_log.txt": "a6de7f43f5190c09ce6c826d0ba0afb2c7925835bec170e07401b58b3842619d",
+      "B04/policy_declarations.txt": "800b66027504baf065a6b1d1ed27079ead3c26aca2edff454ef38526d83f8536",
+      "B05/broker_renewal_summary_jan.txt": "e135a567cf06b8db49bd0219f6a99a92a7ea0035d1b61ff3af28da67d2183983",
+      "B05/claim_notice_workmanship.txt": "98a4f310f5f6238e9fff0a351b27554f4d170a39f734efb86ee2cb09f2076c64",
+      "B05/endorsement_eo_101.txt": "380e83c8732c2c2f334bd017deb7f803d4c970be5c495e24ac69f8b0d763d799",
+      "B05/endorsement_eo_109.txt": "854acb0291a485219f28be9429cb37052290cda484b75696b01468cff64dd122",
+      "B05/policy_declarations.txt": "c5130808bdd9970bf78d1e3d8debaa62c06a9bc4c95518bb426bba2094d34fa6",
+      "B05/project_contract_summary.txt": "e9c558bf8375ec39a03b4c1d38330b9ff656a4957853172bced5970ea250b81c",
+      "B05/underwriting_cancellation_notice_feb.txt": "9428ad3e257dcfdf8a66e553810e5d28c35809c3497c98189573f7ebc8936c2b",
+      "B06/broker_summary_email.txt": "b83345088a752328f69ac82135eae987ba35cf96ee33412f664a864f59b3ef31",
+      "B06/claim_notice_plant2.txt": "3eae742f094c0a62d236d4ec8294fd82f24e8c8dd59dffeb4647b9f89260e232",
+      "B06/endorsement_dd_301.txt": "379fa32895c98c5a5d778389b513857b877613ea1049356f31d2a5451a105379",
+      "B06/endorsement_dd_304.txt": "92bbcbe4cf00e76aeb4b13b278c202111d7627e742dd3ec4919ef7b9979802a7",
+      "B06/plant2_sprinkler_cert.txt": "d278d12385cb6c44029d84e7b18a3e64073e495f5470a510ee6b08b5458e5e25",
+      "B06/policy_declarations.txt": "073c36d6765c798495a8b2a447647369602eec889933099b61465cad9bac9026",
+      "B07/billing_ledger_2026.txt": "0bc68e1b23c21b2d3b1c0859073fc404d46dd6e0ba09eb383ba9963fff8c4975",
+      "B07/broker_email_may.txt": "fd6612fc8ac4378d61cc948ceda2ea41afd36b13b0e615c598ed0fcf05fab9ed",
+      "B07/claim_notice_mold.txt": "059098ee86409af208e4e3713adaf794d0a1435f9c31638c809215fca953a1e7",
+      "B07/hvac_service_report.txt": "757df13d37ef9744929e2839e766ec30f123e4a0047957fe998242451ba1025f",
+      "B07/policy_declarations.txt": "08e9faef12a996c620e63300b9197d7932b2515a4a2d9457cb879a780d114aec",
+      "B07/unsigned_endorsement_mx_502.txt": "62441d0890de4ac58da3bed60da08559230bda8441ad15f2dcda484817d7cd2c",
+      "B08/broker_draft_ag_215.txt": "ffac4683db20d79f9c4fde13bfca76a8977e37bad6417c3df804ded41134bf02",
+      "B08/claim_notice_july.txt": "4f06dec3d630c16f8bf52dd3984801c5a5b68039a9440038abca0e2098b58f69",
+      "B08/endorsement_ag_201.txt": "6e3d51b091817ff3d82970244a464a9bfb32d361e4c5b30086ef2d305816b542",
+      "B08/endorsement_ag_209.txt": "e12c1fd579f44a8e0b9134f11b9f7ff1ca6891544edbbd29248da1a4987a9f4e",
+      "B08/loss_run_2026.txt": "0cff19684d57604081f4178c8570e51a0bcebdf5048e3e929bdd7a5a64c2f196",
+      "B08/policy_declarations.txt": "64874edca75d4af21364bac38feb195fcabc03341e656e175a72663ff0049d6b",
+      "B08/safety_training_roster.txt": "30e68e245b03f455705b5c9e91decd1e8bcfa2808f31808c4e0527b512483ac7",
+      "C01/billing_receipt_q1.txt": "a6afaf59dbefe9619d2567cc1c9440e0102d2de391c57349dfaac1797fc96eba",
+      "C01/claim_notice_cyber.txt": "408af1a3dfeb61e42c634943e2edaa6ded0d6eeee1a9607b04d36e1365082f9f",
+      "C01/endorsement_cy_102.txt": "bef3adc1df5dbd3ba7ee76958935dd50a2f8f9ff1b89c712b8e6ff87326513dd",
+      "C01/it_security_questionnaire.txt": "4858b72bbcd4579209f2867ea502abf1a51213980d2ff98ead226df7214d594e",
+      "C01/policy_declarations.txt": "80c12eb102afd79c51f9e77585311d5dcebec0f36a7a67d44847bc5d629b6b87",
+      "C02/broker_welcome_email.txt": "1d9eb13d709060ebfaa676de2499cfbfe7fc5b656e0ce048cf3bf9db620a20a3",
+      "C02/claim_notice_storm.txt": "cefaf4ff0c380cc8414ad25f6fe6682d655e296056baf8b51eba459c3122dfc0",
+      "C02/endorsement_ns_201.txt": "24ba7e19535e81c2217ee9e76c01fd62923d569ca3e747028ec4c36b9ece57bd",
+      "C02/inspection_report_2026.txt": "222d24ce27d1e911c790a44710302bed0d29d2e133d6fe4db132297909d96316",
+      "C02/policy_declarations.txt": "08e04c96a9af10bbeba858b7eac24668666a9a5c8a6029cafc7bb21b36d05206",
+      "C03/carrier_product_brochure.txt": "664b3c7345378895a7b3b09f5aff36b153351379e7645be1a3c921a6d20e7c8f",
+      "C03/cgl_coverage_form_exclusions.txt": "768e71db03f1cb7fd108c1878d0b5ba0557cfbaa43e7615bf1e56bb9144a4cee",
+      "C03/claim_notice_spill.txt": "5382eb0b40a293a6805e7a8a8cc36598583aee2352bfde1534fe0e8fddb4297f",
+      "C03/policy_declarations.txt": "afa7c3cc870daebc08dcbffa952315a26fabfbf1e82ccbb64504b824afcff024",
+      "C03/safety_audit_2026.txt": "a8c4b010e27787ad8e2537af48f4293257613252f95121ec950eb2cbcc65f276",
+      "C04/claim_notice_press.txt": "7f39abc7ea3dec156afecacce30b3386de6f12cf6488368b969d74c3e2eff5d7",
+      "C04/endorsement_eb_305.txt": "fd44394f98fb891759abe47203ebfba6d66a31b17555842a4e6649066728e946",
+      "C04/maintenance_log_presses.txt": "0240cdc84bd4fa43dd961bdfbb6b6bc538be37acd61ac776c7f9d630d3442d9c",
+      "C04/policy_declarations.txt": "34d61f83052312a58df0d545fd4f9bf66e110392c167768255145ad171bbf6cd",
+      "C04/premium_schedule.txt": "1081dc7349c2345d5a4891ec18985dac511382cf7b8fb60aed7198b33599e49c",
+      "D01/broker_renewal_note.txt": "ca8522b463a44791bc33cfaedeaccab9ad18cd582131e8fc576ee40fe0d1be66",
+      "D01/claim_notice_2026_04.txt": "a1e948e3bcf60b207772b37f1dcd2caa6c656268a7652acaf9150f0f6331f1ab",
+      "D01/endorsement_gl_105.txt": "0999a6e03959c0da75c2c2f4ecc102aeefa4f8f3e7858fc53f33b18c01c5c7bb",
+      "D01/marketing_overview_2025.txt": "cc888796acae4aad8cb79f6fd44ab58162f27c6c5355d0625f41203e8d6e3e22",
+      "D01/policy_declarations.txt": "a42d841be3981a66de01469cbb3cd28cc8f3dbb1e3e7840dc2fdf1be06b7f70c",
+      "D02/broker_correspondence_feb.txt": "bf614f30da4fe1a7a4d53b8a2cb7e8590fe2368739b61f44fe2980d3e5e69d33",
+      "D02/draft_endorsement_water_2026.txt": "848826a7feef8278586ec5aeaa4a380f766c7b30c5898708cffcea06c58a1a7a",
+      "D02/endorsement_ed_401.txt": "21070e7ff78f488667f30340dd59acd68f79ee0aa369b138fc5dd79202c1110b",
+      "D02/endorsement_ed_409.txt": "993fcd7f006a7cafa9c97ea20a74a4f0c711d6a49df8adc2f297819e71575e1a",
+      "D02/loss_notice_march.txt": "65d11cb80b80b2ad490af3fcf7ac0a82abef61a4fe4a83156c7d3215ae49ae47",
+      "D02/policy_declarations.txt": "c19067bbac26a1e0a7c43262c3c68f4bd700bc530917f2a00d6f2db991bc6807",
+      "D03/broker_email_jan.txt": "7b5fd220e6bce93d27dd54b36bf10095241fea9468f8114884fbb513e6e62bd1",
+      "D03/claim_notice_annex_b.txt": "6b0451d7e4a647c6293981246f8f03cbe3fd4052727bb3935777410204c63ae9",
+      "D03/endorsement_sl_204.txt": "0049089feeafcb65b65dbc67155ffdea30e84242bf0ef8e0814768e151792cba",
+      "D03/expired_2024_location_list.txt": "3ee4d20ffc58952b198ad544451476d377901f0e782e540249882d53ff3a72ec",
+      "D03/policy_declarations.txt": "cf871e1bd554a372e9c854d12a2c29cb54318f95987555ea45e673a631a67f10"
+    }
+  },
+  "pilot_total_tokens": 154897,
+  "pilot_total_cost_usd": 0.8107,
+  "estimated_heldout_72_tokens": 1858764,
+  "estimated_heldout_72_cost_usd": 9.7285,
+  "runs": [
+    {
+      "packet_id": "D01",
+      "tier": "clean",
+      "variant": "baseline",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 22.36,
+      "llm_calls": 4,
+      "tool_calls": 6,
+      "tools_called": [
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 7270,
+      "completion_tokens": 3169,
+      "total_tokens": 10439,
+      "cost_usd": 0.069345,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "marketing_overview_2025.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "claim_notice_2026_04.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_declarations.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_renewal_note.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_gl_105.txt",
+          "start_line": 1,
+          "end_line": 7
+        }
+      ],
+      "brief": {
+        "packet_id": "D01",
+        "determination": "covered",
+        "controlling_value": "$2,000,000",
+        "controlling_doc_ids": [
+          "endorsement_gl_105.txt"
+        ],
+        "supersession_chain": [
+          "policy_declarations.txt",
+          "endorsement_gl_105.txt"
+        ],
+        "evidence_citations": [
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Policy Period: 2026-01-01 to 2027-01-01",
+            "claim_supported": "The policy period includes the 2026-04-12 date of loss.",
+            "subject": "Policy Period",
+            "value": "2026-01-01 to 2027-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Base Per-Occurrence Limit: $1,000,000",
+            "claim_supported": "The base declarations set the Per-Occurrence limit at $1,000,000 before endorsement.",
+            "subject": "Base Per-Occurrence Limit",
+            "value": "$1,000,000",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_gl_105.txt",
+            "line_start": 2,
+            "line_end": 2,
+            "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+            "claim_supported": "Endorsement GL-105 is executed and countersigned, so it is binding.",
+            "subject": "GL-105 execution status",
+            "value": "EXECUTED & COUNTERSIGNED",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_gl_105.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Effective Date: 2026-01-01",
+            "claim_supported": "GL-105 took effect before the 2026-04-12 loss.",
+            "subject": "GL-105 effective date",
+            "value": "2026-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_gl_105.txt",
+            "line_start": 6,
+            "line_end": 6,
+            "verbatim_quote": "This endorsement modifies the Base Per-Occurrence Limit from $1,000,000 to $2,000,000.",
+            "claim_supported": "GL-105 raises the Per-Occurrence limit from $1,000,000 to $2,000,000.",
+            "subject": "Per-Occurrence Limit",
+            "value": "$2,000,000",
+            "polarity": "affirmed"
+          }
+        ],
+        "missing_documents": [],
+        "rationale": "The loss date of 2026-04-12 falls within the policy period of 2026-01-01 to 2027-01-01. The base declarations set a $1,000,000 Per-Occurrence limit and refer to executed endorsements. Endorsement GL-105 is executed and countersigned, matches the policy number and named insured, and has been effective since 2026-01-01. It raises the limit to $2,000,000, and no other endorsement supersedes or revokes it. The broker note only corroborates GL-105. The marketing brochure confers no coverage. The claim notice only confirms the insured, the date and the loss description. The packet has no coverage forms, exclusions or location schedule, so it cannot confirm that the ammonia-related third-party inventory damage is covered under the full policy form. The packet shows no exclusion for this loss. The $25,000 base deductible in the declarations (line 6) is unchanged by GL-105."
+      },
+      "passed": false,
+      "determination_correct": true,
+      "expected_determination": "covered",
+      "actual_determination": "covered",
+      "false_definitive_on_insufficient": false,
+      "value_correct": true,
+      "expected_value": "2000000",
+      "actual_value": "2000000",
+      "controlling_docs_ok": true,
+      "missing_required_controlling_docs": [],
+      "no_decoy_used": true,
+      "decoy_in_controlling": [],
+      "citations_grounded": false,
+      "citation_failures": [
+        "Entity/subject mismatch on 'endorsement_gl_105.txt': subject 'GL-105 execution status' not present in cited document"
+      ],
+      "missing_docs_ok": true,
+      "v1_passed": false,
+      "v2_scores": {
+        "scorer_version": "v2",
+        "passed": true,
+        "determination_correct": true,
+        "expected_determination": "covered",
+        "actual_determination": "covered",
+        "false_definitive_on_insufficient": false,
+        "value_correct": true,
+        "expected_value": "2000000",
+        "actual_value": "2000000",
+        "controlling_docs_ok": true,
+        "missing_required_controlling_docs": [],
+        "ordered_chain_ok": true,
+        "operative_chain_expected": [
+          "policy_declarations.txt",
+          "endorsement_gl_105.txt"
+        ],
+        "evidence_only_in_chain": [],
+        "no_decoy_used": true,
+        "decoy_in_controlling": [],
+        "citations_grounded": true,
+        "citation_failures": [],
+        "missing_docs_ok": true
+      },
+      "v2_passed": true
+    },
+    {
+      "packet_id": "D01",
+      "tier": "clean",
+      "variant": "deep_agents",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 39.1,
+      "llm_calls": 7,
+      "tool_calls": 13,
+      "tools_called": [
+        "list_packet_documents",
+        "task",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 33851,
+      "completion_tokens": 5774,
+      "total_tokens": 39625,
+      "cost_usd": 0.188163,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_declarations.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_renewal_note.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "claim_notice_2026_04.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_gl_105.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "marketing_overview_2025.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "list_packet_documents",
+          "count": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "claim_notice_2026_04.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_declarations.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "marketing_overview_2025.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_renewal_note.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_gl_105.txt",
+          "start_line": 1,
+          "end_line": 7
+        }
+      ],
+      "brief": {
+        "packet_id": "D01",
+        "determination": "covered",
+        "controlling_value": "$2,000,000",
+        "controlling_doc_ids": [
+          "endorsement_gl_105.txt"
+        ],
+        "supersession_chain": [
+          "policy_declarations.txt",
+          "endorsement_gl_105.txt"
+        ],
+        "evidence_citations": [
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Policy Period: 2026-01-01 to 2027-01-01",
+            "claim_supported": "The policy period spans the 2026-04-12 date of loss.",
+            "subject": "Policy Period",
+            "value": "2026-01-01 to 2027-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "claim_notice_2026_04.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Date of Loss: 2026-04-12",
+            "claim_supported": "The date of loss is 2026-04-12, inside the policy period.",
+            "subject": "Date of Loss",
+            "value": "2026-04-12",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Base Per-Occurrence Limit: $1,000,000",
+            "claim_supported": "The base declarations Per-Occurrence limit is $1,000,000, before any endorsement.",
+            "subject": "Base Per-Occurrence Limit",
+            "value": "$1,000,000",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 7,
+            "line_end": 7,
+            "verbatim_quote": "Note: See attached executed endorsements for modified limits.",
+            "claim_supported": "The declarations point to executed endorsements as able to modify the limits.",
+            "subject": "Endorsement reference",
+            "value": "executed endorsements modify limits",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_gl_105.txt",
+            "line_start": 2,
+            "line_end": 2,
+            "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+            "claim_supported": "Endorsement GL-105 is executed and countersigned.",
+            "subject": "GL-105 status",
+            "value": "EXECUTED & COUNTERSIGNED",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_gl_105.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Effective Date: 2026-01-01",
+            "claim_supported": "GL-105 took effect before the date of loss.",
+            "subject": "GL-105 effective date",
+            "value": "2026-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_gl_105.txt",
+            "line_start": 6,
+            "line_end": 6,
+            "verbatim_quote": "This endorsement modifies the Base Per-Occurrence Limit from $1,000,000 to $2,000,000.",
+            "claim_supported": "GL-105 raises the Per-Occurrence limit from $1,000,000 to $2,000,000.",
+            "subject": "Per-Occurrence Limit",
+            "value": "$2,000,000",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "marketing_overview_2025.txt",
+            "line_start": 3,
+            "line_end": 3,
+            "verbatim_quote": "This brochure is for informational purposes only and confers no coverage.",
+            "claim_supported": "The marketing brochure confers no coverage and does not control the limit.",
+            "subject": "Marketing brochure",
+            "value": "confers no coverage",
+            "polarity": "negated"
+          }
+        ],
+        "missing_documents": [],
+        "rationale": "The policy (CPL-2026-4401, 2026-01-01 to 2027-01-01) was in force on the 2026-04-12 loss date. The declarations set a $1,000,000 base Per-Occurrence limit and refer to executed endorsements. Executed and countersigned endorsement GL-105, effective 2026-01-01, raises it to $2,000,000, and nothing revokes it. The broker note only repeats GL-105 and the marketing brochure confers no coverage, so neither controls. Caveats: no coverage form or exclusions are in the packet, so whether the ammonia compressor loss is a covered peril is not decided here. The $25,000 base deductible is unchanged by GL-105. Other endorsements not in the packet cannot be ruled out, but none is referenced."
+      },
+      "passed": false,
+      "determination_correct": true,
+      "expected_determination": "covered",
+      "actual_determination": "covered",
+      "false_definitive_on_insufficient": false,
+      "value_correct": true,
+      "expected_value": "2000000",
+      "actual_value": "2000000",
+      "controlling_docs_ok": true,
+      "missing_required_controlling_docs": [],
+      "no_decoy_used": true,
+      "decoy_in_controlling": [],
+      "citations_grounded": false,
+      "citation_failures": [
+        "Entity/subject mismatch on 'policy_declarations.txt': subject 'Endorsement reference' not present in cited document",
+        "Entity/subject mismatch on 'marketing_overview_2025.txt': subject 'Marketing brochure' not present in cited document"
+      ],
+      "missing_docs_ok": true,
+      "v1_passed": false,
+      "v2_scores": {
+        "scorer_version": "v2",
+        "passed": false,
+        "determination_correct": true,
+        "expected_determination": "covered",
+        "actual_determination": "covered",
+        "false_definitive_on_insufficient": false,
+        "value_correct": true,
+        "expected_value": "2000000",
+        "actual_value": "2000000",
+        "controlling_docs_ok": true,
+        "missing_required_controlling_docs": [],
+        "ordered_chain_ok": true,
+        "operative_chain_expected": [
+          "policy_declarations.txt",
+          "endorsement_gl_105.txt"
+        ],
+        "evidence_only_in_chain": [],
+        "no_decoy_used": true,
+        "decoy_in_controlling": [],
+        "citations_grounded": false,
+        "citation_failures": [
+          "Unsupported/unrelated claim terms ['modify', 'point'] on 'policy_declarations.txt' (not present in lines 7-7)",
+          "Unsupported/unrelated claim terms ['control', 'marketing'] on 'marketing_overview_2025.txt' (not present in lines 3-3)"
+        ],
+        "missing_docs_ok": true
+      },
+      "v2_passed": false
+    },
+    {
+      "packet_id": "D02",
+      "tier": "branching",
+      "variant": "baseline",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 25.72,
+      "llm_calls": 4,
+      "tool_calls": 7,
+      "tools_called": [
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 7943,
+      "completion_tokens": 4359,
+      "total_tokens": 12302,
+      "cost_usd": 0.089214,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "loss_notice_march.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_declarations.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_ed_401.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_ed_409.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "draft_endorsement_water_2026.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_correspondence_feb.txt",
+          "start_line": 1,
+          "end_line": 5
+        }
+      ],
+      "brief": {
+        "packet_id": "D02",
+        "determination": "covered",
+        "controlling_value": "$75,000",
+        "controlling_doc_ids": [
+          "endorsement_ed_409.txt"
+        ],
+        "supersession_chain": [
+          "policy_declarations.txt",
+          "endorsement_ed_401.txt",
+          "endorsement_ed_409.txt"
+        ],
+        "evidence_citations": [
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Policy Period: 2026-01-01 to 2027-01-01",
+            "claim_supported": "The policy period spans the date of loss.",
+            "subject": "Policy Period",
+            "value": "2026-01-01 to 2027-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "loss_notice_march.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Date of Loss: 2026-03-18",
+            "claim_supported": "The loss occurred on 2026-03-18, within the policy period.",
+            "subject": "Date of Loss",
+            "value": "2026-03-18",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "loss_notice_march.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Roof drain backup caused interior water damage at Mill #1.",
+            "claim_supported": "The loss was water damage at Mill #1 caused by a roof drain backup.",
+            "subject": "Cause and location of loss",
+            "value": "Roof drain backup, Mill #1",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Base Water Damage Sublimit: $25,000",
+            "claim_supported": "The base declarations set the Water Damage Sublimit at $25,000.",
+            "subject": "Base Water Damage Sublimit",
+            "value": "$25,000",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_401.txt",
+            "line_start": 2,
+            "line_end": 2,
+            "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+            "claim_supported": "ED-401 is an executed and countersigned endorsement.",
+            "subject": "ED-401 execution status",
+            "value": "EXECUTED & COUNTERSIGNED",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_401.txt",
+            "line_start": 6,
+            "line_end": 6,
+            "verbatim_quote": "This endorsement replaces the Base Water Damage Sublimit of $25,000 with $100,000.",
+            "claim_supported": "ED-401 replaced the $25,000 base sublimit with $100,000.",
+            "subject": "ED-401 Water Damage Sublimit",
+            "value": "$100,000",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_409.txt",
+            "line_start": 2,
+            "line_end": 2,
+            "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+            "claim_supported": "ED-409 is an executed and countersigned endorsement.",
+            "subject": "ED-409 execution status",
+            "value": "EXECUTED & COUNTERSIGNED",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_409.txt",
+            "line_start": 6,
+            "line_end": 6,
+            "verbatim_quote": "This endorsement expressly supersedes and replaces Endorsement ED-401 in its entirety.",
+            "claim_supported": "ED-409 expressly supersedes ED-401 in full.",
+            "subject": "ED-409 supersession of ED-401",
+            "value": "supersedes ED-401",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_409.txt",
+            "line_start": 7,
+            "line_end": 7,
+            "verbatim_quote": "Controlling Water Damage Sublimit: $75,000 per occurrence.",
+            "claim_supported": "ED-409 sets the controlling Water Damage Sublimit at $75,000 per occurrence.",
+            "subject": "Controlling Water Damage Sublimit",
+            "value": "$75,000",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "draft_endorsement_water_2026.txt",
+            "line_start": 1,
+            "line_end": 1,
+            "verbatim_quote": "PRELIMINARY DRAFT \u2014 UNSIGNED / NOT EXECUTED",
+            "claim_supported": "The proposed ED-412 ($250,000) draft is unsigned and not executed.",
+            "subject": "Draft endorsement ED-412 status",
+            "value": "$250,000",
+            "polarity": "negated"
+          },
+          {
+            "doc_id": "draft_endorsement_water_2026.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "THIS DRAFT DOES NOT BIND COVERAGE.",
+            "claim_supported": "The draft endorsement does not bind coverage.",
+            "subject": "Draft endorsement binding effect",
+            "value": "$250,000",
+            "polarity": "negated"
+          },
+          {
+            "doc_id": "broker_correspondence_feb.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "We floated a $250,000 draft earlier, but underwriting declined it and issued ED-409.",
+            "claim_supported": "Non-binding broker email confirms the $250,000 draft was declined and ED-409 was issued, consistent with the executed chain.",
+            "subject": "Broker correspondence on draft",
+            "value": "$250,000 draft declined; ED-409 issued",
+            "polarity": "affirmed"
+          }
+        ],
+        "missing_documents": [],
+        "rationale": "The loss on 2026-03-18 falls within the 2026-01-01 to 2027-01-01 policy period. The base declarations set a $25,000 Water Damage Sublimit. Executed ED-401 raised it to $100,000 from 2026-01-01. Executed ED-409, effective 2026-02-15 and before the loss, expressly supersedes ED-401 in its entirety and sets the sublimit at $75,000 per occurrence, so it controls. The unsigned draft (ED-412, $250,000) does not bind coverage, and the broker email is non-binding but consistent with the executed chain. The packet has no base coverage form, exclusions or location schedule, so this determination covers only the controlling sublimit and does not confirm that a roof-drain backup is a covered cause of loss. No required document is missing."
+      },
+      "passed": false,
+      "determination_correct": true,
+      "expected_determination": "covered",
+      "actual_determination": "covered",
+      "false_definitive_on_insufficient": false,
+      "value_correct": true,
+      "expected_value": "75000",
+      "actual_value": "75000",
+      "controlling_docs_ok": true,
+      "missing_required_controlling_docs": [],
+      "no_decoy_used": true,
+      "decoy_in_controlling": [],
+      "citations_grounded": false,
+      "citation_failures": [
+        "Entity/subject mismatch on 'loss_notice_march.txt': subject 'Cause and location of loss' not present in cited document",
+        "Entity/subject mismatch on 'endorsement_ed_401.txt': subject 'ED-401 execution status' not present in cited document",
+        "Entity/subject mismatch on 'endorsement_ed_409.txt': subject 'ED-409 execution status' not present in cited document",
+        "Entity/subject mismatch on 'endorsement_ed_409.txt': subject 'ED-409 supersession of ED-401' not present in cited document",
+        "Value mismatch on 'draft_endorsement_water_2026.txt': '$250,000' not in clause",
+        "Value mismatch on 'draft_endorsement_water_2026.txt': '$250,000' not in clause",
+        "Entity/subject mismatch on 'broker_correspondence_feb.txt': subject 'Broker correspondence on draft' not present in cited document"
+      ],
+      "missing_docs_ok": true,
+      "v1_passed": false,
+      "v2_scores": {
+        "scorer_version": "v2",
+        "passed": false,
+        "determination_correct": true,
+        "expected_determination": "covered",
+        "actual_determination": "covered",
+        "false_definitive_on_insufficient": false,
+        "value_correct": true,
+        "expected_value": "75000",
+        "actual_value": "75000",
+        "controlling_docs_ok": true,
+        "missing_required_controlling_docs": [],
+        "ordered_chain_ok": true,
+        "operative_chain_expected": [
+          "policy_declarations.txt",
+          "endorsement_ed_401.txt",
+          "endorsement_ed_409.txt"
+        ],
+        "evidence_only_in_chain": [],
+        "no_decoy_used": true,
+        "decoy_in_controlling": [],
+        "citations_grounded": false,
+        "citation_failures": [
+          "Heading-only/non-operative span (lines 5-5) on 'loss_notice_march.txt' cannot support substantive coverage claim",
+          "Unsupported numeric value(s) ['250000'] in claim_supported not present in lines 1-1 of 'draft_endorsement_water_2026.txt'",
+          "Value mismatch on 'draft_endorsement_water_2026.txt': '$250,000' not in cited span",
+          "Unsupported/unrelated claim terms ['binding', 'consistent'] on 'broker_correspondence_feb.txt' (not present in lines 4-4)"
+        ],
+        "missing_docs_ok": true
+      },
+      "v2_passed": false
+    },
+    {
+      "packet_id": "D02",
+      "tier": "branching",
+      "variant": "deep_agents",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 43.6,
+      "llm_calls": 7,
+      "tool_calls": 15,
+      "tools_called": [
+        "list_packet_documents",
+        "task",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 35368,
+      "completion_tokens": 7057,
+      "total_tokens": 42425,
+      "cost_usd": 0.211959,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "draft_endorsement_water_2026.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_ed_409.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_ed_401.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_correspondence_feb.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "loss_notice_march.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_declarations.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "list_packet_documents",
+          "count": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "draft_endorsement_water_2026.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_correspondence_feb.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_ed_409.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_declarations.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "loss_notice_march.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_ed_401.txt",
+          "start_line": 1,
+          "end_line": 6
+        }
+      ],
+      "brief": {
+        "packet_id": "D02",
+        "determination": "covered",
+        "controlling_value": "$75,000",
+        "controlling_doc_ids": [
+          "endorsement_ed_409.txt"
+        ],
+        "supersession_chain": [
+          "policy_declarations.txt",
+          "endorsement_ed_401.txt",
+          "endorsement_ed_409.txt"
+        ],
+        "evidence_citations": [
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Policy Period: 2026-01-01 to 2027-01-01",
+            "claim_supported": "The policy period runs from 2026-01-01 to 2027-01-01, which includes the 2026-03-18 loss date.",
+            "subject": "Policy Period",
+            "value": "2026-01-01 to 2027-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Base Water Damage Sublimit: $25,000",
+            "claim_supported": "The base declarations set the Water Damage Sublimit at $25,000.",
+            "subject": "Base Water Damage Sublimit",
+            "value": "$25,000",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_401.txt",
+            "line_start": 2,
+            "line_end": 2,
+            "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+            "claim_supported": "ED-401 is executed and countersigned.",
+            "subject": "ED-401 execution status",
+            "value": "EXECUTED & COUNTERSIGNED",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_401.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Effective Date: 2026-01-01",
+            "claim_supported": "ED-401 took effect on 2026-01-01.",
+            "subject": "ED-401 effective date",
+            "value": "2026-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_401.txt",
+            "line_start": 6,
+            "line_end": 6,
+            "verbatim_quote": "This endorsement replaces the Base Water Damage Sublimit of $25,000 with $100,000.",
+            "claim_supported": "ED-401 replaced the $25,000 base sublimit with $100,000, and was later superseded by ED-409.",
+            "subject": "Water Damage Sublimit under ED-401",
+            "value": "$100,000",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_409.txt",
+            "line_start": 2,
+            "line_end": 2,
+            "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+            "claim_supported": "ED-409 is executed and countersigned.",
+            "subject": "ED-409 execution status",
+            "value": "EXECUTED & COUNTERSIGNED",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_409.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Effective Date: 2026-02-15",
+            "claim_supported": "ED-409 took effect on 2026-02-15, before the loss date of 2026-03-18.",
+            "subject": "ED-409 effective date",
+            "value": "2026-02-15",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_409.txt",
+            "line_start": 6,
+            "line_end": 6,
+            "verbatim_quote": "This endorsement expressly supersedes and replaces Endorsement ED-401 in its entirety.",
+            "claim_supported": "ED-409 supersedes and replaces ED-401 in its entirety.",
+            "subject": "ED-409 supersession of ED-401",
+            "value": "ED-401 superseded",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_ed_409.txt",
+            "line_start": 7,
+            "line_end": 7,
+            "verbatim_quote": "Controlling Water Damage Sublimit: $75,000 per occurrence.",
+            "claim_supported": "ED-409 sets the controlling Water Damage Sublimit at $75,000 per occurrence.",
+            "subject": "Controlling Water Damage Sublimit",
+            "value": "$75,000",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "loss_notice_march.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Date of Loss: 2026-03-18",
+            "claim_supported": "The date of loss is 2026-03-18, within the policy period and after the ED-409 effective date.",
+            "subject": "Date of Loss",
+            "value": "2026-03-18",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "draft_endorsement_water_2026.txt",
+            "line_start": 1,
+            "line_end": 1,
+            "verbatim_quote": "PRELIMINARY DRAFT \u2014 UNSIGNED / NOT EXECUTED",
+            "claim_supported": "The $250,000 proposed endorsement (ED-412) is an unsigned, unexecuted draft.",
+            "subject": "Draft endorsement ED-412 status",
+            "value": "$250,000",
+            "polarity": "negated"
+          },
+          {
+            "doc_id": "draft_endorsement_water_2026.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "THIS DRAFT DOES NOT BIND COVERAGE.",
+            "claim_supported": "The draft endorsement does not bind coverage and cannot control the sublimit.",
+            "subject": "Draft endorsement binding effect",
+            "value": "$250,000",
+            "polarity": "negated"
+          },
+          {
+            "doc_id": "broker_correspondence_feb.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "We floated a $250,000 draft earlier, but underwriting declined it and issued ED-409.",
+            "claim_supported": "The broker email, which is informal and not relied on, is consistent with ED-409 being issued after the $250,000 draft was declined.",
+            "subject": "Broker correspondence on ED-409",
+            "value": "$250,000 draft declined",
+            "polarity": "affirmed"
+          }
+        ],
+        "missing_documents": [],
+        "rationale": "The base declarations set a $25,000 Water Damage Sublimit. Executed and countersigned ED-401 (effective 2026-01-01) raised it to $100,000. Executed and countersigned ED-409 (effective 2026-02-15) expressly superseded ED-401 in its entirety and set the sublimit at $75,000 per occurrence. The 2026-03-18 loss is within the policy period and after ED-409's effective date, so ED-409 controls. The unsigned $250,000 draft (ED-412) does not bind coverage, and the informal broker email is not relied on. The packet has no policy form, so deductibles, occurrence wording, exclusions such as roof-drain backup, and cause-of-loss coverage could not be checked. This finding fixes the sublimit only. The only evidence of execution is the Status line, since the packet has no signature blocks."
+      },
+      "passed": false,
+      "determination_correct": true,
+      "expected_determination": "covered",
+      "actual_determination": "covered",
+      "false_definitive_on_insufficient": false,
+      "value_correct": true,
+      "expected_value": "75000",
+      "actual_value": "75000",
+      "controlling_docs_ok": true,
+      "missing_required_controlling_docs": [],
+      "no_decoy_used": true,
+      "decoy_in_controlling": [],
+      "citations_grounded": false,
+      "citation_failures": [
+        "Entity/subject mismatch on 'endorsement_ed_401.txt': subject 'ED-401 execution status' not present in cited document",
+        "Entity/subject mismatch on 'endorsement_ed_401.txt': subject 'Water Damage Sublimit under ED-401' not present in cited document",
+        "Entity/subject mismatch on 'endorsement_ed_409.txt': subject 'ED-409 execution status' not present in cited document",
+        "Entity/subject mismatch on 'endorsement_ed_409.txt': subject 'ED-409 supersession of ED-401' not present in cited document",
+        "Value mismatch on 'draft_endorsement_water_2026.txt': '$250,000' not in clause",
+        "Value mismatch on 'draft_endorsement_water_2026.txt': '$250,000' not in clause",
+        "Entity/subject mismatch on 'broker_correspondence_feb.txt': subject 'Broker correspondence on ED-409' not present in cited document"
+      ],
+      "missing_docs_ok": true,
+      "v1_passed": false,
+      "v2_scores": {
+        "scorer_version": "v2",
+        "passed": false,
+        "determination_correct": true,
+        "expected_determination": "covered",
+        "actual_determination": "covered",
+        "false_definitive_on_insufficient": false,
+        "value_correct": true,
+        "expected_value": "75000",
+        "actual_value": "75000",
+        "controlling_docs_ok": true,
+        "missing_required_controlling_docs": [],
+        "ordered_chain_ok": true,
+        "operative_chain_expected": [
+          "policy_declarations.txt",
+          "endorsement_ed_401.txt",
+          "endorsement_ed_409.txt"
+        ],
+        "evidence_only_in_chain": [],
+        "no_decoy_used": true,
+        "decoy_in_controlling": [],
+        "citations_grounded": false,
+        "citation_failures": [
+          "Unsupported/unrelated claim terms ['later', 'replaced'] on 'endorsement_ed_401.txt' (not present in lines 6-6)",
+          "Unsupported numeric value(s) ['250000'] in claim_supported not present in lines 1-1 of 'draft_endorsement_water_2026.txt'",
+          "Value mismatch on 'draft_endorsement_water_2026.txt': '$250,000' not in cited span",
+          "Unsupported/unrelated claim terms ['being', 'consistent', 'informal', 'relied'] on 'broker_correspondence_feb.txt' (not present in lines 4-4)"
+        ],
+        "missing_docs_ok": true
+      },
+      "v2_passed": false
+    },
+    {
+      "packet_id": "D03",
+      "tier": "branching",
+      "variant": "baseline",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 16.96,
+      "llm_calls": 4,
+      "tool_calls": 6,
+      "tools_called": [
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 7340,
+      "completion_tokens": 2670,
+      "total_tokens": 10010,
+      "cost_usd": 0.06207,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "claim_notice_annex_b.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_sl_204.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_declarations.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_email_jan.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "expired_2024_location_list.txt",
+          "start_line": 1,
+          "end_line": 4
+        }
+      ],
+      "brief": {
+        "packet_id": "D03",
+        "determination": "insufficient_evidence",
+        "controlling_value": "insufficient_evidence",
+        "controlling_doc_ids": [
+          "endorsement_sl_204.txt"
+        ],
+        "supersession_chain": [
+          "policy_declarations.txt",
+          "endorsement_sl_204.txt"
+        ],
+        "evidence_citations": [
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Policy Period: 2026-01-01 to 2027-01-01",
+            "claim_supported": "The policy period includes the loss date of 2026-05-02.",
+            "subject": "Policy Period",
+            "value": "2026-01-01 to 2027-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Covered Locations: Per Scheduled Locations Endorsement SL-204.",
+            "claim_supported": "Covered locations are determined by Scheduled Locations Endorsement SL-204.",
+            "subject": "Covered Locations",
+            "value": "Per Scheduled Locations Endorsement SL-204",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_sl_204.txt",
+            "line_start": 2,
+            "line_end": 2,
+            "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+            "claim_supported": "Endorsement SL-204 is executed and countersigned.",
+            "subject": "SL-204 status",
+            "value": "EXECUTED & COUNTERSIGNED",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_sl_204.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Effective Date: 2026-01-01",
+            "claim_supported": "SL-204 was effective on 2026-01-01, before the loss date.",
+            "subject": "SL-204 effective date",
+            "value": "2026-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_sl_204.txt",
+            "line_start": 6,
+            "line_end": 6,
+            "verbatim_quote": "Coverage applies solely to locations explicitly enumerated in Schedule A-2026 (attached separately and incorporated by reference). Unscheduled locations are excluded.",
+            "claim_supported": "Coverage is limited to locations enumerated in Schedule A-2026, and unscheduled locations are excluded.",
+            "subject": "Scheduled locations limitation",
+            "value": "Schedule A-2026 only",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "broker_email_jan.txt",
+            "line_start": 3,
+            "line_end": 4,
+            "verbatim_quote": "Schedule A-2026 upload pending",
+            "claim_supported": "Schedule A-2026 was not yet uploaded and is not in the archive; the broker email is informal and non-binding.",
+            "subject": "Schedule A-2026",
+            "value": "upload pending",
+            "polarity": "negated"
+          },
+          {
+            "doc_id": "expired_2024_location_list.txt",
+            "line_start": 1,
+            "line_end": 2,
+            "verbatim_quote": "EXPIRED 2024 RENEWAL WORKSHEET (SUPERSEDED)",
+            "claim_supported": "The 2024 location list is expired and superseded, and cannot establish 2026 coverage for 412 Dockside Rd.",
+            "subject": "2024 location list validity",
+            "value": "expired and superseded",
+            "polarity": "negated"
+          }
+        ],
+        "missing_documents": [
+          "Schedule A-2026 (finalized and executed), incorporated by SL-204",
+          "Any executed endorsement adding Warehouse Annex B (412 Dockside Rd) to the schedule after 2026-01-01"
+        ],
+        "rationale": "The policy was in force on the loss date and SL-204, executed and effective 2026-01-01, limits coverage to locations enumerated in Schedule A-2026, excluding unscheduled locations. Schedule A-2026 is not in the archive. The broker email is informal and non-binding, and the 2024 location list is expired and superseded, so neither can confirm Annex B. Coverage cannot be confirmed or denied without the schedule."
+      },
+      "passed": false,
+      "determination_correct": true,
+      "expected_determination": "insufficient_evidence",
+      "actual_determination": "insufficient_evidence",
+      "false_definitive_on_insufficient": false,
+      "value_correct": true,
+      "expected_value": "insufficient_evidence",
+      "actual_value": "insufficient_evidence",
+      "controlling_docs_ok": true,
+      "missing_required_controlling_docs": [],
+      "no_decoy_used": true,
+      "decoy_in_controlling": [],
+      "citations_grounded": false,
+      "citation_failures": [
+        "Polarity mismatch on 'broker_email_jan.txt': claimed negated on affirmed clause",
+        "Polarity mismatch on 'expired_2024_location_list.txt': claimed negated on affirmed clause"
+      ],
+      "missing_docs_ok": true,
+      "v1_passed": false,
+      "v2_scores": {
+        "scorer_version": "v2",
+        "passed": false,
+        "determination_correct": true,
+        "expected_determination": "insufficient_evidence",
+        "actual_determination": "insufficient_evidence",
+        "false_definitive_on_insufficient": false,
+        "value_correct": true,
+        "expected_value": "insufficient_evidence",
+        "actual_value": "insufficient_evidence",
+        "controlling_docs_ok": true,
+        "missing_required_controlling_docs": [],
+        "ordered_chain_ok": true,
+        "operative_chain_expected": [
+          "policy_declarations.txt",
+          "endorsement_sl_204.txt"
+        ],
+        "evidence_only_in_chain": [],
+        "no_decoy_used": true,
+        "decoy_in_controlling": [],
+        "citations_grounded": false,
+        "citation_failures": [
+          "Unsupported/unrelated claim terms ['binding', 'informal', 'uploaded'] on 'broker_email_jan.txt' (not present in lines 3-4)"
+        ],
+        "missing_docs_ok": true
+      },
+      "v2_passed": false
+    },
+    {
+      "packet_id": "D03",
+      "tier": "branching",
+      "variant": "deep_agents",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 37.99,
+      "llm_calls": 7,
+      "tool_calls": 13,
+      "tools_called": [
+        "list_packet_documents",
+        "task",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 34290,
+      "completion_tokens": 5806,
+      "total_tokens": 40096,
+      "cost_usd": 0.18996,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "expired_2024_location_list.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "claim_notice_annex_b.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_email_jan.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_sl_204.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_declarations.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "list_packet_documents",
+          "count": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "claim_notice_annex_b.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_declarations.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_sl_204.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "expired_2024_location_list.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_email_jan.txt",
+          "start_line": 1,
+          "end_line": 4
+        }
+      ],
+      "brief": {
+        "packet_id": "D03",
+        "determination": "insufficient_evidence",
+        "controlling_value": "insufficient_evidence",
+        "controlling_doc_ids": [
+          "endorsement_sl_204.txt"
+        ],
+        "supersession_chain": [
+          "policy_declarations.txt",
+          "endorsement_sl_204.txt"
+        ],
+        "evidence_citations": [
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Policy Period: 2026-01-01 to 2027-01-01",
+            "claim_supported": "The policy period includes the loss date of 2026-05-02.",
+            "subject": "policy period",
+            "value": "2026-01-01 to 2027-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "claim_notice_annex_b.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "Date of Loss: 2026-05-02",
+            "claim_supported": "The loss occurred on 2026-05-02.",
+            "subject": "date of loss",
+            "value": "2026-05-02",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "policy_declarations.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Covered Locations: Per Scheduled Locations Endorsement SL-204.",
+            "claim_supported": "Covered locations are controlled by endorsement SL-204.",
+            "subject": "covered locations",
+            "value": "Per SL-204",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_sl_204.txt",
+            "line_start": 2,
+            "line_end": 2,
+            "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+            "claim_supported": "Endorsement SL-204 is executed and countersigned.",
+            "subject": "SL-204 status",
+            "value": "EXECUTED & COUNTERSIGNED",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_sl_204.txt",
+            "line_start": 5,
+            "line_end": 5,
+            "verbatim_quote": "Effective Date: 2026-01-01",
+            "claim_supported": "Endorsement SL-204 is effective 2026-01-01.",
+            "subject": "SL-204 effective date",
+            "value": "2026-01-01",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "endorsement_sl_204.txt",
+            "line_start": 6,
+            "line_end": 6,
+            "verbatim_quote": "Coverage applies solely to locations explicitly enumerated in Schedule A-2026 (attached separately and incorporated by reference). Unscheduled locations are excluded.",
+            "claim_supported": "Coverage is limited to locations listed in Schedule A-2026, which is not in the packet, so coverage for Annex B cannot be confirmed.",
+            "subject": "scheduled locations limitation",
+            "value": "Schedule A-2026 only",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "broker_email_jan.txt",
+            "line_start": 3,
+            "line_end": 4,
+            "verbatim_quote": "Subject: Schedule A-2026 upload pending \u2026 We will forward the finalized Schedule A-2026 once the insured signs off on the new annex.",
+            "claim_supported": "The broker email shows Schedule A-2026 was not final as of January and does not supply the schedule or bind coverage.",
+            "subject": "Schedule A-2026 availability",
+            "value": "pending",
+            "polarity": "negated"
+          },
+          {
+            "doc_id": "expired_2024_location_list.txt",
+            "line_start": 4,
+            "line_end": 4,
+            "verbatim_quote": "2. 412 Dockside Rd (Warehouse Annex B)",
+            "claim_supported": "Only the expired 2024 worksheet names Annex B, which cannot establish 2026 coverage.",
+            "subject": "412 Dockside Rd (Warehouse Annex B)",
+            "value": "listed on expired 2024 worksheet only",
+            "polarity": "affirmed"
+          },
+          {
+            "doc_id": "expired_2024_location_list.txt",
+            "line_start": 2,
+            "line_end": 2,
+            "verbatim_quote": "NOT VALID FOR 2026 POLICY TERM",
+            "claim_supported": "The 2024 location list is not valid for the 2026 policy term.",
+            "subject": "2024 location list validity",
+            "value": "not valid for 2026",
+            "polarity": "negated"
+          }
+        ],
+        "missing_documents": [
+          "Schedule A-2026 (finalized location schedule incorporated by SL-204)",
+          "Any later executed endorsement adding 412 Dockside Rd (Warehouse Annex B)",
+          "Evidence of insured sign-off on the new annex and broker transmittal of the final schedule"
+        ],
+        "rationale": "The policy was in force on the loss date and SL-204 is the executed, effective endorsement controlling covered locations, with no supersession. SL-204 limits coverage to locations enumerated in Schedule A-2026, which is not in the archive. The broker email only says the schedule was pending and cannot bind coverage. The expired 2024 list is the only document naming Annex B and is expressly not valid for 2026. Coverage can be neither confirmed nor denied without Schedule A-2026 or a later executed endorsement."
+      },
+      "passed": false,
+      "determination_correct": true,
+      "expected_determination": "insufficient_evidence",
+      "actual_determination": "insufficient_evidence",
+      "false_definitive_on_insufficient": false,
+      "value_correct": true,
+      "expected_value": "insufficient_evidence",
+      "actual_value": "insufficient_evidence",
+      "controlling_docs_ok": true,
+      "missing_required_controlling_docs": [],
+      "no_decoy_used": true,
+      "decoy_in_controlling": [],
+      "citations_grounded": false,
+      "citation_failures": [
+        "unreviewable: verbatim_quote not found in 'broker_email_jan.txt'",
+        "Value mismatch on 'expired_2024_location_list.txt': 'listed on expired 2024 worksheet only' not in clause",
+        "Polarity mismatch on 'expired_2024_location_list.txt': claimed negated on affirmed clause"
+      ],
+      "missing_docs_ok": true,
+      "v1_passed": false,
+      "v2_scores": {
+        "scorer_version": "v2",
+        "passed": false,
+        "determination_correct": true,
+        "expected_determination": "insufficient_evidence",
+        "actual_determination": "insufficient_evidence",
+        "false_definitive_on_insufficient": false,
+        "value_correct": true,
+        "expected_value": "insufficient_evidence",
+        "actual_value": "insufficient_evidence",
+        "controlling_docs_ok": false,
+        "missing_required_controlling_docs": [
+          "endorsement_sl_204.txt:missing_gap_clause"
+        ],
+        "ordered_chain_ok": true,
+        "operative_chain_expected": [
+          "policy_declarations.txt",
+          "endorsement_sl_204.txt"
+        ],
+        "evidence_only_in_chain": [],
+        "no_decoy_used": true,
+        "decoy_in_controlling": [],
+        "citations_grounded": false,
+        "citation_failures": [
+          "Unsupported/unrelated claim terms ['annex', 'limited', 'packet'] on 'endorsement_sl_204.txt' (not present in lines 6-6)",
+          "unreviewable: verbatim_quote not found in cited lines 3-4 of 'broker_email_jan.txt'",
+          "Unsupported numeric value(s) ['2024', '2026'] in claim_supported not present in lines 4-4 of 'expired_2024_location_list.txt'"
+        ],
+        "missing_docs_ok": true
+      },
+      "v2_passed": false
+    }
+  ],
+  "routing_bar_v1": {
+    "baseline": {
+      "branching_cases_passed": 0,
+      "branching_cases_total": 2,
+      "branching_attempts_passed": 0,
+      "branching_attempts_total": 2,
+      "false_definitive_on_insufficient": 0,
+      "total_branching_tokens": 22312,
+      "tokens_per_verified_branching": null
+    },
+    "deep_agents": {
+      "branching_cases_passed": 0,
+      "branching_cases_total": 2,
+      "branching_attempts_passed": 0,
+      "branching_attempts_total": 2,
+      "false_definitive_on_insufficient": 0,
+      "total_branching_tokens": 82521,
+      "tokens_per_verified_branching": null
+    },
+    "delta_branching_cases": 0,
+    "deep_agents_zero_false_definitive": true,
+    "token_cost_ratio_vs_baseline": null,
+    "within_2x_token_bar": false,
+    "routing_bar_met": false
+  },
+  "routing_bar_v2": {
+    "baseline": {
+      "branching_cases_passed": 0,
+      "branching_cases_total": 2,
+      "branching_attempts_passed": 0,
+      "branching_attempts_total": 2,
+      "false_definitive_on_insufficient": 0,
+      "total_branching_tokens": 22312,
+      "tokens_per_verified_branching": null
+    },
+    "deep_agents": {
+      "branching_cases_passed": 0,
+      "branching_cases_total": 2,
+      "branching_attempts_passed": 0,
+      "branching_attempts_total": 2,
+      "false_definitive_on_insufficient": 0,
+      "total_branching_tokens": 82521,
+      "tokens_per_verified_branching": null
+    },
+    "delta_branching_cases": 0,
+    "deep_agents_zero_false_definitive": true,
+    "token_cost_ratio_vs_baseline": null,
+    "within_2x_token_bar": false,
+    "routing_bar_met": false
+  },
+  "observed_max_usage": {
+    "baseline": {
+      "max_llm_calls": 4,
+      "max_tool_calls": 7,
+      "max_total_tokens": 12302,
+      "max_duration_s": 25.72
+    },
+    "deep_agents": {
+      "max_llm_calls": 7,
+      "max_tool_calls": 15,
+      "max_total_tokens": 42425,
+      "max_duration_s": 43.6
+    }
+  }
+}

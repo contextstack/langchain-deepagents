@@ -14,7 +14,9 @@ from evals.coverage_audit import (
     evaluate_routing_bar,
     run_coverage_audit_suite,
     score_coverage_audit_brief,
+    score_coverage_audit_brief_v2,
     verify_coverage_citation,
+    verify_coverage_citation_v2,
 )
 from gateway.mocks import ScriptedMockChatModel
 from workflows.coverage_audit.graph import (
@@ -486,3 +488,424 @@ async def test_coverage_audit_gateway_branch_and_token_budget_with_stub_agent(
             ),
             context=ctx,
         )
+
+    # Token budget exceeded AFTER synthesis also raises CoverageBudgetExceededError,
+    # and partial doc_reads populated before failure are preserved in caller's read_log!
+    cb_post = UsageTrackingCallback()
+    cb_post.stats.total_tokens = 10_000
+    partial_reads: list[dict[str, object]] = []
+
+    class _PostBurstStructured:
+        async def ainvoke(self, *_a: object, **_kw: object) -> CoverageAuditBrief:
+            cb_post.stats.total_tokens = 120_000
+            return stub_brief
+
+    class _PostBurstModel:
+        _llm_type = "mock-chat"
+
+        def with_structured_output(self, _schema: object) -> _PostBurstStructured:
+            return _PostBurstStructured()
+
+        def with_retry(self, **_kw: object) -> _PostBurstModel:
+            return self
+
+    class _ReadingAgent:
+        async def ainvoke(self, *_a: object, **_kw: object) -> dict[str, object]:
+            partial_reads.append(
+                {"tool": "read_document_section", "doc_id": "endorsement_gl_105.txt"}
+            )
+            return {"messages": ["Investigation summary"]}
+
+    monkeypatch.setattr(cov_graph, "get_chat_model", lambda **_kw: _PostBurstModel())
+    monkeypatch.setattr(cov_graph, "create_agent", lambda **_kw: _ReadingAgent())
+    with pytest.raises(CoverageBudgetExceededError):
+        await run_coverage_audit_attempt(
+            packet_id="D01",
+            prompt="Audit D01",
+            deps=CoverageAuditDeps(
+                settings=gw_settings,
+                planner_variant="baseline",
+                max_total_tokens=96_000,
+                callbacks=[cb_post],
+            ),
+            context=ctx,
+            read_log=partial_reads,
+        )
+    assert len(partial_reads) == 1
+    assert partial_reads[0]["doc_id"] == "endorsement_gl_105.txt"
+
+
+def test_v2_negative_control_b01_heading_only_earthquake_and_empty_chain_fails() -> None:
+    """Coordinator regression: B01 line-1 heading + earthquake claim + empty chain MUST fail."""
+    key_b01 = _load_key(HELDOUT_KEY_PATH, "B01")
+    bad_b01 = CoverageAuditBrief(
+        packet_id="B01",
+        determination="covered",
+        controlling_value="$300,000",
+        controlling_doc_ids=["endorsement_tr_115.txt"],
+        supersession_chain=[],
+        evidence_citations=[
+            CoverageCitation(
+                doc_id="endorsement_tr_115.txt",
+                line_start=1,
+                line_end=1,
+                verbatim_quote="ENDORSEMENT TR-115 — FINAL TRANSIT LIMIT MODIFICATION",
+                claim_supported="Policy includes earthquake-resistant certification.",
+                subject="Pacific Freightways Inc.",
+                polarity="affirmed",
+            )
+        ],
+    )
+    scores = score_coverage_audit_brief_v2(key_b01, bad_b01)
+    assert scores["passed"] is False
+    assert scores["ordered_chain_ok"] is False
+    assert scores["citations_grounded"] is False
+    assert scores["controlling_docs_ok"] is False
+
+
+def test_v2_controls_date_omission_unrelated_claim_and_rule_out_citations() -> None:
+    """v2 rejects missing dates/unrelated claims, allows rule-out citations & operative chains."""
+    docs_b01 = load_packet_documents("B01")
+    # Claiming effective date 2026-03-10 while citing only lines 6-7 (which omit the date) -> FAIL
+    ok_dt, msg_dt = verify_coverage_citation_v2(
+        CoverageCitation(
+            doc_id="endorsement_tr_115.txt",
+            line_start=6,
+            line_end=7,
+            verbatim_quote="Controlling Property-in-Transit Limit: $300,000 per conveyance.",
+            claim_supported="TR-115 sets $300,000 limit effective 2026-03-10.",
+            subject="Pacific Freightways Inc.",
+            value="$300,000",
+            polarity="affirmed",
+        ),
+        docs_b01,
+        expected_subject="Pacific Freightways Inc.",
+    )
+    assert ok_dt is False and "Unsupported date" in msg_dt
+
+    # C03 exclusion affirmed in prose -> PASSES under v2
+    key_c03 = _load_key(HELDOUT_KEY_PATH, "C03")
+    good_c03 = CoverageAuditBrief(
+        packet_id="C03",
+        determination="excluded",
+        controlling_value="excluded",
+        controlling_doc_ids=["cgl_coverage_form_exclusions.txt"],
+        supersession_chain=["policy_declarations.txt", "cgl_coverage_form_exclusions.txt"],
+        evidence_citations=[
+            CoverageCitation(
+                doc_id="cgl_coverage_form_exclusions.txt",
+                line_start=3,
+                line_end=3,
+                verbatim_quote=(
+                    "Total Pollution Exclusion: This insurance does NOT apply to bodily injury, "
+                    "property damage, or cleanup costs arising out of the actual, alleged, or "
+                    "threatened discharge, dispersal, seepage, migration, release, or escape of "
+                    "pollutants at any time, including sudden and accidental releases."
+                ),
+                claim_supported=(
+                    "Total Pollution Exclusion bars coverage for sudden pollutant releases."
+                ),
+                subject="Heartland Chemical Blending Corp.",
+                polarity="affirmed",
+            )
+        ],
+    )
+    assert score_coverage_audit_brief_v2(key_c03, good_c03)["passed"] is True
+
+    # D02 citing unsigned draft ONLY to rule it out -> PASSES under v2!
+    key_d02 = _load_key(DEV_KEY_PATH, "D02")
+    good_d02_with_ruleout = CoverageAuditBrief(
+        packet_id="D02",
+        determination="covered",
+        controlling_value="$75,000",
+        controlling_doc_ids=["endorsement_ed_409.txt"],
+        supersession_chain=[
+            "policy_declarations.txt",
+            "endorsement_ed_401.txt",
+            "endorsement_ed_409.txt",
+        ],
+        evidence_citations=[
+            CoverageCitation(
+                doc_id="endorsement_ed_409.txt",
+                line_start=6,
+                line_end=7,
+                verbatim_quote="Controlling Water Damage Sublimit: $75,000 per occurrence.",
+                claim_supported="ED-409 supersedes ED-401 with $75,000 Water Damage Sublimit.",
+                subject="Cascadia Timberworks Inc.",
+                value="$75,000",
+                polarity="affirmed",
+            ),
+            CoverageCitation(
+                doc_id="draft_endorsement_water_2026.txt",
+                line_start=1,
+                line_end=5,
+                verbatim_quote="WARNING: FOR DISCUSSION ONLY. THIS DRAFT DOES NOT BIND COVERAGE.",
+                claim_supported="Draft endorsement is unsigned and does not bind coverage.",
+                subject="Cascadia Timberworks Inc.",
+                polarity="negated",
+            ),
+        ],
+    )
+    assert score_coverage_audit_brief_v2(key_d02, good_d02_with_ruleout)["passed"] is True
+
+    # B07: unsigned MX-502 MUST NOT be in operative supersession_chain; B08: loss_run separate!
+    key_b07 = _load_key(HELDOUT_KEY_PATH, "B07")
+    good_b07 = CoverageAuditBrief(
+        packet_id="B07",
+        determination="insufficient_evidence",
+        controlling_value="insufficient_evidence",
+        controlling_doc_ids=["unsigned_endorsement_mx_502.txt"],
+        supersession_chain=["policy_declarations.txt"],
+        evidence_citations=[
+            CoverageCitation(
+                doc_id="unsigned_endorsement_mx_502.txt",
+                line_start=2,
+                line_end=7,
+                verbatim_quote="Carrier Authorized Signature: [BLANK — NOT EXECUTED]",
+                claim_supported="MX-502 is unsigned and not executed.",
+                subject="Evergreen Senior Living LLC",
+                polarity="negated",
+            )
+        ],
+        missing_documents=["Executed copy of MX-502"],
+    )
+    assert score_coverage_audit_brief_v2(key_b07, good_b07)["passed"] is True
+    bad_b07_chain = good_b07.model_copy(
+        update={
+            "supersession_chain": [
+                "policy_declarations.txt",
+                "unsigned_endorsement_mx_502.txt",
+            ]
+        }
+    )
+    assert score_coverage_audit_brief_v2(key_b07, bad_b07_chain)["ordered_chain_ok"] is False
+
+    key_b08 = _load_key(HELDOUT_KEY_PATH, "B08")
+    good_b08 = CoverageAuditBrief(
+        packet_id="B08",
+        determination="covered",
+        controlling_value="$750,000",
+        controlling_doc_ids=["endorsement_ag_209.txt", "loss_run_2026.txt"],
+        supersession_chain=[
+            "policy_declarations.txt",
+            "endorsement_ag_201.txt",
+            "endorsement_ag_209.txt",
+        ],
+        evidence_citations=[
+            CoverageCitation(
+                doc_id="endorsement_ag_209.txt",
+                line_start=6,
+                line_end=7,
+                verbatim_quote=(
+                    "Controlling Annual Aggregate Limit for the 2026 policy term: $1,200,000."
+                ),
+                claim_supported="AG-209 sets controlling Annual Aggregate Limit to $1,200,000.",
+                subject="Atlas Industrial Services Corp.",
+                value="$1,200,000",
+                polarity="affirmed",
+            ),
+            CoverageCitation(
+                doc_id="loss_run_2026.txt",
+                line_start=5,
+                line_end=5,
+                verbatim_quote="Total Paid Erosion Against 2026 Annual Aggregate: $450,000",
+                claim_supported="Loss run shows $450,000 paid erosion against 2026 aggregate.",
+                subject="Atlas Industrial Services Corp.",
+                value="$450,000",
+                polarity="affirmed",
+            ),
+        ],
+    )
+    assert score_coverage_audit_brief_v2(key_b08, good_b08)["passed"] is True
+
+
+def test_v2_citation_and_controlling_clause_edge_branches() -> None:
+    """Exercise all v2 validation branches: bounds, numeric/value/polarity/entity/gap checks."""
+    docs_d01 = load_packet_documents("D01")
+    for cit, expected_sub in (
+        (
+            CoverageCitation(
+                doc_id="missing.txt",
+                line_start=1,
+                line_end=1,
+                verbatim_quote="x",
+                claim_supported="y",
+            ),
+            "unknown doc_id",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_gl_105.txt",
+                line_start=1,
+                line_end=1,
+                verbatim_quote="   ",
+                claim_supported="y",
+            ),
+            "empty verbatim_quote",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_gl_105.txt",
+                line_start=1,
+                line_end=999,
+                verbatim_quote="GL-105",
+                claim_supported="y",
+            ),
+            "invalid line range",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_gl_105.txt",
+                line_start=1,
+                line_end=2,
+                verbatim_quote="$2,000,000",
+                claim_supported="Limit is $2,000,000.",
+            ),
+            "not found in cited lines",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_gl_105.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="$2,000,000",
+                claim_supported="   ",
+            ),
+            "empty claim_supported",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_gl_105.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="$2,000,000",
+                claim_supported="Limit is $9,500,000.",
+            ),
+            "Unsupported numeric",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_gl_105.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="$2,000,000",
+                claim_supported="Limit is $2,000,000.",
+                value="$9,500,000",
+            ),
+            "Value mismatch",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_gl_105.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="$2,000,000",
+                claim_supported="Limit is $2,000,000.",
+                polarity="negated",
+            ),
+            "Polarity mismatch",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_gl_105.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="$2,000,000",
+                claim_supported="Limit is $2,000,000.",
+                subject="Moonbeam Logistics LLC",
+            ),
+            "Entity/subject mismatch",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_gl_105.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="$2,000,000",
+                claim_supported="Limit is $2,000,000 with volcanic tsunami certification.",
+            ),
+            "Unsupported/unrelated claim terms",
+        ),
+    ):
+        ok, msg = verify_coverage_citation_v2(
+            cit, docs_d01, expected_subject="Harborview Cold Storage LLC"
+        )
+        assert ok is False and expected_sub in msg
+
+    # Date-in-range entailment passes (2026-04-12 inside 2026-01-01 to 2027-01-01)
+    ok_rng, _ = verify_coverage_citation_v2(
+        CoverageCitation(
+            doc_id="policy_declarations.txt",
+            line_start=4,
+            line_end=4,
+            verbatim_quote="Policy Period: 2026-01-01 to 2027-01-01",
+            claim_supported="Policy is active on 2026-04-12.",
+        ),
+        docs_d01,
+    )
+    assert ok_rng is True
+
+    # Missing expected value/exclusion/gap on controlling doc fails controlling_docs_ok
+    s_miss_val = score_coverage_audit_brief_v2(
+        _load_key(DEV_KEY_PATH, "D01"),
+        CoverageAuditBrief(
+            packet_id="D01",
+            determination="covered",
+            controlling_value="$2,000,000",
+            controlling_doc_ids=["endorsement_gl_105.txt"],
+            supersession_chain=["policy_declarations.txt", "endorsement_gl_105.txt"],
+            evidence_citations=[
+                CoverageCitation(
+                    doc_id="endorsement_gl_105.txt",
+                    line_start=5,
+                    line_end=5,
+                    verbatim_quote="Effective Date: 2026-01-01",
+                    claim_supported="Effective Date is 2026-01-01.",
+                )
+            ],
+        ),
+    )
+    assert s_miss_val["controlling_docs_ok"] is False
+
+    s_miss_excl = score_coverage_audit_brief_v2(
+        _load_key(HELDOUT_KEY_PATH, "C03"),
+        CoverageAuditBrief(
+            packet_id="C03",
+            determination="excluded",
+            controlling_value="excluded",
+            controlling_doc_ids=["cgl_coverage_form_exclusions.txt"],
+            supersession_chain=["policy_declarations.txt", "cgl_coverage_form_exclusions.txt"],
+            evidence_citations=[
+                CoverageCitation(
+                    doc_id="cgl_coverage_form_exclusions.txt",
+                    line_start=2,
+                    line_end=2,
+                    verbatim_quote="Policy Number: CGL-2026-3088",
+                    claim_supported="Policy Number is CGL-2026-3088.",
+                )
+            ],
+        ),
+    )
+    assert s_miss_excl["controlling_docs_ok"] is False
+
+    s_miss_gap = score_coverage_audit_brief_v2(
+        _load_key(DEV_KEY_PATH, "D03"),
+        CoverageAuditBrief(
+            packet_id="D03",
+            determination="insufficient_evidence",
+            controlling_value="insufficient_evidence",
+            controlling_doc_ids=["endorsement_sl_204.txt"],
+            supersession_chain=["policy_declarations.txt", "endorsement_sl_204.txt"],
+            evidence_citations=[
+                CoverageCitation(
+                    doc_id="endorsement_sl_204.txt",
+                    line_start=5,
+                    line_end=5,
+                    verbatim_quote="Effective Date: 2026-01-01",
+                    claim_supported="Effective Date is 2026-01-01.",
+                )
+            ],
+            missing_documents=["Schedule A-2026"],
+        ),
+    )
+    assert s_miss_gap["controlling_docs_ok"] is False
