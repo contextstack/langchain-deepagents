@@ -20,7 +20,12 @@ from langchain_core.runnables import RunnableConfig
 from core.config import Settings, get_settings
 from core.models import RunContext
 from gateway.factory import get_chat_model
-from workflows.coverage_audit.models import CoverageAuditBrief, CoverageCitation
+from workflows.coverage_audit.models import (
+    CoverageAuditBrief,
+    CoverageCitation,
+    IssueAuditBrief,
+    IssueResolution,
+)
 from workflows.coverage_audit.tools import (
     ARCHIVE_ROOT,
     build_coverage_audit_tools,
@@ -319,6 +324,159 @@ async def run_coverage_audit_attempt(
             config=invoke_cfg,
         )
         # Enforce token budget AFTER synthesis as well
+        _sync_callback_tokens()
+        return brief_obj
+
+    brief_out = await asyncio.wait_for(_execute(), timeout=deps.timeout_s)
+    return {
+        "packet_id": packet_id,
+        "variant": deps.planner_variant,
+        "brief": brief_out.model_dump(mode="json"),
+        "doc_reads": active_read_log,
+        "budget_used": {
+            "model_calls": budget.model_calls,
+            "tool_calls": budget.tool_calls,
+            "total_tokens": budget.total_tokens,
+        },
+    }
+
+
+ISSUE_AUDIT_SYNTHESIS_PROMPT = (
+    "Produce a structured IssueAuditBrief matching the schema from the investigation below.\n"
+    "Rules:\n"
+    "- packet_id MUST be '{packet_id}'.\n"
+    "- Return ONE IssueResolution entry for EVERY requested issue_id in the prompt.\n"
+    "- outcome MUST be one of: 'applies', 'does_not_apply', 'insufficient_evidence'.\n"
+    "- determining_value: exact controlling dollar amount (e.g. '$5,000'), 'applies', "
+    "'does_not_apply', or 'insufficient_evidence'.\n"
+    "- controlling_doc_ids: exact doc_id filename(s) controlling that specific issue.\n"
+    "- citations: include exact doc_id, 1-indexed line_start/line_end, verbatim_quote copied "
+    "verbatim from those lines, atomic claim_supported, subject (Named Insured), value, "
+    "and polarity ('affirmed' or 'negated').\n"
+    "- superseded_or_out_of_scope: explain any superseded or out-of-scope document/endorsement.\n"
+    "- missing_record_needed: for 'insufficient_evidence', state what record resolves it.\n\n"
+    "Audit Question: {prompt}\n"
+    "Investigation Findings:\n{investigation}"
+)
+
+
+async def run_issue_audit_attempt(
+    *,
+    packet_id: str,
+    prompt: str,
+    deps: CoverageAuditDeps,
+    context: RunContext,
+    read_log: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Execute one isolated read-only Issue-Level Coverage Audit attempt under shared budget."""
+    active_read_log: list[dict[str, Any]] = read_log if read_log is not None else []
+    read_tools = build_coverage_audit_tools(
+        allowed_packet_id=packet_id,
+        archive_root=deps.archive_root,
+        read_log=active_read_log,
+    )
+    budget = CoverageAuditBudget(
+        max_model_calls=deps.max_model_calls,
+        max_tool_calls=deps.max_tool_calls,
+        max_total_tokens=deps.max_total_tokens,
+    )
+
+    if deps.settings.model_mode == "mock":
+        docs = load_packet_documents(packet_id, deps.archive_root)
+        first_doc = sorted(docs.keys())[0] if docs else "policy_section_06_machinery.txt"
+        first_line = docs[first_doc].splitlines()[0] if docs else ""
+        mock_brief = IssueAuditBrief(
+            packet_id=packet_id,
+            issues=[
+                IssueResolution(
+                    issue_id="mock_issue",
+                    outcome="insufficient_evidence",
+                    determining_value="insufficient_evidence",
+                    controlling_doc_ids=[first_doc],
+                    citations=[
+                        CoverageCitation(
+                            doc_id=first_doc,
+                            line_start=1,
+                            line_end=1,
+                            verbatim_quote=first_line,
+                            claim_supported=f"Mock read {first_doc}.",
+                        )
+                    ],
+                    missing_record_needed="Mock missing record.",
+                )
+            ],
+            rationale="Offline mock dry-run.",
+        )
+        return {
+            "packet_id": packet_id,
+            "variant": deps.planner_variant,
+            "brief": mock_brief.model_dump(mode="json"),
+            "doc_reads": active_read_log,
+            "budget_used": {
+                "model_calls": budget.model_calls,
+                "tool_calls": budget.tool_calls,
+                "total_tokens": budget.total_tokens,
+            },
+        }
+
+    chat_model = get_chat_model(
+        alias=deps.primary_model_alias,
+        tenant_id=context.tenant_id,
+        settings=deps.settings,
+    )
+    invoke_cfg: RunnableConfig = {"callbacks": deps.callbacks} if deps.callbacks else {}
+
+    def _sync_callback_tokens() -> None:
+        observed = 0
+        for cb in deps.callbacks:
+            stats = getattr(cb, "stats", None)
+            if stats is not None:
+                observed = max(observed, int(getattr(stats, "total_tokens", 0) or 0))
+        delta = observed - budget.total_tokens
+        if delta > 0:
+            budget.record_tokens(delta)
+
+    async def _execute() -> IssueAuditBrief:
+        if deps.planner_variant == "deep_agents":
+            agent = build_coverage_deep_agent(
+                chat_model=chat_model,
+                model_alias=deps.primary_model_alias,
+                read_tools=read_tools,
+                budget=budget,
+            )
+        else:
+            agent = create_agent(
+                model=chat_model,
+                tools=read_tools,
+                system_prompt=AUDIT_PLANNER_PROMPT,
+                context_schema=RunContext,
+                middleware=[
+                    SummarizationMiddleware(
+                        model=chat_model,
+                        trigger=("tokens", 8000),
+                        keep=("messages", 10),
+                    ),
+                    CoverageBudgetMiddleware(budget),
+                ],
+            )
+        agent_res = await agent.ainvoke(
+            {"messages": [{"role": "user", "content": prompt}]},
+            config=invoke_cfg,
+            context=context,
+        )
+        _sync_callback_tokens()
+        last_msg = agent_res["messages"][-1]
+        investigation = str(getattr(last_msg, "content", last_msg))
+        budget.record_model_call()
+        structured = chat_model.with_structured_output(IssueAuditBrief)
+        brief_obj: IssueAuditBrief = await structured.ainvoke(
+            ISSUE_AUDIT_SYNTHESIS_PROMPT.format(
+                packet_id=packet_id,
+                prompt=prompt,
+                investigation=investigation,
+            ),
+            config=invoke_cfg,
+        )
         _sync_callback_tokens()
         return brief_obj
 

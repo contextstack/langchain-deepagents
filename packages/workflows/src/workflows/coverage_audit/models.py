@@ -36,3 +36,23 @@ class CoverageAuditBrief(BaseModel, frozen=True):
     evidence_citations: list[CoverageCitation] = Field(default_factory=list)
     missing_documents: list[str] = Field(default_factory=list)
     rationale: str = ""
+
+
+class IssueResolution(BaseModel, frozen=True):
+    """Single independently graded issue outcome for issue-level coverage audits."""
+
+    issue_id: str
+    outcome: Literal["applies", "does_not_apply", "insufficient_evidence"]
+    determining_value: str
+    controlling_doc_ids: list[str] = Field(default_factory=list)
+    citations: list[CoverageCitation] = Field(default_factory=list)
+    superseded_or_out_of_scope: str = ""
+    missing_record_needed: str = ""
+
+
+class IssueAuditBrief(BaseModel, frozen=True):
+    """Issue-level coverage audit output shared by Baseline and Deep Agents on control packets."""
+
+    packet_id: str
+    issues: list[IssueResolution] = Field(default_factory=list)
+    rationale: str = ""

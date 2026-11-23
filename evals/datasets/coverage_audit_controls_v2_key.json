@@ -1,0 +1,67 @@
+[
+  {
+    "packet_id": "CTRL-C04",
+    "tier": "clean",
+    "expected_subject": "Northport Cold Milling LLC",
+    "prompt": "Audit packet CTRL-C04 for Northport Cold Milling LLC. Return issue_id 'optional_machinery_coverage': does optional machinery coverage apply?",
+    "expected_issues": [
+      {
+        "issue_id": "optional_machinery_coverage",
+        "expected_outcome": "insufficient_evidence",
+        "expected_value": "insufficient_evidence",
+        "required_controlling_docs": [
+          "policy_section_06_machinery.txt",
+          "intake_record_machinery.txt"
+        ],
+        "expected_missing_keywords": [
+          "selection form",
+          "ms-10",
+          "issuance record"
+        ]
+      }
+    ]
+  },
+  {
+    "packet_id": "CTRL-B08",
+    "tier": "branching",
+    "expected_subject": "Harborline Maritime LLC",
+    "prompt": "Audit packet CTRL-B08 for Harborline Maritime LLC. Return TWO separate issues: (1) issue_id='theft_coverage_applicability': does theft coverage apply at Harbor? (2) issue_id='applicable_deductible': what deductible applies to this loss?",
+    "expected_issues": [
+      {
+        "issue_id": "theft_coverage_applicability",
+        "expected_outcome": "applies",
+        "expected_value": "applies",
+        "required_controlling_docs": [
+          "endorsement_e18_a_theft.txt",
+          "site_schedule_2026.txt"
+        ],
+        "required_scope_tokens": [
+          "hbr-4",
+          "harbor"
+        ],
+        "forbidden_scope_tokens": [
+          "hbr-9",
+          "bayview"
+        ]
+      },
+      {
+        "issue_id": "applicable_deductible",
+        "expected_outcome": "applies",
+        "expected_value": "5000",
+        "required_controlling_docs": [
+          "endorsement_e18_a_theft.txt",
+          "endorsement_e18_b_deductible.txt",
+          "incident_report_harbor.txt"
+        ],
+        "required_dates": [
+          "2026-08-27",
+          "2026-09-01"
+        ],
+        "forbidden_scope_tokens": [
+          "hbr-9",
+          "bayview"
+        ]
+      }
+    ]
+  }
+]

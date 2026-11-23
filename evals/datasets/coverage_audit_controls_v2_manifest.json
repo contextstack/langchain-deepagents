@@ -1,0 +1,22 @@
+{
+  "archive_root": "packages/workflows/src/workflows/coverage_audit/policy-archive-controls",
+  "packets": [
+    "CTRL-C04",
+    "CTRL-B08"
+  ],
+  "key_sha256": "c8b54c52188f2052b48cf5411c7ba67a62907b2c40134eabddf1df773089afee",
+  "archive_file_count": 11,
+  "archive_files_sha256": {
+    "CTRL-B08/broker_note_september.txt": "35900ee059dd56ca42ac255b62c9a070cd4212c86d3628b694441be29f439782",
+    "CTRL-B08/endorsement_e18_a_theft.txt": "4c882c29129965b08e015a8bc653a9adc709638a3e1db1e9f3b20be077642614",
+    "CTRL-B08/endorsement_e18_b_deductible.txt": "c0e868706492755d267d2a73c24405b3d492f0ee57d122167d613115a080d50c",
+    "CTRL-B08/incident_report_harbor.txt": "52fab00c5682dcc31ee8ee6c4b3502ee9ed8331596b2bb2691bd17c458ca9d32",
+    "CTRL-B08/issuance_register_2026.txt": "374135be546d1b0211819ccc6edc605b905cbd6cb476333d4c8fff02ac398cb4",
+    "CTRL-B08/policy_section_02_theft.txt": "3f19e3171aeb0ba288fdbe41346b3e90f952288ad84047b43db6c5d2702740ee",
+    "CTRL-B08/site_schedule_2026.txt": "ee8e7e96b7dd291ac92d90b045bc541f1c7d65be1d6c0d9d090242b4b13f6f1e",
+    "CTRL-C04/billing_summary_2026.txt": "e7ca67eab11d2d86f0022be25b02aaa4d706174a253f4c92172763ac3bc5352b",
+    "CTRL-C04/equipment_inventory_2026.txt": "133128311af96ec25dddb60c68f9e72acfeae97b68b64bcb0ae0a92d9823888e",
+    "CTRL-C04/intake_record_machinery.txt": "81af12c5c4b04225f27565ae8736ace34e4d936d973ad975d1ee372c45c02fb1",
+    "CTRL-C04/policy_section_06_machinery.txt": "9dc77e406faabf8e53586064a448add6ab2103f36cf442ad32f9fcfa7eaa81bc"
+  }
+}

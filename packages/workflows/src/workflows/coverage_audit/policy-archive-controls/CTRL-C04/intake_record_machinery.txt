@@ -1,0 +1,5 @@
+SYNTHETIC UNDERWRITING PACKET INTAKE NOTE (I4 §2)
+Account: Northport Cold Milling LLC | Policy Number: SYN-2026-4404
+Intake Date: 2026-05-14
+Record Status: The supplied packet contains NO signed Machinery Selection Form (Form MS-10) and does not establish whether a signed selection form or definitive issuance record exists.
+Audit Question: Does optional machinery coverage apply?

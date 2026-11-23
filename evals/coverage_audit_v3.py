@@ -23,7 +23,11 @@ from evals.coverage_audit import (
     _ordered_subsequence,
     _policy_numbers_in_doc,
 )
-from workflows.coverage_audit.models import CoverageAuditBrief, CoverageCitation
+from workflows.coverage_audit.models import (
+    CoverageAuditBrief,
+    CoverageCitation,
+    IssueAuditBrief,
+)
 from workflows.coverage_audit.tools import ARCHIVE_ROOT, load_packet_documents
 
 Verdict = Literal["supported", "contradicted", "unverified"]
@@ -44,11 +48,16 @@ _SUPERSEDES_TARGET_RE = re.compile(
     r"[^.\n]{0,30}?\b([a-z]{2}-\d{3}(?:-[a-z])?)\b"
 )
 
+_V3_OPERATIVE_EXTRA_RE = re.compile(
+    r"(?:applies\s+only|not\s+automatically\s+included|no\s+signed|selection\s+form|"
+    r"issuance\s+record|hbr-\d+|hub-\d+|does\s+not\s+establish|site\s+[a-z0-9\-]+\s*:)",
+    re.I,
+)
 # Site / location identifiers to catch wrong-site scope attributions
 _SITE_TOKEN_RE = re.compile(
-    r"\b(?:plant\s+\d+|dock\s+\d+|annex\s+[a-z0-9]+|tier-\d+|site\s+[a-z0-9\-]+|"
+    r"\b(?:plant\s+\d+|dock\s+\d+|annex\s+[a-z0-9]+|tier-\d+|"
     r"hbr-\d+|hub-\d+|s-\d+|l-\d+|n-\d+|m-\d+|unit\s*#?\d+|truck\s*#?\d+|"
-    r"toledo|detroit|harbor|cedar)\b"
+    r"toledo|detroit|harbor|bayview|cedar)\b"
 )
 
 # Unverifiable / fabricated domain concepts (not valid coverage paraphrases unless in span)
@@ -182,7 +191,9 @@ def verify_coverage_citation_v3(
         }
 
     # 1. Reject heading-only citations for substantive coverage assertions
-    if not _V2_OPERATIVE_SPAN_RE.search(span_norm):
+    if not _V2_OPERATIVE_SPAN_RE.search(span_norm) and not _V3_OPERATIVE_EXTRA_RE.search(
+        span_norm
+    ):
         return {
             "verdict": "unverified",
             "reason": (
@@ -696,4 +707,151 @@ def score_coverage_audit_brief_v3(
         "unverified_reasons": unverified_reasons,
         "citation_verdicts": citation_verdicts,
         "missing_docs_ok": missing_docs_ok,
+    }
+
+
+def score_issue_audit_brief(
+    key_case: dict[str, Any],
+    brief: IssueAuditBrief,
+    *,
+    archive_root: Path,
+) -> dict[str, Any]:
+    """Grade an IssueAuditBrief independently per requested issue using calibrated v3 checks."""
+    packet_id = str(key_case["packet_id"])
+    docs = load_packet_documents(packet_id, archive_root)
+    expected_subject = str(key_case.get("expected_subject") or "")
+    expected_issues: list[dict[str, Any]] = list(key_case["expected_issues"])
+    by_id = {iss.issue_id: iss for iss in brief.issues}
+
+    issue_results: list[dict[str, Any]] = []
+    any_false_definitive = False
+    for exp in expected_issues:
+        iid = str(exp["issue_id"])
+        actual = by_id.get(iid)
+        if actual is None:
+            issue_results.append(
+                {
+                    "issue_id": iid,
+                    "passed": False,
+                    "omitted": True,
+                    "outcome_correct": False,
+                    "value_correct": False,
+                    "false_definitive_on_insufficient": False,
+                    "controlling_docs_ok": False,
+                    "scope_ok": False,
+                    "dates_ok": False,
+                    "missing_record_ok": False,
+                    "citations_grounded": False,
+                    "reasons": [f"Omitted required issue '{iid}'."],
+                }
+            )
+            continue
+
+        exp_out = str(exp["expected_outcome"])
+        outcome_correct = actual.outcome == exp_out
+        false_def = exp_out == "insufficient_evidence" and actual.outcome != "insufficient_evidence"
+        if false_def:
+            any_false_definitive = True
+
+        exp_val = _normalize_controlling_value(str(exp["expected_value"]))
+        act_val = _normalize_controlling_value(actual.determining_value)
+        value_correct = act_val == exp_val
+
+        verdicts: list[dict[str, Any]] = []
+        verified_docs: set[str] = set()
+        verified_spans: list[str] = []
+        reasons: list[str] = []
+        for cit in actual.citations:
+            v = verify_coverage_citation_v3(cit, docs, expected_subject=expected_subject)
+            verdicts.append(v)
+            if v["verdict"] == "supported":
+                verified_docs.add(cit.doc_id)
+                lines = docs[cit.doc_id].splitlines()
+                verified_spans.append(_norm(" ".join(lines[cit.line_start - 1 : cit.line_end])))
+            else:
+                reasons.append(f"[{v['verdict']}] {v['reason']}")
+
+        req_docs = set(exp.get("required_controlling_docs") or [])
+        cited_ctrl = set(actual.controlling_doc_ids) | verified_docs
+        missing_ctrl = sorted(d for d in req_docs if d not in cited_ctrl or d not in verified_docs)
+        controlling_docs_ok = len(missing_ctrl) == 0
+        if missing_ctrl:
+            reasons.append(f"Missing verified controlling doc(s): {missing_ctrl}")
+
+        blob = _norm(
+            " ".join(verified_spans)
+            + " "
+            + " ".join(c.claim_supported for c in actual.citations)
+            + " "
+            + actual.superseded_or_out_of_scope
+            + " "
+            + actual.missing_record_needed
+            + " "
+            + brief.rationale
+        )
+        req_scope = [str(t).lower() for t in (exp.get("required_scope_tokens") or [])]
+        forb_scope = [str(t).lower() for t in (exp.get("forbidden_scope_tokens") or [])]
+        # Forbidden scope tokens fail if asserted in controlling citations or determining_value
+        ctrl_blob = _norm(
+            actual.determining_value + " " + " ".join(c.claim_supported for c in actual.citations)
+        )
+        scope_ok = all(t in blob for t in req_scope) and not any(t in ctrl_blob for t in forb_scope)
+        if not scope_ok:
+            reasons.append("Scope check failed (missing required scope or forbidden site).")
+
+        req_dates = [str(d) for d in (exp.get("required_dates") or [])]
+        dates_ok = all(d in blob for d in req_dates)
+        if not dates_ok:
+            missing_d = [d for d in req_dates if d not in blob]
+            reasons.append(f"Missing required date anchor(s): {missing_d}")
+
+        req_miss = [str(k).lower() for k in (exp.get("expected_missing_keywords") or [])]
+        miss_blob = _norm(actual.missing_record_needed + " " + brief.rationale)
+        missing_record_ok = (not req_miss) or any(k in miss_blob for k in req_miss)
+        if not missing_record_ok:
+            reasons.append("Missing required record-request explanation for insufficient_evidence.")
+
+        citations_grounded = bool(actual.citations) and all(
+            v["verdict"] == "supported" for v in verdicts
+        )
+        iss_passed = (
+            outcome_correct
+            and value_correct
+            and controlling_docs_ok
+            and scope_ok
+            and dates_ok
+            and missing_record_ok
+            and citations_grounded
+        )
+        issue_results.append(
+            {
+                "issue_id": iid,
+                "passed": iss_passed,
+                "omitted": False,
+                "outcome_correct": outcome_correct,
+                "expected_outcome": exp_out,
+                "actual_outcome": actual.outcome,
+                "value_correct": value_correct,
+                "expected_value": exp_val,
+                "actual_value": act_val,
+                "false_definitive_on_insufficient": false_def,
+                "controlling_docs_ok": controlling_docs_ok,
+                "scope_ok": scope_ok,
+                "dates_ok": dates_ok,
+                "missing_record_ok": missing_record_ok,
+                "citations_grounded": citations_grounded,
+                "citation_verdicts": verdicts,
+                "reasons": reasons,
+            }
+        )
+
+    all_passed = bool(issue_results) and all(r["passed"] for r in issue_results)
+    return {
+        "scorer_version": "v3_issue",
+        "packet_id": packet_id,
+        "passed": all_passed,
+        "issues_passed": sum(1 for r in issue_results if r["passed"]),
+        "issues_total": len(issue_results),
+        "false_definitive_on_insufficient": any_false_definitive,
+        "issue_results": issue_results,
     }
