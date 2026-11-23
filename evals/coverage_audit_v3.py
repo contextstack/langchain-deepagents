@@ -82,6 +82,51 @@ def _extract_site_tokens(norm_text: str) -> set[str]:
     return {re.sub(r"\s+", " ", m.group(0)).strip() for m in _SITE_TOKEN_RE.finditer(norm_text)}
 
 
+_MONETARY_DEDUCTIBLE_RE = re.compile(r"\bdeductible\b")
+_MONETARY_EROSION_RE = re.compile(
+    r"\b(?:paid\s+erosion|erosion|erodes|eroded|paid\s+indemnity)\b"
+)
+_MONETARY_LIMIT_RE = re.compile(
+    r"\b(?:sublimit|aggregate\s+limit|per-occurrence\s+limit|transit\s+limit|"
+    r"breakdown\s+limit|coverage\s+limit|controlling\s+limit|limit)\b"
+)
+_CLAUSE_SPLIT_RE = re.compile(r"[.;]\s+|\s+(?:and|while|whereas)\s+")
+
+
+def _extract_monetary_roles(norm_text: str) -> set[str]:
+    """Classify the monetary role(s) asserted in a normalized clause."""
+    roles: set[str] = set()
+    if _MONETARY_DEDUCTIBLE_RE.search(norm_text):
+        roles.add("deductible")
+    if _MONETARY_EROSION_RE.search(norm_text):
+        roles.add("erosion")
+    # Only tag 'limit' if it's not merely the target of 'erosion against ... aggregate'
+    cleaned = re.sub(r"erosion\s+against[^.;\n]*", "", norm_text)
+    if _MONETARY_LIMIT_RE.search(cleaned):
+        roles.add("limit")
+    return roles
+
+
+def _extract_site_amount_pairs(norm_text: str) -> set[tuple[str, str]]:
+    """Extract (site, numeric_amount) bindings per atomic clause."""
+    pairs: set[tuple[str, str]] = set()
+    for clause in _CLAUSE_SPLIT_RE.split(norm_text):
+        c = clause.strip()
+        if not c:
+            continue
+        sites = _extract_site_tokens(c)
+        nums = set(_NUM_RE.findall(c))
+        if len(sites) >= 1 and len(nums) == 1:
+            num = next(iter(nums))
+            for s in sites:
+                pairs.add((s, num))
+        elif len(sites) == 1 and len(nums) >= 1:
+            site = next(iter(sites))
+            for n in nums:
+                pairs.add((site, n))
+    return pairs
+
+
 def verify_coverage_citation_v3(
     citation: CoverageCitation,
     docs: dict[str, str],
@@ -334,7 +379,43 @@ def verify_coverage_citation_v3(
                 "doc_id": citation.doc_id,
             }
 
-    # 6. Typed site / location scope check (catches Plant 1 vs Plant 2, wrong dock/site)
+    # 5b. Monetary role binding (limit/sublimit vs. deductible vs. paid erosion)
+    span_roles = _extract_monetary_roles(span_norm)
+    claim_roles = _extract_monetary_roles(claim_norm)
+    if span_roles and claim_roles:
+        if "deductible" in claim_roles and "deductible" not in span_roles:
+            return {
+                "verdict": "contradicted",
+                "reason": (
+                    f"Monetary role mismatch on '{citation.doc_id}': claim asserts a deductible "
+                    f"but source span specifies {sorted(span_roles)}."
+                ),
+                "doc_id": citation.doc_id,
+            }
+        if (
+            "limit" in claim_roles
+            and "limit" not in span_roles
+            and ("deductible" in span_roles or "erosion" in span_roles)
+        ):
+            return {
+                "verdict": "contradicted",
+                "reason": (
+                    f"Monetary role mismatch on '{citation.doc_id}': claim asserts a limit "
+                    f"but source span specifies {sorted(span_roles)}."
+                ),
+                "doc_id": citation.doc_id,
+            }
+        if "erosion" in span_roles and "limit" in claim_roles and "erosion" not in claim_roles:
+            return {
+                "verdict": "contradicted",
+                "reason": (
+                    f"Monetary role mismatch on '{citation.doc_id}': source reports paid "
+                    "erosion, not an aggregate limit."
+                ),
+                "doc_id": citation.doc_id,
+            }
+
+    # 6. Typed site / location scope & per-clause (site, amount) pair binding
     doc_norm = _norm(doc_text)
     span_sites = _extract_site_tokens(span_norm)
     doc_sites = _extract_site_tokens(doc_norm)
@@ -347,6 +428,19 @@ def verify_coverage_citation_v3(
                 "reason": (
                     f"Site/location mismatch on '{citation.doc_id}': claim references "
                     f"{out_of_scope_sites} not present in document sites {sorted(doc_sites)}."
+                ),
+                "doc_id": citation.doc_id,
+            }
+    span_site_pairs = _extract_site_amount_pairs(span_norm)
+    claim_site_pairs = _extract_site_amount_pairs(claim_norm)
+    if span_site_pairs and claim_site_pairs:
+        mismatched_pairs = sorted(p for p in claim_site_pairs if p not in span_site_pairs)
+        if mismatched_pairs:
+            return {
+                "verdict": "contradicted",
+                "reason": (
+                    f"Site-amount assignment mismatch on '{citation.doc_id}': claimed "
+                    f"{mismatched_pairs} not supported by source pairs {sorted(span_site_pairs)}."
                 ),
                 "doc_id": citation.doc_id,
             }

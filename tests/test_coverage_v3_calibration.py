@@ -229,3 +229,75 @@ def test_v3_calibration_wrong_actor_site_date_negation_stale_missing_cross_sourc
         docs_c01,
     )
     assert r_fab["verdict"] == "unverified"
+
+
+def test_v3_independent_relationship_role_swap_controls() -> None:
+    """All 4 independent role-swap controls -> contradicted."""
+    # 1. B01 TR-115 line 7: $300,000 transit limit called a deductible
+    r1 = verify_coverage_citation_v3(
+        CoverageCitation(
+            doc_id="endorsement_tr_115.txt",
+            line_start=7,
+            line_end=7,
+            verbatim_quote="Controlling Property-in-Transit Limit: $300,000 per conveyance.",
+            claim_supported=(
+                "The controlling property-in-transit deductible is $300,000 per conveyance."
+            ),
+            subject="Pacific Freightways Inc.",
+            value="$300,000",
+        ),
+        load_packet_documents("B01"),
+    )
+    assert r1["verdict"] == "contradicted"
+
+    # 2. B06 DD-304 line 6: swaps Plant 1 ($50k) and Plant 2 ($35k) deductible assignments
+    r2 = verify_coverage_citation_v3(
+        CoverageCitation(
+            doc_id="endorsement_dd_304.txt",
+            line_start=6,
+            line_end=6,
+            verbatim_quote=(
+                "Amends Endorsement DD-301 solely for Plant 2 (Toledo): controlling deductible "
+                "for Plant 2 is $35,000 per occurrence. Plant 1 remains at $50,000."
+            ),
+            claim_supported="Plant 1 has a $35,000 deductible and Plant 2 remains at $50,000.",
+            subject="Ironworks Fabrication Inc.",
+        ),
+        load_packet_documents("B06"),
+    )
+    assert r2["verdict"] == "contradicted"
+
+    # 3. B04 BL-408 line 6: $250,000 spoilage sublimit called a deductible
+    r3 = verify_coverage_citation_v3(
+        CoverageCitation(
+            doc_id="endorsement_bl_408.txt",
+            line_start=6,
+            line_end=6,
+            verbatim_quote=(
+                "Grants Spoilage Coverage specifically to Summit BioLabs LLC with a controlling "
+                "sublimit of $250,000 per occurrence."
+            ),
+            claim_supported=(
+                "Summit BioLabs LLC gets a $250,000 spoilage deductible per occurrence."
+            ),
+            subject="Summit BioLabs LLC",
+            value="$250,000",
+        ),
+        load_packet_documents("B04"),
+    )
+    assert r3["verdict"] == "contradicted"
+
+    # 4. B08 loss_run_2026 line 5: $450,000 paid erosion called current annual aggregate limit
+    r4 = verify_coverage_citation_v3(
+        CoverageCitation(
+            doc_id="loss_run_2026.txt",
+            line_start=5,
+            line_end=5,
+            verbatim_quote="Total Paid Erosion Against 2026 Annual Aggregate: $450,000",
+            claim_supported="The current annual aggregate limit is $450,000.",
+            subject="Atlas Industrial Services Corp.",
+            value="$450,000",
+        ),
+        load_packet_documents("B08"),
+    )
+    assert r4["verdict"] == "contradicted"

@@ -24153,7 +24153,7 @@
       "max_duration_s": 50.67
     }
   },
-  "v3_scorer_sha256": "e2780972f1d24e072ca6c7e30de99a6a35f05b5fc9e60e8515751e001298ea7c",
+  "v3_scorer_sha256": "c00ba6b249ae7cef376e3fb3dd65bb665b775c88c649a96462f28c475c5b2720",
   "routing_bar_v3": {
     "baseline": {
       "branching_cases_passed": 0,

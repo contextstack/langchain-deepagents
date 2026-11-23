@@ -93,7 +93,7 @@
 
 ## Calibrated Grader v3 Re-Grade (Arm-Blinded, Preserving v1 & v2)
 
-- **Frozen v3 Scorer SHA-256 (`evals/coverage_audit_v3.py`):** `e2780972f1d24e072ca6c7e30de99a6a35f05b5fc9e60e8515751e001298ea7c`
+- **Frozen v3 Scorer SHA-256 (`evals/coverage_audit_v3.py`):** `c00ba6b249ae7cef376e3fb3dd65bb665b775c88c649a96462f28c475c5b2720`
 - **Blinded Packet & Key:** `artifacts/experiments/coverage_audit_heldout_blinded_v3.jsonl` & `artifacts/experiments/coverage_audit_heldout_blind_key_v3.json` (all 72 attempts graded with arm, model, trial, and usage hidden before unblinding).
 - **Combined v1/v2/v3 Artifact:** `artifacts/experiments/coverage_audit_heldout_v1_v2_v3.json`.
 
