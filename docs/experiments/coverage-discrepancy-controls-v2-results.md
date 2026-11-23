@@ -42,4 +42,22 @@
 | 2 | `CTRL-B08` | `deep_agents` | `False` | 1/2 | 7 | 17 | 43,083 | \$0.2105 | 43.74 |
 | 2 | `CTRL-B08` | `baseline` | `False` | 0/2 | 4 | 8 | 12,851 | \$0.0878 | 25.42 |
 | 3 | `CTRL-B08` | `baseline` | `False` | 0/2 | 4 | 8 | 13,050 | \$0.0916 | 27.98 |
-| 3 | `CTRL-B08` | `deep_agents` | `False` | 0/2 | 7 | 17 | 44,130 | \$0.2229 | 44.48 |
+| 3 | `CTRL-B08` | `deep_agents` | `False` | 1/2 | 7 | 17 | 44,130 | \$0.2229 | 44.48 |
+
+## Independent Arm-Blinded Source Review (Verified Requested Decisions & Controlling Evidence)
+
+An independent arm-blinded audit reviewed all 12 anonymized briefs (`SC-01`–`SC-12`) from `cov-ctrl-v2-20261123` against the frozen packet sources with arm labels and automated pass flags hidden, validating the pinned commit/rubric/fixture hashes, alternating pair order, zero errors, and zero false definitive answers. **Scope note:** this review verifies the requested decisions and their controlling evidence against the combined citations for each issue; ancillary narrative assertions were outside this decisive-evidence grade, and the frozen automated all-citation pass (`0/12` briefs, `1/18` issues above) is preserved unmodified alongside it.
+
+| Arm | Attempted | Automated All-Citation Pass (Frozen Scorer) | Independent Verified Requested Decisions & Controlling Evidence | False Def. | Total Tokens (All 6) | Branching Tokens (`CTRL-B08`, 3) | Token Ratio vs. Baseline |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `baseline` | 6 | 0/6 (0/9 issues) | **6/6 briefs (9/9 issues)** | 0 | 68,987 | 39,211 | 1.00× |
+| `deep_agents` | 6 | 0/6 (1/9 issues) | **6/6 briefs (9/9 issues)** | 0 | 246,041 | 130,941 | **3.57×** (3.34× branching) |
+
+- **`CTRL-C04` (clean abstention, 6/6 verified):** Every brief correctly abstained on optional machinery, identified signed Form MS-10 or a signed issuance record as missing, and quoted both the conditional grant in `policy_section_06_machinery.txt` and the absent-record statement in `intake_record_machinery.txt`.
+- **`CTRL-B08` (branching dual-issue, 6/6 verified on both issues):** Every brief correctly applied theft coverage at Harbor (citing `endorsement_e18_a_theft.txt`, `site_schedule_2026.txt` mapping `HBR-4` to Harbor, and `endorsement_e18_b_deductible.txt` / `issuance_register_2026.txt` confirming theft applicability was unchanged) and correctly applied the `$5,000` deductible (citing E18-A `$5,000`, actual loss date `2026-08-27`, and E18-B prospective effective date `2026-09-01`; zero briefs used the `2026-09-05` report date or `$12,000`).
+
+## CI Coverage Provenance (Live Commit vs. Final CI Commit)
+
+- **Pinned live-execution commit (`02f1bc8`):** `137` passing tests, `94.64%` exact 2-decimal coverage (`coverage report --precision=2`), `ruff` clean, `mypy` clean, `10/10` offline evals.
+- **Final CI commit (`aff2efc`, test-only coverage addition in `tests/test_coverage_v3_calibration.py`):** `138` passing tests, **`95.25%` exact 2-decimal coverage** (`coverage report --precision=2 --fail-under=95` passed), `ruff` clean, `mypy` clean, `10/10` offline evals.
+
