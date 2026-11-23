@@ -42,7 +42,7 @@
 | 2 | `CTRL-B08` | `deep_agents` | `False` | 1/2 | 7 | 17 | 43,083 | \$0.2105 | 43.74 |
 | 2 | `CTRL-B08` | `baseline` | `False` | 0/2 | 4 | 8 | 12,851 | \$0.0878 | 25.42 |
 | 3 | `CTRL-B08` | `baseline` | `False` | 0/2 | 4 | 8 | 13,050 | \$0.0916 | 27.98 |
-| 3 | `CTRL-B08` | `deep_agents` | `False` | 1/2 | 7 | 17 | 44,130 | \$0.2229 | 44.48 |
+| 3 | `CTRL-B08` | `deep_agents` | `False` | 0/2 | 7 | 17 | 44,130 | \$0.2229 | 44.48 |
 
 ## Independent Arm-Blinded Source Review (Verified Requested Decisions & Controlling Evidence)
 
