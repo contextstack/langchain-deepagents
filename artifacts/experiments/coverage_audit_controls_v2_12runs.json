@@ -1,0 +1,3421 @@
+{
+  "run_id": "cov-ctrl-v2-20261123",
+  "commit_sha": "02f1bc81f74b830265c7ab07539ba7fd43bb743b",
+  "timestamp_utc": "2026-11-23T08:51:56.486562+00:00",
+  "model_alias": "eval-anthropic",
+  "concurrency": 1,
+  "effective_settings": {
+    "max_model_calls": 16,
+    "max_tool_calls": 32,
+    "max_total_tokens": 96000,
+    "timeout_s": 180.0,
+    "model_timeout_s": 60.0,
+    "model_max_tokens": 4096
+  },
+  "manifest": {
+    "archive_root": "packages/workflows/src/workflows/coverage_audit/policy-archive-controls",
+    "packets": [
+      "CTRL-C04",
+      "CTRL-B08"
+    ],
+    "key_sha256": "dbfe84a9b80006463b85403c66c1ac22e3e5abd5c9dc84a9d58d9ea2569bfec2",
+    "archive_file_count": 11,
+    "archive_files_sha256": {
+      "CTRL-B08/broker_note_september.txt": "35900ee059dd56ca42ac255b62c9a070cd4212c86d3628b694441be29f439782",
+      "CTRL-B08/endorsement_e18_a_theft.txt": "4c882c29129965b08e015a8bc653a9adc709638a3e1db1e9f3b20be077642614",
+      "CTRL-B08/endorsement_e18_b_deductible.txt": "c0e868706492755d267d2a73c24405b3d492f0ee57d122167d613115a080d50c",
+      "CTRL-B08/incident_report_harbor.txt": "52fab00c5682dcc31ee8ee6c4b3502ee9ed8331596b2bb2691bd17c458ca9d32",
+      "CTRL-B08/issuance_register_2026.txt": "374135be546d1b0211819ccc6edc605b905cbd6cb476333d4c8fff02ac398cb4",
+      "CTRL-B08/policy_section_02_theft.txt": "3f19e3171aeb0ba288fdbe41346b3e90f952288ad84047b43db6c5d2702740ee",
+      "CTRL-B08/site_schedule_2026.txt": "ee8e7e96b7dd291ac92d90b045bc541f1c7d65be1d6c0d9d090242b4b13f6f1e",
+      "CTRL-C04/billing_summary_2026.txt": "e7ca67eab11d2d86f0022be25b02aaa4d706174a253f4c92172763ac3bc5352b",
+      "CTRL-C04/equipment_inventory_2026.txt": "133128311af96ec25dddb60c68f9e72acfeae97b68b64bcb0ae0a92d9823888e",
+      "CTRL-C04/intake_record_machinery.txt": "81af12c5c4b04225f27565ae8736ace34e4d936d973ad975d1ee372c45c02fb1",
+      "CTRL-C04/policy_section_06_machinery.txt": "9dc77e406faabf8e53586064a448add6ab2103f36cf442ad32f9fcfa7eaa81bc"
+    }
+  },
+  "rubric_sha256": "a83a2f30c73ab08134233894a6c09900f6dd8ec95e1b4f361acdec7ba5f970e0",
+  "total_cost_usd": 1.636,
+  "total_tokens": 315028,
+  "runs": [
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-C04",
+      "tier": "clean",
+      "variant": "baseline",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 19.1,
+      "llm_calls": 4,
+      "tool_calls": 5,
+      "tools_called": [
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 7139,
+      "completion_tokens": 2686,
+      "total_tokens": 9825,
+      "cost_usd": 0.061707,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "billing_summary_2026.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "intake_record_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "equipment_inventory_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_06_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-C04",
+        "issues": [
+          {
+            "issue_id": "optional_machinery_coverage",
+            "outcome": "insufficient_evidence",
+            "determining_value": "insufficient_evidence",
+            "controlling_doc_ids": [
+              "policy_section_06_machinery.txt",
+              "intake_record_machinery.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_06_machinery.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Optional Machinery Breakdown Coverage is NOT automatically included. Optional Machinery Breakdown Coverage applies ONLY if the insured executed and returned a signed Machinery Selection Form (Form MS-10) prior to inception or an official signed issuance record confirms election.",
+                "claim_supported": "Optional machinery coverage applies only if a signed Form MS-10 was returned before inception or an official signed issuance record confirms the election.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "Conditional on signed Form MS-10 or signed issuance record",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "intake_record_machinery.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "The supplied packet contains NO signed Machinery Selection Form (Form MS-10) and does not establish whether a signed selection form or definitive issuance record exists.",
+                "claim_supported": "The packet contains no signed Form MS-10 and does not establish whether a signed selection form or issuance record exists.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "No signed Form MS-10 in packet",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "billing_summary_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Optional endorsement line items are not itemized on this summary sheet.",
+                "claim_supported": "The billing summary does not itemize optional endorsements, so it does not show whether optional machinery coverage was elected or charged.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "No optional machinery premium itemized",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "equipment_inventory_2026.txt",
+                "line_start": 3,
+                "line_end": 4,
+                "verbatim_quote": "Inventory listing does not confer optional machinery coverage.",
+                "claim_supported": "The equipment inventory is informational only and does not confer optional machinery coverage.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "Inventory does not confer coverage",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "No endorsements are in the packet, so there is no replacement or revocation chain. billing_summary_2026.txt and equipment_inventory_2026.txt are informational only and do not bind or confer optional machinery coverage. No date of loss is given.",
+            "missing_record_needed": "The signed Machinery Selection Form (Form MS-10) executed and returned before the 2026-01-01 inception, or an official signed issuance record (e.g., declarations page or endorsement schedule) confirming the machinery election. A billing statement itemizing the optional machinery premium would only corroborate the election."
+          }
+        ],
+        "rationale": "Under policy_section_06_machinery.txt, optional machinery coverage is not automatic and requires a signed Form MS-10 or a signed issuance record. The intake record states the packet has neither, and the billing summary and equipment inventory neither show nor confer the election. The named insured and policy number SYN-2026-4404 are consistent across documents, so there is no entity mismatch. The packet cannot establish whether coverage applies."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 1,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "optional_machinery_coverage",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "insufficient_evidence",
+          "actual_outcome": "insufficient_evidence",
+          "value_correct": true,
+          "expected_value": "insufficient_evidence",
+          "actual_value": "insufficient_evidence",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_06_machinery.txt' lines 5-5.",
+              "doc_id": "policy_section_06_machinery.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'intake_record_machinery.txt' lines 4-4.",
+              "doc_id": "intake_record_machinery.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "billing_summary_2026.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'equipment_inventory_2026.txt' lines 3-4.",
+              "doc_id": "equipment_inventory_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim."
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-C04",
+      "tier": "clean",
+      "variant": "deep_agents",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 35.03,
+      "llm_calls": 7,
+      "tool_calls": 11,
+      "tools_called": [
+        "list_packet_documents",
+        "task",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 33515,
+      "completion_tokens": 4998,
+      "total_tokens": 38513,
+      "cost_usd": 0.175515,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "intake_record_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "billing_summary_2026.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "equipment_inventory_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_06_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "list_packet_documents",
+          "count": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "intake_record_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_06_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "billing_summary_2026.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "equipment_inventory_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-C04",
+        "issues": [
+          {
+            "issue_id": "optional_machinery_coverage",
+            "outcome": "insufficient_evidence",
+            "determining_value": "insufficient_evidence",
+            "controlling_doc_ids": [
+              "policy_section_06_machinery.txt",
+              "intake_record_machinery.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_06_machinery.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Optional Machinery Breakdown Coverage is NOT automatically included. Optional Machinery Breakdown Coverage applies ONLY if the insured executed and returned a signed Machinery Selection Form (Form MS-10) prior to inception or an official signed issuance record confirms election.",
+                "claim_supported": "Optional machinery coverage applies only if a signed Form MS-10 was returned before inception or an official signed issuance record confirms election.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "applies only with signed MS-10 or signed issuance record",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "intake_record_machinery.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "The supplied packet contains NO signed Machinery Selection Form (Form MS-10) and does not establish whether a signed selection form or definitive issuance record exists.",
+                "claim_supported": "The packet contains no signed Form MS-10 and does not establish whether a signed selection form or issuance record exists.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "no signed MS-10 in packet",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "billing_summary_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Optional endorsement line items are not itemized on this summary sheet.",
+                "claim_supported": "The billing summary does not itemize optional endorsements, so it cannot confirm or rule out an election of machinery coverage.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "optional endorsements not itemized",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "equipment_inventory_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "Inventory listing does not confer optional machinery coverage.",
+                "claim_supported": "The equipment inventory does not confer optional machinery coverage.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "inventory confers no coverage",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "No endorsements are in the packet, so there is no supersession or revocation chain. The equipment inventory and billing summary show only that the equipment exists and that base premium was paid. They do not establish an election of optional machinery coverage. No date of loss or location schedule appears in the packet.",
+            "missing_record_needed": "A signed Machinery Selection Form (Form MS-10) executed and returned before 2026-01-01 naming Northport Cold Milling LLC and policy SYN-2026-4404, or an official signed issuance record (e.g., a declarations page or countersigned endorsement) confirming the election. Documentation of the date of loss is also needed to confirm it falls within the policy period."
+          }
+        ],
+        "rationale": "Optional machinery breakdown coverage is not automatic. It depends on a signed Form MS-10 or an official signed issuance record, and neither is in the packet. The billing summary and equipment inventory neither confirm nor exclude the election. The packet therefore neither supports nor refutes coverage, so the outcome is insufficient_evidence."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 1,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "optional_machinery_coverage",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "insufficient_evidence",
+          "actual_outcome": "insufficient_evidence",
+          "value_correct": true,
+          "expected_value": "insufficient_evidence",
+          "actual_value": "insufficient_evidence",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_06_machinery.txt' lines 5-5.",
+              "doc_id": "policy_section_06_machinery.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'intake_record_machinery.txt' lines 4-4.",
+              "doc_id": "intake_record_machinery.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "billing_summary_2026.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "equipment_inventory_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim.",
+            "[unverified] Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim."
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-C04",
+      "tier": "clean",
+      "variant": "deep_agents",
+      "trial": 2,
+      "model_alias": "eval-anthropic",
+      "duration_s": 32.04,
+      "llm_calls": 7,
+      "tool_calls": 11,
+      "tools_called": [
+        "list_packet_documents",
+        "task",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 33394,
+      "completion_tokens": 4637,
+      "total_tokens": 38031,
+      "cost_usd": 0.169737,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "intake_record_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_06_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "billing_summary_2026.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "equipment_inventory_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "list_packet_documents",
+          "count": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_06_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "billing_summary_2026.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "intake_record_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "equipment_inventory_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-C04",
+        "issues": [
+          {
+            "issue_id": "optional_machinery_coverage",
+            "outcome": "insufficient_evidence",
+            "determining_value": "insufficient_evidence",
+            "controlling_doc_ids": [
+              "policy_section_06_machinery.txt",
+              "intake_record_machinery.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_06_machinery.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Optional Machinery Breakdown Coverage is NOT automatically included. Optional Machinery Breakdown Coverage applies ONLY if the insured executed and returned a signed Machinery Selection Form (Form MS-10) prior to inception or an official signed issuance record confirms election.",
+                "claim_supported": "Optional machinery coverage applies only if a signed Form MS-10 was returned before inception or an official signed issuance record confirms election.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "applies only with signed Form MS-10 or official signed issuance record",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "intake_record_machinery.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "The supplied packet contains NO signed Machinery Selection Form (Form MS-10) and does not establish whether a signed selection form or definitive issuance record exists.",
+                "claim_supported": "The packet contains no signed Form MS-10 and does not establish whether a signed selection form or definitive issuance record exists.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "no signed Form MS-10 in packet; existence of election record not established",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "billing_summary_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Optional endorsement line items are not itemized on this summary sheet.",
+                "claim_supported": "The billing summary does not itemize optional endorsements and so cannot confirm an optional machinery election.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "no optional endorsement itemization",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "equipment_inventory_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "Inventory listing does not confer optional machinery coverage.",
+                "claim_supported": "The equipment inventory does not confer optional machinery coverage.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "inventory does not confer coverage",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "The packet contains no endorsements, so there is no supersession or revocation chain. The billing summary (base property premium of $31,400 only) and the equipment inventory (lists machinery) are non-controlling and cannot establish election. No date of loss or location is stated, so effective dates and location scope cannot be verified.",
+            "missing_record_needed": "A signed Machinery Selection Form (Form MS-10) executed and returned before the 2026-01-01 inception, or an official signed issuance record confirming the election (including any machinery endorsement or schedule). A billing record itemizing an optional machinery premium would be corroborating, and the claim notice or date of loss if a specific loss is at issue."
+          }
+        ],
+        "rationale": "Policy section 06 makes optional machinery breakdown coverage conditional on a signed Form MS-10 returned before inception or an official signed issuance record. The intake record states the packet contains no signed MS-10 and does not establish whether such a form or issuance record exists. Billing and inventory documents cannot confirm an election. Because the packet neither shows election nor shows its absence, the outcome is insufficient_evidence rather than does_not_apply."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 1,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "optional_machinery_coverage",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "insufficient_evidence",
+          "actual_outcome": "insufficient_evidence",
+          "value_correct": true,
+          "expected_value": "insufficient_evidence",
+          "actual_value": "insufficient_evidence",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_06_machinery.txt' lines 5-5.",
+              "doc_id": "policy_section_06_machinery.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'intake_record_machinery.txt' lines 4-4.",
+              "doc_id": "intake_record_machinery.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "billing_summary_2026.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "equipment_inventory_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim.",
+            "[unverified] Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim."
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-C04",
+      "tier": "clean",
+      "variant": "baseline",
+      "trial": 2,
+      "model_alias": "eval-anthropic",
+      "duration_s": 19.2,
+      "llm_calls": 4,
+      "tool_calls": 5,
+      "tools_called": [
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 7176,
+      "completion_tokens": 2766,
+      "total_tokens": 9942,
+      "cost_usd": 0.063018,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "billing_summary_2026.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "intake_record_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "equipment_inventory_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_06_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-C04",
+        "issues": [
+          {
+            "issue_id": "optional_machinery_coverage",
+            "outcome": "insufficient_evidence",
+            "determining_value": "insufficient_evidence",
+            "controlling_doc_ids": [
+              "policy_section_06_machinery.txt",
+              "intake_record_machinery.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_06_machinery.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Optional Machinery Breakdown Coverage is NOT automatically included. Optional Machinery Breakdown Coverage applies ONLY if the insured executed and returned a signed Machinery Selection Form (Form MS-10) prior to inception or an official signed issuance record confirms election.",
+                "claim_supported": "Optional Machinery Breakdown Coverage applies only if a signed MS-10 was returned before inception or an official signed issuance record confirms the election.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "applies only with signed MS-10 or signed issuance record",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "intake_record_machinery.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "The supplied packet contains NO signed Machinery Selection Form (Form MS-10) and does not establish whether a signed selection form or definitive issuance record exists.",
+                "claim_supported": "The packet contains no signed MS-10 and does not establish whether a signed selection form or issuance record exists.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "no signed MS-10 in packet",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "billing_summary_2026.txt",
+                "line_start": 2,
+                "line_end": 2,
+                "verbatim_quote": "Base Property Premium: $31,400 (Paid 2026-01-04).",
+                "claim_supported": "Only the base property premium is shown as paid, which does not show that the optional coverage was elected.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "$31,400",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "billing_summary_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Optional endorsement line items are not itemized on this summary sheet.",
+                "claim_supported": "The billing summary does not itemize optional endorsements, so it neither confirms nor rules out an election.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "optional endorsements not itemized",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "equipment_inventory_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "Inventory listing does not confer optional machinery coverage.",
+                "claim_supported": "The equipment inventory is informational only and does not confer optional machinery coverage.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "inventory confers no coverage",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "No endorsements, replacements or revocations are in the packet. The equipment inventory and billing summary are informational or corroborating only and cannot establish election. No date of loss is stated; the policy period 2026-01-01 to 2027-01-01 is the only date range.",
+            "missing_record_needed": "A signed and returned Machinery Selection Form (Form MS-10) executed before the 2026-01-01 inception, or an official signed issuance record (e.g., declarations page or endorsement schedule listing Optional Machinery Breakdown Coverage). An itemized billing or premium record showing a charge for the optional coverage would be corroborating only."
+          }
+        ],
+        "rationale": "Section 6 makes optional machinery coverage conditional on a signed MS-10 or an official signed issuance record. The packet contains neither, and the billing and inventory documents cannot confirm or exclude an election. The packet therefore neither shows that the coverage applies nor that it does not, so the outcome is insufficient_evidence."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 1,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "optional_machinery_coverage",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "insufficient_evidence",
+          "actual_outcome": "insufficient_evidence",
+          "value_correct": true,
+          "expected_value": "insufficient_evidence",
+          "actual_value": "insufficient_evidence",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_06_machinery.txt' lines 5-5.",
+              "doc_id": "policy_section_06_machinery.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'intake_record_machinery.txt' lines 4-4.",
+              "doc_id": "intake_record_machinery.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Actor/entity mismatch on 'billing_summary_2026.txt': subject 'Northport Cold Milling LLC' does not match document scope.",
+              "doc_id": "billing_summary_2026.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "billing_summary_2026.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "equipment_inventory_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[contradicted] Actor/entity mismatch on 'billing_summary_2026.txt': subject 'Northport Cold Milling LLC' does not match document scope.",
+            "[unverified] Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim.",
+            "[unverified] Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim."
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-C04",
+      "tier": "clean",
+      "variant": "baseline",
+      "trial": 3,
+      "model_alias": "eval-anthropic",
+      "duration_s": 17.83,
+      "llm_calls": 4,
+      "tool_calls": 5,
+      "tools_called": [
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 7232,
+      "completion_tokens": 2777,
+      "total_tokens": 10009,
+      "cost_usd": 0.063351,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "equipment_inventory_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_06_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "intake_record_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "billing_summary_2026.txt",
+          "start_line": 1,
+          "end_line": 3
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-C04",
+        "issues": [
+          {
+            "issue_id": "optional_machinery_coverage",
+            "outcome": "insufficient_evidence",
+            "determining_value": "insufficient_evidence",
+            "controlling_doc_ids": [
+              "policy_section_06_machinery.txt",
+              "intake_record_machinery.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_06_machinery.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Optional Machinery Breakdown Coverage is NOT automatically included. Optional Machinery Breakdown Coverage applies ONLY if the insured executed and returned a signed Machinery Selection Form (Form MS-10) prior to inception or an official signed issuance record confirms election.",
+                "claim_supported": "Optional Machinery Breakdown Coverage applies only if a signed Form MS-10 was returned before inception or an official signed issuance record confirms the election.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "applies only with signed Form MS-10 or official signed issuance record",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "intake_record_machinery.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "The supplied packet contains NO signed Machinery Selection Form (Form MS-10) and does not establish whether a signed selection form or definitive issuance record exists.",
+                "claim_supported": "The packet contains no signed Form MS-10 and does not establish whether a signed selection form or definitive issuance record exists.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "no signed Form MS-10 in packet",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "equipment_inventory_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "Inventory listing does not confer optional machinery coverage.",
+                "claim_supported": "The equipment inventory does not elect or confer optional machinery coverage.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "inventory does not confer coverage",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "billing_summary_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Optional endorsement line items are not itemized on this summary sheet.",
+                "claim_supported": "The billing summary does not itemize optional endorsements, so it neither confirms nor rules out an optional machinery election.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "optional endorsements not itemized",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "No endorsements are in the packet, so there is no replacement or revocation chain. The equipment inventory (equipment_inventory_2026.txt) and billing summary (billing_summary_2026.txt) are informational only. Neither is an election document or an issuance record. The named insured and policy number match across the documents, and no entity or location scope problem appears.",
+            "missing_record_needed": "A signed Machinery Selection Form (Form MS-10) executed and returned before the 2026-01-01 inception, or an official signed issuance record (such as a declarations page or endorsement schedule) confirming the machinery election. An itemized billing record showing an optional machinery premium would support the election but would not replace either document."
+          }
+        ],
+        "rationale": "The policy makes Optional Machinery Breakdown Coverage conditional on a signed Form MS-10 returned before inception or an official signed issuance record. The packet contains neither, and the intake record says it does not establish whether either exists. The inventory and billing summary cannot elect coverage or serve as an issuance record. The packet therefore cannot show that the coverage applies or does not apply."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 1,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "optional_machinery_coverage",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "insufficient_evidence",
+          "actual_outcome": "insufficient_evidence",
+          "value_correct": true,
+          "expected_value": "insufficient_evidence",
+          "actual_value": "insufficient_evidence",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_06_machinery.txt' lines 5-5.",
+              "doc_id": "policy_section_06_machinery.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'intake_record_machinery.txt' lines 4-4.",
+              "doc_id": "intake_record_machinery.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "equipment_inventory_2026.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "billing_summary_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim.",
+            "[unverified] Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim."
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-C04",
+      "tier": "clean",
+      "variant": "deep_agents",
+      "trial": 3,
+      "model_alias": "eval-anthropic",
+      "duration_s": 34.15,
+      "llm_calls": 7,
+      "tool_calls": 11,
+      "tools_called": [
+        "list_packet_documents",
+        "task",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 33544,
+      "completion_tokens": 5012,
+      "total_tokens": 38556,
+      "cost_usd": 0.175812,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "intake_record_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "billing_summary_2026.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_06_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "equipment_inventory_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "list_packet_documents",
+          "count": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "intake_record_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_06_machinery.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "billing_summary_2026.txt",
+          "start_line": 1,
+          "end_line": 3
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "equipment_inventory_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-C04",
+        "issues": [
+          {
+            "issue_id": "optional_machinery_coverage",
+            "outcome": "insufficient_evidence",
+            "determining_value": "insufficient_evidence",
+            "controlling_doc_ids": [
+              "policy_section_06_machinery.txt",
+              "intake_record_machinery.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_06_machinery.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Optional Machinery Breakdown Coverage is NOT automatically included. Optional Machinery Breakdown Coverage applies ONLY if the insured executed and returned a signed Machinery Selection Form (Form MS-10) prior to inception or an official signed issuance record confirms election.",
+                "claim_supported": "Optional machinery coverage applies only if a signed MS-10 was returned before inception or an official signed issuance record confirms election.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "applies only with signed MS-10 or signed issuance record",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "intake_record_machinery.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "The supplied packet contains NO signed Machinery Selection Form (Form MS-10) and does not establish whether a signed selection form or definitive issuance record exists.",
+                "claim_supported": "The packet contains no signed MS-10 and does not establish whether a signed selection form or issuance record exists.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "no signed MS-10 in packet",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "equipment_inventory_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "Inventory listing does not confer optional machinery coverage.",
+                "claim_supported": "The equipment inventory does not establish an election of optional machinery coverage.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "inventory confers no optional machinery coverage",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "billing_summary_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Optional endorsement line items are not itemized on this summary sheet.",
+                "claim_supported": "The billing summary does not itemize optional endorsements, so it neither shows nor rules out a machinery premium.",
+                "subject": "Northport Cold Milling LLC",
+                "value": "no itemized optional endorsement premium",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "No endorsements are in the packet, so there is no supersession or revocation chain. The equipment inventory and billing summary are non-controlling: neither confers or excludes optional machinery coverage. The $31,400 payment is the base property premium and is not evidence of an election. The intake date of 2026-05-14 is not a date of loss.",
+            "missing_record_needed": "A signed Machinery Selection Form (Form MS-10) returned before the 2026-01-01 inception, or an official signed issuance record confirming the election. Supporting records would be any machinery endorsement or covered-equipment schedule, an itemized billing statement or declarations page showing the optional machinery coverage or premium, and the claim notice with date and location of loss."
+          }
+        ],
+        "rationale": "Section 06 makes optional machinery breakdown coverage conditional on a signed MS-10 returned before inception or an official signed issuance record. The packet contains neither, and the intake record says so. The inventory and billing summary do not show an election and do not rule one out. Coverage can be neither confirmed nor denied, so the outcome is insufficient_evidence."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 1,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "optional_machinery_coverage",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "insufficient_evidence",
+          "actual_outcome": "insufficient_evidence",
+          "value_correct": true,
+          "expected_value": "insufficient_evidence",
+          "actual_value": "insufficient_evidence",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_06_machinery.txt' lines 5-5.",
+              "doc_id": "policy_section_06_machinery.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'intake_record_machinery.txt' lines 4-4.",
+              "doc_id": "intake_record_machinery.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "equipment_inventory_2026.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim.",
+              "doc_id": "billing_summary_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Heading-only span (lines 4-4) on 'equipment_inventory_2026.txt' does not substantiate coverage claim.",
+            "[unverified] Heading-only span (lines 3-3) on 'billing_summary_2026.txt' does not substantiate coverage claim."
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-B08",
+      "tier": "branching",
+      "variant": "baseline",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 28.86,
+      "llm_calls": 4,
+      "tool_calls": 8,
+      "tools_called": [
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 8734,
+      "completion_tokens": 4576,
+      "total_tokens": 13310,
+      "cost_usd": 0.094842,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_02_theft.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_note_september.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "issuance_register_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_a_theft.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "site_schedule_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "incident_report_harbor.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_b_deductible.txt",
+          "start_line": 1,
+          "end_line": 6
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-B08",
+        "issues": [
+          {
+            "issue_id": "theft_coverage_applicability",
+            "outcome": "applies",
+            "determining_value": "applies",
+            "controlling_doc_ids": [
+              "policy_section_02_theft.txt",
+              "endorsement_e18_a_theft.txt",
+              "site_schedule_2026.txt",
+              "endorsement_e18_b_deductible.txt",
+              "issuance_register_2026.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_02_theft.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Loss or damage caused by Theft is EXCLUDED unless expressly added by executed site endorsement.",
+                "claim_supported": "The base form excludes theft unless an executed site endorsement adds it.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft excluded unless added by executed site endorsement",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 2,
+                "line_end": 2,
+                "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+                "claim_supported": "Endorsement E18-A is executed and countersigned.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Executed",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Effective Date: 2026-01-01",
+                "claim_supported": "E18-A took effect on 2026-01-01, before the 2026-08-27 date of loss.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-01-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A adds Theft coverage at site HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft coverage added at HBR-4",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "site_schedule_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Site HBR-4: Harbor (400 Pier Rd, Terminal East)",
+                "claim_supported": "Harbor is site HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Harbor = HBR-4",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "does not change Theft coverage applicability.",
+                "claim_supported": "E18-B does not change theft coverage applicability.",
+                "subject": "Harborline Maritime LLC",
+                "value": "No change to theft coverage",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "issuance_register_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "E18-B does NOT alter or revoke Theft coverage applicability granted under E18-A.",
+                "claim_supported": "E18-B does not revoke the theft coverage granted under E18-A.",
+                "subject": "Harborline Maritime LLC",
+                "value": "E18-A theft coverage not revoked",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B (endorsement_e18_b_deductible.txt) amends only the deductible and does not remove or alter theft coverage, so it does not supersede E18-A on applicability. The date of loss, 2026-08-27, falls within the policy period 2026-01-01 to 2027-01-01 and after E18-A took effect.",
+            "missing_record_needed": ""
+          },
+          {
+            "issue_id": "applicable_deductible",
+            "outcome": "applies",
+            "determining_value": "$5,000",
+            "controlling_doc_ids": [
+              "endorsement_e18_a_theft.txt",
+              "endorsement_e18_b_deductible.txt",
+              "incident_report_harbor.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Actual Date of Loss: 2026-08-27",
+                "claim_supported": "The actual date of loss is 2026-08-27, which controls over the report date of 2026-09-05.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Effective Date: 2026-09-01",
+                "claim_supported": "E18-B is effective 2026-09-01, after the date of loss.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-09-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "replacing $5,000 with $12,000 strictly for losses occurring on or after 2026-09-01. Does not apply retroactively to losses occurring prior to 2026-09-01",
+                "claim_supported": "The $12,000 deductible does not apply to losses occurring before 2026-09-01.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$12,000 not applicable to pre-2026-09-01 losses",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "The E18-A deductible of $5,000 per occurrence applies to the 2026-08-27 theft loss at HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$5,000",
+                "polarity": "affirmed"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B's $12,000 deductible is out of scope because it applies only to losses on or after 2026-09-01. The register's 2026-08-20 entry for E18-B is an issuance date, not the effective date. The broker note (broker_note_september.txt line 4: 'the new $12,000 theft deductible took effect in September') is an informal summary that does not bind coverage and keys to the report date rather than the date of loss.",
+            "missing_record_needed": ""
+          }
+        ],
+        "rationale": "The base form excludes theft unless added by an executed site endorsement. E18-A, executed and effective 2026-01-01, adds theft at HBR-4 (Harbor) with a $5,000 per-occurrence deductible. E18-B changes only the deductible, to $12,000, and only for losses on or after 2026-09-01. The loss occurred 2026-08-27, so the $5,000 deductible applies. The record chain is complete."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 2,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "theft_coverage_applicability",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "applies",
+          "actual_value": "applies",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_02_theft.txt' lines 5-5.",
+              "doc_id": "policy_section_02_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 2-2.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 5-5.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'site_schedule_2026.txt' lines 3-3.",
+              "doc_id": "site_schedule_2026.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Polarity/authority contradiction on 'endorsement_e18_b_deductible.txt': affirmative claim drawn from excluded, unsigned, revoked, expired, or non-binding clause.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope.",
+              "doc_id": "issuance_register_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[contradicted] Polarity/authority contradiction on 'endorsement_e18_b_deductible.txt': affirmative claim drawn from excluded, unsigned, revoked, expired, or non-binding clause.",
+            "[contradicted] Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope."
+          ]
+        },
+        {
+          "issue_id": "applicable_deductible",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "5000",
+          "actual_value": "5000",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": false,
+          "propositions_ok": false,
+          "scope_ok": true,
+          "dates_ok": false,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "unverified",
+              "reason": "Date 2026-09-05 in claim_supported is not established by lines 5-5 of 'incident_report_harbor.txt'.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_b_deductible.txt' lines 5-5.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_b_deductible.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Date 2026-08-27 in claim_supported is not established by lines 6-6 of 'endorsement_e18_a_theft.txt'.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Date 2026-09-05 in claim_supported is not established by lines 5-5 of 'incident_report_harbor.txt'.",
+            "[unverified] Date 2026-08-27 in claim_supported is not established by lines 6-6 of 'endorsement_e18_a_theft.txt'.",
+            "Missing verified controlling doc(s): ['endorsement_e18_a_theft.txt', 'incident_report_harbor.txt']",
+            "Missing required verified source proposition on 'endorsement_e18_a_theft.txt' (pattern: '5000.*deductible|deductible.*5000').",
+            "Missing required verified source proposition on 'incident_report_harbor.txt' (pattern: 'actual\\\\s+date\\\\s+of\\\\s+loss.*2026-08-27').",
+            "Missing required verified date span(s): ['2026-08-27']"
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-B08",
+      "tier": "branching",
+      "variant": "deep_agents",
+      "trial": 1,
+      "model_alias": "eval-anthropic",
+      "duration_s": 44.58,
+      "llm_calls": 7,
+      "tool_calls": 17,
+      "tools_called": [
+        "list_packet_documents",
+        "task",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 36389,
+      "completion_tokens": 7339,
+      "total_tokens": 43728,
+      "cost_usd": 0.219252,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_note_september.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "site_schedule_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_a_theft.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_b_deductible.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "issuance_register_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "incident_report_harbor.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_02_theft.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "list_packet_documents",
+          "count": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_b_deductible.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "site_schedule_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "incident_report_harbor.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_note_september.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_02_theft.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "issuance_register_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_a_theft.txt",
+          "start_line": 1,
+          "end_line": 6
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-B08",
+        "issues": [
+          {
+            "issue_id": "theft_coverage_applicability",
+            "outcome": "applies",
+            "determining_value": "applies",
+            "controlling_doc_ids": [
+              "policy_section_02_theft.txt",
+              "endorsement_e18_a_theft.txt",
+              "site_schedule_2026.txt",
+              "incident_report_harbor.txt",
+              "endorsement_e18_b_deductible.txt",
+              "issuance_register_2026.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_02_theft.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Loss or damage caused by Theft is EXCLUDED unless expressly added by executed site endorsement.",
+                "claim_supported": "The base form excludes theft unless an executed site endorsement adds it.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft excluded absent executed site endorsement",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 2,
+                "line_end": 2,
+                "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+                "claim_supported": "Endorsement E18-A is executed and countersigned.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Executed & countersigned",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A adds Theft coverage at site HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft coverage added at HBR-4",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "site_schedule_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Site HBR-4: Harbor (400 Pier Rd, Terminal East)",
+                "claim_supported": "Site HBR-4 is the Harbor site.",
+                "subject": "Harborline Maritime LLC",
+                "value": "HBR-4 = Harbor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "Incident Location: Harbor",
+                "claim_supported": "The incident occurred at Harbor.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Harbor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Actual Date of Loss: 2026-08-27",
+                "claim_supported": "The loss occurred 2026-08-27, after E18-A's effective date and within the policy period.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "does not change Theft coverage applicability.",
+                "claim_supported": "E18-B does not change theft coverage applicability.",
+                "subject": "Harborline Maritime LLC",
+                "value": "No change to theft applicability",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "issuance_register_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "E18-B does NOT alter or revoke Theft coverage applicability granted under E18-A.",
+                "claim_supported": "The issuance register confirms E18-B does not revoke the theft grant under E18-A.",
+                "subject": "Harborline Maritime LLC",
+                "value": "E18-A theft grant not revoked",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "The base form's theft exclusion is overridden at HBR-4 by executed endorsement E18-A. E18-B changes only the deductible and does not revoke theft coverage.",
+            "missing_record_needed": ""
+          },
+          {
+            "issue_id": "applicable_deductible",
+            "outcome": "applies",
+            "determining_value": "$5,000",
+            "controlling_doc_ids": [
+              "endorsement_e18_a_theft.txt",
+              "endorsement_e18_b_deductible.txt",
+              "incident_report_harbor.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A sets a $5,000 per-occurrence theft deductible at HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$5,000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Effective Date: 2026-09-01",
+                "claim_supported": "E18-B is effective 2026-09-01.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-09-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "replacing $5,000 with $12,000 strictly for losses occurring on or after 2026-09-01. Does not apply retroactively to losses occurring prior to 2026-09-01",
+                "claim_supported": "E18-B's $12,000 deductible applies only to losses occurring on or after 2026-09-01 and is not retroactive.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$12,000 only for losses on/after 2026-09-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Actual Date of Loss: 2026-08-27",
+                "claim_supported": "The loss occurred 2026-08-27, before E18-B's effective date, so E18-B does not apply.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Date Reported: 2026-09-05",
+                "claim_supported": "The report date of 2026-09-05 is not the date of loss and does not trigger E18-B.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-09-05",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "broker_note_september.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "the claim was reported September 5 and the new $12,000 theft deductible took effect in September",
+                "claim_supported": "The broker note asserts a $12,000 deductible based on the report date, but it is informal and not controlling.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$12,000 (non-controlling)",
+                "polarity": "affirmed"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B's $12,000 deductible is out of scope because it applies only to losses occurring on or after 2026-09-01, and this loss occurred 2026-08-27. The broker note is an informal summary that relies on the report date rather than the date of loss, so it does not control.",
+            "missing_record_needed": ""
+          }
+        ],
+        "rationale": "Theft is excluded by the base form but added at HBR-4 (Harbor) by executed E18-A, effective 2026-01-01. The 2026-08-27 loss falls within the policy period, and E18-B does not revoke the theft grant. E18-B's $12,000 deductible applies only to losses occurring on or after 2026-09-01, so E18-A's $5,000 per-occurrence deductible controls. The broker note's reliance on the report date is not controlling."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 2,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "theft_coverage_applicability",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "applies",
+          "actual_value": "applies",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_02_theft.txt' lines 5-5.",
+              "doc_id": "policy_section_02_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 2-2.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'site_schedule_2026.txt' lines 3-3.",
+              "doc_id": "site_schedule_2026.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 4-4) on 'incident_report_harbor.txt' does not substantiate coverage claim.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 5-5.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Polarity/authority contradiction on 'endorsement_e18_b_deductible.txt': affirmative claim drawn from excluded, unsigned, revoked, expired, or non-binding clause.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope.",
+              "doc_id": "issuance_register_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Heading-only span (lines 4-4) on 'incident_report_harbor.txt' does not substantiate coverage claim.",
+            "[contradicted] Polarity/authority contradiction on 'endorsement_e18_b_deductible.txt': affirmative claim drawn from excluded, unsigned, revoked, expired, or non-binding clause.",
+            "[contradicted] Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope."
+          ]
+        },
+        {
+          "issue_id": "applicable_deductible",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "5000",
+          "actual_value": "5000",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_b_deductible.txt' lines 5-5.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_b_deductible.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 5-5.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 6-6.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Actor/entity mismatch on 'broker_note_september.txt': subject 'Harborline Maritime LLC' does not match document scope.",
+              "doc_id": "broker_note_september.txt"
+            }
+          ],
+          "reasons": [
+            "[contradicted] Actor/entity mismatch on 'broker_note_september.txt': subject 'Harborline Maritime LLC' does not match document scope."
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-B08",
+      "tier": "branching",
+      "variant": "deep_agents",
+      "trial": 2,
+      "model_alias": "eval-anthropic",
+      "duration_s": 43.74,
+      "llm_calls": 7,
+      "tool_calls": 17,
+      "tools_called": [
+        "list_packet_documents",
+        "task",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 36316,
+      "completion_tokens": 6767,
+      "total_tokens": 43083,
+      "cost_usd": 0.210453,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "issuance_register_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_a_theft.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "incident_report_harbor.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_02_theft.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "site_schedule_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_b_deductible.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_note_september.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "list_packet_documents",
+          "count": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "site_schedule_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_note_september.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_02_theft.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_a_theft.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "issuance_register_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_b_deductible.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "incident_report_harbor.txt",
+          "start_line": 1,
+          "end_line": 7
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-B08",
+        "issues": [
+          {
+            "issue_id": "theft_coverage_applicability",
+            "outcome": "applies",
+            "determining_value": "applies",
+            "controlling_doc_ids": [
+              "policy_section_02_theft.txt",
+              "endorsement_e18_a_theft.txt",
+              "site_schedule_2026.txt",
+              "incident_report_harbor.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_02_theft.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Loss or damage caused by Theft is EXCLUDED unless expressly added by executed site endorsement.",
+                "claim_supported": "The base policy excludes Theft unless an executed site endorsement adds it.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft excluded absent executed site endorsement",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 2,
+                "line_end": 2,
+                "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+                "claim_supported": "Endorsement E18-A is executed and countersigned.",
+                "subject": "Harborline Maritime LLC",
+                "value": "EXECUTED & COUNTERSIGNED",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A adds Theft coverage at site HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft coverage added at HBR-4",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "site_schedule_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Site HBR-4: Harbor (400 Pier Rd, Terminal East)",
+                "claim_supported": "Site HBR-4 is the Harbor location.",
+                "subject": "Harborline Maritime LLC",
+                "value": "HBR-4 = Harbor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Actual Date of Loss: 2026-08-27",
+                "claim_supported": "The loss occurred on 2026-08-27, after E18-A took effect and within the policy period.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "issuance_register_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "E18-B does NOT alter or revoke Theft coverage applicability granted under E18-A.",
+                "claim_supported": "E18-B does not revoke the Theft coverage granted under E18-A.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft coverage not revoked",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B (endorsement_e18_b_deductible.txt) changes only the deductible and does not alter Theft coverage applicability, so it does not supersede E18-A on this issue.",
+            "missing_record_needed": ""
+          },
+          {
+            "issue_id": "applicable_deductible",
+            "outcome": "applies",
+            "determining_value": "$5,000",
+            "controlling_doc_ids": [
+              "endorsement_e18_a_theft.txt",
+              "endorsement_e18_b_deductible.txt",
+              "incident_report_harbor.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A sets a $5,000 per-occurrence Theft deductible at HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$5,000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Actual Date of Loss: 2026-08-27",
+                "claim_supported": "The loss occurred on 2026-08-27, before E18-B's effective date.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Does not apply retroactively to losses occurring prior to 2026-09-01",
+                "claim_supported": "E18-B's $12,000 deductible does not apply to losses occurring before 2026-09-01.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$12,000 not applicable to pre-2026-09-01 losses",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B ($12,000 deductible, effective 2026-09-01) is out of scope because the loss occurred on 2026-08-27 and E18-B is not retroactive. broker_note_september.txt (line 4: the claim was reported September 5 and the new $12,000 theft deductible took effect in September) is an informal summary that keys on the report date rather than the date of loss, and it does not control.",
+            "missing_record_needed": ""
+          }
+        ],
+        "rationale": "Theft is excluded by the base policy unless an executed site endorsement adds it. Executed E18-A adds it at HBR-4 (Harbor) with a $5,000 deductible. The loss occurred on 2026-08-27, which is within the policy period and after E18-A took effect. E18-B raises the deductible to $12,000 but only for losses on or after 2026-09-01, and it does not change Theft coverage applicability. The September 5 report date does not determine the deductible, so $5,000 applies."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 1,
+      "issues_total": 2,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "theft_coverage_applicability",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "applies",
+          "actual_value": "applies",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_02_theft.txt' lines 5-5.",
+              "doc_id": "policy_section_02_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 2-2.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'site_schedule_2026.txt' lines 3-3.",
+              "doc_id": "site_schedule_2026.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 5-5.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope.",
+              "doc_id": "issuance_register_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[contradicted] Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope."
+          ]
+        },
+        {
+          "issue_id": "applicable_deductible",
+          "passed": true,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "5000",
+          "actual_value": "5000",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": true,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 5-5.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_b_deductible.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            }
+          ],
+          "reasons": []
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-B08",
+      "tier": "branching",
+      "variant": "baseline",
+      "trial": 2,
+      "model_alias": "eval-anthropic",
+      "duration_s": 25.42,
+      "llm_calls": 4,
+      "tool_calls": 8,
+      "tools_called": [
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 8745,
+      "completion_tokens": 4106,
+      "total_tokens": 12851,
+      "cost_usd": 0.087825,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_02_theft.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_note_september.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_a_theft.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_b_deductible.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "issuance_register_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "incident_report_harbor.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "site_schedule_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-B08",
+        "issues": [
+          {
+            "issue_id": "theft_coverage_applicability",
+            "outcome": "applies",
+            "determining_value": "applies",
+            "controlling_doc_ids": [
+              "endorsement_e18_a_theft.txt",
+              "site_schedule_2026.txt",
+              "incident_report_harbor.txt",
+              "policy_section_02_theft.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_02_theft.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Loss or damage caused by Theft is EXCLUDED unless expressly added by executed site endorsement.",
+                "claim_supported": "The base form excludes theft unless an executed site endorsement adds it.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft excluded absent executed site endorsement",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "Executed endorsement E18-A adds theft coverage at site HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft coverage added at HBR-4",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "site_schedule_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Site HBR-4: Harbor (400 Pier Rd, Terminal East)",
+                "claim_supported": "Site HBR-4 is the Harbor site.",
+                "subject": "Harborline Maritime LLC",
+                "value": "HBR-4 = Harbor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "Harbor",
+                "claim_supported": "The incident location is Harbor, within the scope of the E18-A site endorsement.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Harbor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "does not change Theft coverage applicability",
+                "claim_supported": "E18-B does not change theft coverage applicability.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft coverage unchanged by E18-B",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "issuance_register_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "E18-B does NOT alter or revoke Theft coverage applicability granted under E18-A.",
+                "claim_supported": "The issuance register confirms E18-B does not revoke the theft coverage granted by E18-A.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft coverage not revoked",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B (endorsement_e18_b_deductible.txt) changes only the deductible and does not supersede or revoke E18-A's theft coverage grant. The base-form exclusion is overridden at HBR-4 by the executed E18-A.",
+            "missing_record_needed": ""
+          },
+          {
+            "issue_id": "applicable_deductible",
+            "outcome": "applies",
+            "determining_value": "$5,000",
+            "controlling_doc_ids": [
+              "endorsement_e18_a_theft.txt",
+              "endorsement_e18_b_deductible.txt",
+              "incident_report_harbor.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Actual Date of Loss: 2026-08-27",
+                "claim_supported": "The loss occurred on 2026-08-27, before the E18-B effective date.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "for losses occurring on or after 2026-09-01. Does not apply retroactively to losses occurring prior to 2026-09-01",
+                "claim_supported": "The $12,000 deductible in E18-B applies only to losses on or after 2026-09-01 and is not retroactive.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$12,000 only for losses on or after 2026-09-01",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A sets a $5,000 per-occurrence theft deductible, which controls for the 2026-08-27 loss.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$5,000",
+                "polarity": "affirmed"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B's $12,000 deductible is out of scope because the loss date (2026-08-27) precedes its 2026-09-01 effective date. The register issuance date of 2026-08-20 (issuance_register_2026.txt) is not the effective date. The broker note (broker_note_september.txt, line 4) says the new $12,000 deductible took effect in September and points to the 2026-09-05 report date. It is an informal summary, not binding, and is overridden by the executed endorsement's loss-date test.",
+            "missing_record_needed": ""
+          }
+        ],
+        "rationale": "Theft is excluded by the base form but added back at HBR-4 (Harbor) by executed E18-A, and E18-B does not revoke it. The 2026-08-27 loss falls within the policy period and before E18-B's 2026-09-01 loss-date effective date, so E18-A's $5,000 per-occurrence deductible controls. The report date and the register issuance date do not change the deductible."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 2,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "theft_coverage_applicability",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "applies",
+          "actual_value": "applies",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_02_theft.txt' lines 5-5.",
+              "doc_id": "policy_section_02_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'site_schedule_2026.txt' lines 3-3.",
+              "doc_id": "site_schedule_2026.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 4-4) on 'incident_report_harbor.txt' does not substantiate coverage claim.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Polarity/authority contradiction on 'endorsement_e18_b_deductible.txt': affirmative claim drawn from excluded, unsigned, revoked, expired, or non-binding clause.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope.",
+              "doc_id": "issuance_register_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Heading-only span (lines 4-4) on 'incident_report_harbor.txt' does not substantiate coverage claim.",
+            "[contradicted] Polarity/authority contradiction on 'endorsement_e18_b_deductible.txt': affirmative claim drawn from excluded, unsigned, revoked, expired, or non-binding clause.",
+            "[contradicted] Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope."
+          ]
+        },
+        {
+          "issue_id": "applicable_deductible",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "5000",
+          "actual_value": "5000",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": false,
+          "propositions_ok": false,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 5-5.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_b_deductible.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Date 2026-08-27 in claim_supported is not established by lines 6-6 of 'endorsement_e18_a_theft.txt'.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Date 2026-08-27 in claim_supported is not established by lines 6-6 of 'endorsement_e18_a_theft.txt'.",
+            "Missing verified controlling doc(s): ['endorsement_e18_a_theft.txt']",
+            "Missing required verified source proposition on 'endorsement_e18_a_theft.txt' (pattern: '5000.*deductible|deductible.*5000')."
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-B08",
+      "tier": "branching",
+      "variant": "baseline",
+      "trial": 3,
+      "model_alias": "eval-anthropic",
+      "duration_s": 27.98,
+      "llm_calls": 4,
+      "tool_calls": 8,
+      "tools_called": [
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 8679,
+      "completion_tokens": 4371,
+      "total_tokens": 13050,
+      "cost_usd": 0.091602,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_a_theft.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "issuance_register_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "site_schedule_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "incident_report_harbor.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_02_theft.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_b_deductible.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_note_september.txt",
+          "start_line": 1,
+          "end_line": 4
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-B08",
+        "issues": [
+          {
+            "issue_id": "theft_coverage_applicability",
+            "outcome": "applies",
+            "determining_value": "applies",
+            "controlling_doc_ids": [
+              "endorsement_e18_a_theft.txt",
+              "site_schedule_2026.txt",
+              "incident_report_harbor.txt",
+              "policy_section_02_theft.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_02_theft.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Loss or damage caused by Theft is EXCLUDED unless expressly added by executed site endorsement.",
+                "claim_supported": "The base policy excludes theft unless an executed site endorsement adds it.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft excluded by default",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 2,
+                "line_end": 2,
+                "verbatim_quote": "EXECUTED & COUNTERSIGNED",
+                "claim_supported": "Endorsement E18-A is executed and countersigned.",
+                "subject": "Harborline Maritime LLC",
+                "value": "E18-A executed",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A adds theft coverage at site HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft coverage added at HBR-4",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "site_schedule_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Site HBR-4: Harbor (400 Pier Rd, Terminal East)",
+                "claim_supported": "Site HBR-4 is the Harbor site.",
+                "subject": "Harborline Maritime LLC",
+                "value": "HBR-4 = Harbor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "2026-08-27",
+                "claim_supported": "The Harbor loss occurred on 2026-08-27, within the policy period and after E18-A took effect.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "does not change Theft coverage applicability.",
+                "claim_supported": "E18-B does not change theft coverage applicability.",
+                "subject": "Harborline Maritime LLC",
+                "value": "No change to theft applicability",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "issuance_register_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "does NOT alter or revoke Theft coverage applicability granted under E18-A.",
+                "claim_supported": "The issuance register confirms E18-B does not revoke the theft coverage granted under E18-A.",
+                "subject": "Harborline Maritime LLC",
+                "value": "E18-A theft coverage not revoked",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "The base policy theft exclusion in policy_section_02_theft.txt is overridden at HBR-4 by E18-A. E18-B changes only the deductible and does not affect theft coverage applicability.",
+            "missing_record_needed": ""
+          },
+          {
+            "issue_id": "applicable_deductible",
+            "outcome": "applies",
+            "determining_value": "$5,000",
+            "controlling_doc_ids": [
+              "endorsement_e18_a_theft.txt",
+              "endorsement_e18_b_deductible.txt",
+              "incident_report_harbor.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A sets a $5,000 per-occurrence deductible for theft at HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$5,000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 5,
+                "line_end": 6,
+                "verbatim_quote": "strictly for losses occurring on or after 2026-09-01.",
+                "claim_supported": "The $12,000 deductible in E18-B applies only to losses occurring on or after 2026-09-01.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$12,000 effective 2026-09-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 5,
+                "line_end": 6,
+                "verbatim_quote": "Does not apply retroactively to losses occurring prior to 2026-09-01.",
+                "claim_supported": "E18-B does not apply to losses occurring before 2026-09-01, so the $12,000 deductible does not apply to this loss.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$12,000 not applicable to this loss",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "2026-08-27",
+                "claim_supported": "The date of loss is 2026-08-27, before the E18-B effective date.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "broker_note_september.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "took effect in September.",
+                "claim_supported": "The broker note's suggestion of a $12,000 deductible is an informal summary and does not control, because the deductible turns on the date of loss.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$12,000 (non-controlling)",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B ($12,000), effective 2026-09-01, is out of scope for this 2026-08-27 loss because it is not retroactive. Its issue date of 2026-08-20 in the register does not matter. The broker note is informal, non-binding, and keyed to the report date (2026-09-05) rather than the date of loss.",
+            "missing_record_needed": ""
+          }
+        ],
+        "rationale": "The base policy excludes theft, but executed endorsement E18-A adds it at HBR-4, which the site schedule identifies as Harbor. The loss date of 2026-08-27 falls within the policy period and after E18-A took effect. E18-B raises the deductible to $12,000 only for losses on or after 2026-09-01, so E18-A's $5,000 per-occurrence deductible controls. The broker note does not override the endorsement terms."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 2,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "theft_coverage_applicability",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "applies",
+          "actual_value": "applies",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_02_theft.txt' lines 5-5.",
+              "doc_id": "policy_section_02_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 2-2.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'site_schedule_2026.txt' lines 3-3.",
+              "doc_id": "site_schedule_2026.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 5-5.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Polarity/authority contradiction on 'endorsement_e18_b_deductible.txt': affirmative claim drawn from excluded, unsigned, revoked, expired, or non-binding clause.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope.",
+              "doc_id": "issuance_register_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[contradicted] Polarity/authority contradiction on 'endorsement_e18_b_deductible.txt': affirmative claim drawn from excluded, unsigned, revoked, expired, or non-binding clause.",
+            "[contradicted] Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope."
+          ]
+        },
+        {
+          "issue_id": "applicable_deductible",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "5000",
+          "actual_value": "5000",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_b_deductible.txt' lines 5-6.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Verbatim quote not found in lines 5-6 of 'endorsement_e18_b_deductible.txt'.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 5-5.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Verbatim quote not found in lines 4-4 of 'broker_note_september.txt'.",
+              "doc_id": "broker_note_september.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Verbatim quote not found in lines 5-6 of 'endorsement_e18_b_deductible.txt'.",
+            "[unverified] Verbatim quote not found in lines 4-4 of 'broker_note_september.txt'."
+          ]
+        }
+      ]
+    },
+    {
+      "run_id": "cov-ctrl-v2-20261123",
+      "packet_id": "CTRL-B08",
+      "tier": "branching",
+      "variant": "deep_agents",
+      "trial": 3,
+      "model_alias": "eval-anthropic",
+      "duration_s": 44.48,
+      "llm_calls": 7,
+      "tool_calls": 17,
+      "tools_called": [
+        "list_packet_documents",
+        "task",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "list_packet_documents",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section",
+        "read_document_section"
+      ],
+      "model_ids_requested": [
+        "eval-anthropic"
+      ],
+      "model_ids_responded": [
+        "eval-anthropic"
+      ],
+      "prompt_tokens": 36591,
+      "completion_tokens": 7539,
+      "total_tokens": 44130,
+      "cost_usd": 0.222858,
+      "error": null,
+      "doc_reads": [
+        {
+          "tool": "list_packet_documents",
+          "count": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_note_september.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "site_schedule_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "incident_report_harbor.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_b_deductible.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_02_theft.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_a_theft.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "issuance_register_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "list_packet_documents",
+          "count": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "site_schedule_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "incident_report_harbor.txt",
+          "start_line": 1,
+          "end_line": 7
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_a_theft.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "endorsement_e18_b_deductible.txt",
+          "start_line": 1,
+          "end_line": 6
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "broker_note_september.txt",
+          "start_line": 1,
+          "end_line": 4
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "policy_section_02_theft.txt",
+          "start_line": 1,
+          "end_line": 5
+        },
+        {
+          "tool": "read_document_section",
+          "doc_id": "issuance_register_2026.txt",
+          "start_line": 1,
+          "end_line": 4
+        }
+      ],
+      "brief": {
+        "packet_id": "CTRL-B08",
+        "issues": [
+          {
+            "issue_id": "theft_coverage_applicability",
+            "outcome": "applies",
+            "determining_value": "applies",
+            "controlling_doc_ids": [
+              "policy_section_02_theft.txt",
+              "endorsement_e18_a_theft.txt",
+              "site_schedule_2026.txt",
+              "incident_report_harbor.txt",
+              "issuance_register_2026.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "policy_section_02_theft.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Loss or damage caused by Theft is EXCLUDED unless expressly added by executed site endorsement.",
+                "claim_supported": "The base form excludes theft unless added by an executed site endorsement.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft excluded by default",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 2,
+                "line_end": 2,
+                "verbatim_quote": "Status: EXECUTED & COUNTERSIGNED",
+                "claim_supported": "Endorsement E18-A is executed and countersigned.",
+                "subject": "Harborline Maritime LLC",
+                "value": "EXECUTED & COUNTERSIGNED",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Effective Date: 2026-01-01",
+                "claim_supported": "E18-A is effective 2026-01-01, before the date of loss.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-01-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A adds Theft coverage at site HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft covered at HBR-4",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "site_schedule_2026.txt",
+                "line_start": 3,
+                "line_end": 3,
+                "verbatim_quote": "Site HBR-4: Harbor (400 Pier Rd, Terminal East)",
+                "claim_supported": "Harbor is site HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Harbor = HBR-4",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "Incident Location: Harbor",
+                "claim_supported": "The loss occurred at Harbor.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Harbor",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Actual Date of Loss: 2026-08-27",
+                "claim_supported": "The loss occurred on 2026-08-27.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "policy_section_02_theft.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "Policy Period: 2026-01-01 to 2027-01-01",
+                "claim_supported": "The date of loss falls within the policy period.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-01-01 to 2027-01-01",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "issuance_register_2026.txt",
+                "line_start": 4,
+                "line_end": 4,
+                "verbatim_quote": "E18-B does NOT alter or revoke Theft coverage applicability granted under E18-A.",
+                "claim_supported": "E18-B does not revoke the theft coverage granted by E18-A.",
+                "subject": "Harborline Maritime LLC",
+                "value": "Theft coverage not revoked",
+                "polarity": "negated"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B (endorsement_e18_b_deductible.txt) changes only the deductible and expressly does not change Theft coverage applicability, so it does not displace E18-A's grant. The base-form theft exclusion is overridden at HBR-4 by the executed E18-A site endorsement.",
+            "missing_record_needed": ""
+          },
+          {
+            "issue_id": "applicable_deductible",
+            "outcome": "applies",
+            "determining_value": "$5,000",
+            "controlling_doc_ids": [
+              "endorsement_e18_a_theft.txt",
+              "endorsement_e18_b_deductible.txt",
+              "incident_report_harbor.txt"
+            ],
+            "citations": [
+              {
+                "doc_id": "endorsement_e18_a_theft.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Adds Theft coverage specifically at site HBR-4 with a $5,000 deductible per occurrence.",
+                "claim_supported": "E18-A sets a $5,000 per-occurrence theft deductible at HBR-4.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$5,000",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "endorsement_e18_b_deductible.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "replacing $5,000 with $12,000 strictly for losses occurring on or after 2026-09-01. Does not apply retroactively to losses occurring prior to 2026-09-01",
+                "claim_supported": "E18-B's $12,000 deductible applies only to losses on or after 2026-09-01 and is not retroactive.",
+                "subject": "Harborline Maritime LLC",
+                "value": "$12,000 only for losses on or after 2026-09-01",
+                "polarity": "negated"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 5,
+                "line_end": 5,
+                "verbatim_quote": "Actual Date of Loss: 2026-08-27",
+                "claim_supported": "The loss occurred 2026-08-27, before E18-B's effective date, so the $5,000 deductible controls.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-08-27",
+                "polarity": "affirmed"
+              },
+              {
+                "doc_id": "incident_report_harbor.txt",
+                "line_start": 6,
+                "line_end": 6,
+                "verbatim_quote": "Date Reported: 2026-09-05",
+                "claim_supported": "The report date of 2026-09-05 is not the operative date; E18-B turns on date of loss.",
+                "subject": "Harborline Maritime LLC",
+                "value": "2026-09-05",
+                "polarity": "affirmed"
+              }
+            ],
+            "superseded_or_out_of_scope": "E18-B ($12,000 deductible, effective 2026-09-01) is out of scope because it applies only to losses occurring on or after 2026-09-01 and is not retroactive. broker_note_september.txt is an informal summary tying the $12,000 deductible to the September report date; it does not bind coverage and is not controlling.",
+            "missing_record_needed": ""
+          }
+        ],
+        "rationale": "All documents name Harborline Maritime LLC under Policy SYN-2026-8808. Theft is excluded by default but restored at HBR-4 (Harbor) by executed E18-A, effective before the 2026-08-27 loss and within the policy period. E18-B changes the deductible to $12,000 only for losses on or after 2026-09-01 and does not revoke theft coverage. The loss date precedes that date, so E18-A's $5,000 per-occurrence deductible controls. The report date and the broker note do not change this. No signature pages or declarations page are in the packet, but neither affects either conclusion."
+      },
+      "scorer_version": "v3_issue",
+      "packet_id_ok": true,
+      "duplicate_issue_ids": [],
+      "unexpected_issue_ids": [],
+      "passed": false,
+      "issues_passed": 0,
+      "issues_total": 2,
+      "false_definitive_on_insufficient": false,
+      "issue_results": [
+        {
+          "issue_id": "theft_coverage_applicability",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "applies",
+          "actual_value": "applies",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": true,
+          "scope_ok": true,
+          "dates_ok": true,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_02_theft.txt' lines 5-5.",
+              "doc_id": "policy_section_02_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 2-2.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 5-5.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'site_schedule_2026.txt' lines 3-3.",
+              "doc_id": "site_schedule_2026.txt"
+            },
+            {
+              "verdict": "unverified",
+              "reason": "Heading-only span (lines 4-4) on 'incident_report_harbor.txt' does not substantiate coverage claim.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 5-5.",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'policy_section_02_theft.txt' lines 4-4.",
+              "doc_id": "policy_section_02_theft.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope.",
+              "doc_id": "issuance_register_2026.txt"
+            }
+          ],
+          "reasons": [
+            "[unverified] Heading-only span (lines 4-4) on 'incident_report_harbor.txt' does not substantiate coverage claim.",
+            "[contradicted] Actor/entity mismatch on 'issuance_register_2026.txt': subject 'Harborline Maritime LLC' does not match document scope."
+          ]
+        },
+        {
+          "issue_id": "applicable_deductible",
+          "passed": false,
+          "omitted": false,
+          "outcome_correct": true,
+          "expected_outcome": "applies",
+          "actual_outcome": "applies",
+          "value_correct": true,
+          "expected_value": "5000",
+          "actual_value": "5000",
+          "false_definitive_on_insufficient": false,
+          "controlling_docs_ok": true,
+          "propositions_ok": false,
+          "scope_ok": true,
+          "dates_ok": false,
+          "missing_record_ok": true,
+          "citations_grounded": false,
+          "citation_verdicts": [
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_a_theft.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_a_theft.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'endorsement_e18_b_deductible.txt' lines 6-6.",
+              "doc_id": "endorsement_e18_b_deductible.txt"
+            },
+            {
+              "verdict": "contradicted",
+              "reason": "Numeric value(s) ['5000'] not supported by lines 5-5 of 'incident_report_harbor.txt' (source values: ['2026']).",
+              "doc_id": "incident_report_harbor.txt"
+            },
+            {
+              "verdict": "supported",
+              "reason": "Typed relationships, dates, values, scope, and polarity grounded in 'incident_report_harbor.txt' lines 6-6.",
+              "doc_id": "incident_report_harbor.txt"
+            }
+          ],
+          "reasons": [
+            "[contradicted] Numeric value(s) ['5000'] not supported by lines 5-5 of 'incident_report_harbor.txt' (source values: ['2026']).",
+            "Missing required verified source proposition on 'incident_report_harbor.txt' (pattern: 'actual\\\\s+date\\\\s+of\\\\s+loss.*2026-08-27').",
+            "Missing required verified date span(s): ['2026-08-27']"
+          ]
+        }
+      ]
+    }
+  ]
+}

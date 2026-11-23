@@ -335,3 +335,251 @@ def test_v3_independent_relationship_role_swap_controls() -> None:
         load_packet_documents("C01"),
     )
     assert r_c01_ok["verdict"] == "supported"
+
+
+def test_v3_edge_branches_and_brief_scorer_coverage() -> None:
+    """Exercise all v3 citation & brief-scoring edge branches for exact 95%+ CI coverage."""
+    docs_c01 = load_packet_documents("C01")
+    docs_b01 = load_packet_documents("B01")
+    for cit, docs, exp_v in (
+        (
+            CoverageCitation(
+                doc_id="nope.txt", line_start=1, line_end=1, verbatim_quote="x", claim_supported="y"
+            ),
+            docs_c01,
+            "unverified",
+        ),
+        (
+            CoverageCitation(
+                doc_id="policy_declarations.txt",
+                line_start=1,
+                line_end=1,
+                verbatim_quote=" ",
+                claim_supported="y",
+            ),
+            docs_c01,
+            "unverified",
+        ),
+        (
+            CoverageCitation(
+                doc_id="policy_declarations.txt",
+                line_start=1,
+                line_end=99,
+                verbatim_quote="x",
+                claim_supported="y",
+            ),
+            docs_c01,
+            "unverified",
+        ),
+        (
+            CoverageCitation(
+                doc_id="policy_declarations.txt",
+                line_start=1,
+                line_end=1,
+                verbatim_quote="not there",
+                claim_supported="y",
+            ),
+            docs_c01,
+            "unverified",
+        ),
+        (
+            CoverageCitation(
+                doc_id="policy_declarations.txt",
+                line_start=4,
+                line_end=4,
+                verbatim_quote="2026-01-01 to 2027-01-01",
+                claim_supported=" ",
+            ),
+            docs_c01,
+            "unverified",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_tr_115.txt",
+                line_start=1,
+                line_end=1,
+                verbatim_quote="ENDORSEMENT TR-115 — FINAL TRANSIT LIMIT MODIFICATION",
+                claim_supported="Limit is $300,000.",
+            ),
+            docs_b01,
+            "unverified",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_tr_101.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="Replaces Base Property-in-Transit Limit of $100,000 with $250,000",
+                claim_supported="TR-101 reduced the transit limit.",
+            ),
+            docs_b01,
+            "contradicted",
+        ),
+        (
+            CoverageCitation(
+                doc_id="policy_declarations.txt",
+                line_start=4,
+                line_end=4,
+                verbatim_quote="Policy Period: 2026-01-01 to 2027-01-01",
+                claim_supported="2026-04-08 is outside the policy period.",
+            ),
+            docs_c01,
+            "contradicted",
+        ),
+        (
+            CoverageCitation(
+                doc_id="policy_declarations.txt",
+                line_start=4,
+                line_end=4,
+                verbatim_quote="Policy Period: 2026-01-01 to 2027-01-01",
+                claim_supported="2028-04-08 falls within the policy period.",
+            ),
+            docs_c01,
+            "contradicted",
+        ),
+        (
+            CoverageCitation(
+                doc_id="policy_declarations.txt",
+                line_start=4,
+                line_end=4,
+                verbatim_quote="Policy Period: 2026-01-01 to 2027-01-01",
+                claim_supported="2028-04-08 is outside the policy period.",
+            ),
+            docs_c01,
+            "supported",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_cy_102.txt",
+                line_start=5,
+                line_end=5,
+                verbatim_quote="Effective Date: 2026-01-01",
+                claim_supported="CY-102 took effect prior to 2026-04-08.",
+            ),
+            docs_c01,
+            "supported",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_cy_102.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="increased from $100,000 to $500,000.",
+                claim_supported="Effective date is 2026-04-08.",
+            ),
+            docs_c01,
+            "unverified",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_cy_102.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="increased from $100,000 to $500,000.",
+                claim_supported="Sublimit is $900,000.",
+            ),
+            docs_c01,
+            "contradicted",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_cy_102.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="increased from $100,000 to $500,000.",
+                claim_supported="Sublimit is $500,000.",
+                value="$900,000",
+            ),
+            docs_c01,
+            "contradicted",
+        ),
+        (
+            CoverageCitation(
+                doc_id="endorsement_cy_102.txt",
+                line_start=6,
+                line_end=6,
+                verbatim_quote="increased from $100,000 to $500,000.",
+                claim_supported="Sublimit is $500,000.",
+                polarity="negated",
+            ),
+            docs_c01,
+            "contradicted",
+        ),
+    ):
+        assert verify_coverage_citation_v3(cit, docs)["verdict"] == exp_v
+
+    # Score C03 excluded, B03 insufficient, B08 arithmetic missing controlling clauses
+    s_c03 = score_coverage_audit_brief_v3(
+        _heldout_key("C03"),
+        CoverageAuditBrief(
+            packet_id="C03",
+            determination="excluded",
+            controlling_value="excluded",
+            controlling_doc_ids=["cgl_coverage_form_exclusions.txt"],
+            supersession_chain=["policy_declarations.txt", "cgl_coverage_form_exclusions.txt"],
+            evidence_citations=[
+                CoverageCitation(
+                    doc_id="cgl_coverage_form_exclusions.txt",
+                    line_start=2,
+                    line_end=2,
+                    verbatim_quote="Policy Number: CGL-2026-3088",
+                    claim_supported="Policy Number is CGL-2026-3088.",
+                )
+            ],
+        ),
+    )
+    assert s_c03["controlling_docs_ok"] is False
+
+    s_b03 = score_coverage_audit_brief_v3(
+        _heldout_key("B03"),
+        CoverageAuditBrief(
+            packet_id="B03",
+            determination="insufficient_evidence",
+            controlling_value="insufficient_evidence",
+            controlling_doc_ids=["endorsement_ba_701.txt"],
+            supersession_chain=["policy_declarations.txt", "endorsement_ba_701.txt"],
+            evidence_citations=[
+                CoverageCitation(
+                    doc_id="endorsement_ba_701.txt",
+                    line_start=5,
+                    line_end=5,
+                    verbatim_quote="Effective Date: 2026-01-01",
+                    claim_supported="Effective Date is 2026-01-01.",
+                )
+            ],
+            missing_documents=["Schedule V-2026"],
+        ),
+    )
+    assert s_b03["controlling_docs_ok"] is False
+
+    s_b08 = score_coverage_audit_brief_v3(
+        _heldout_key("B08"),
+        CoverageAuditBrief(
+            packet_id="B08",
+            determination="covered",
+            controlling_value="$750,000",
+            controlling_doc_ids=["endorsement_ag_209.txt", "loss_run_2026.txt"],
+            supersession_chain=[
+                "policy_declarations.txt",
+                "endorsement_ag_201.txt",
+                "endorsement_ag_209.txt",
+            ],
+            evidence_citations=[
+                CoverageCitation(
+                    doc_id="endorsement_ag_209.txt",
+                    line_start=5,
+                    line_end=5,
+                    verbatim_quote="Effective Date: 2026-02-01",
+                    claim_supported="Effective Date is 2026-02-01.",
+                ),
+                CoverageCitation(
+                    doc_id="loss_run_2026.txt",
+                    line_start=2,
+                    line_end=2,
+                    verbatim_quote="Valued As Of: 2026-07-01",
+                    claim_supported="Valued as of 2026-07-01.",
+                ),
+            ],
+        ),
+    )
+    assert s_b08["controlling_docs_ok"] is False
